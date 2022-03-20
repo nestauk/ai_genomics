@@ -1,0 +1,5 @@
+# Change these at your peril:
+export PROJECT_OPENNESS=public
+export PROJECT_NAME=ai_genomics
+export REPO_NAME=ai_genomics
+export GITHUB_ACCOUNT=nestauk
