@@ -50,4 +50,4 @@ Fortunately, instuitutions come with a GRID ID as a variable, so this shouldn't 
 
 ## Other: Known Issues
 
-OpenAlex have a page detailing their [known issues](), none of which look like 'breaking' issues.
+OpenAlex have a page detailing their [known issues](https://docs.openalex.org/known-issues), none of which look like 'breaking' issues.
