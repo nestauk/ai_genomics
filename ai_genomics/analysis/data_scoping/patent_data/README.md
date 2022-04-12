@@ -31,4 +31,5 @@ some open source data instead.
 They have good coverage (patent offices across the world), 
 you can get the location of the patent holder, and they also have 
 a rough estimate of the ‘market value’ of the patent in USD which is interesting. 
-The patent search and selection happens primarily with keyword queries.```
+The patent search and selection happens primarily with keyword queries.
+```
