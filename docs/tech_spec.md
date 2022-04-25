@@ -6,7 +6,7 @@ author:
   - "Juan Mateos-Garcia"
   - "Jack Vines"
 date:
-  - 25 April 2022
+  - "25 April 2022"
 figPrefix:
   - "Figure"
   - "Figures"
@@ -49,7 +49,7 @@ We distinguish between core project activities and stretch goals.
 
 At its core, the project will create a novel dataset about AI and genomics R&D that we will analyse in order to map its landscape. In order to do this, we will collect, enrich and analyse data about research, technology development and business activities and enrich it with information about the geography and character of actors (e.g. researchers, inventors, entrepreneurs) participating in AI genomics R&D and the purpose and influence (e.g. citations, social media reach) of their R&D activities.
 
-We will analyse these data with Natural Language Processing (NPL) and machine learning methods. This will help us tag projects / patents / companies with categories of interest such as the disease areas they target, measure the composition of AI genomics R&D (e.g. key research themes and technological trajectores) and identify emerging trends that might be of particular interest to the project. This will also help us create and compare the specialisation profiles of different countries / actors / types of actors (e.g. private sector vs academic researchers). Where possible we will benchmark the situation in AI genomics R&D vs. the wider field of genomics.
+We will analyse these data with Natural Language Processing (NLP) and machine learning methods. This will help us tag projects / patents / companies with categories of interest such as the disease areas they target, measure the composition of AI genomics R&D (e.g. key research themes and technological trajectories) and identify emerging trends that might be of particular interest to the project. This will also help us create and compare the specialisation profiles of different countries / actors / types of actors (e.g. private sector vs academic researchers). Where possible we will benchmark the situation in AI genomics R&D vs. the wider field of genomics.
 
 As stretch goals, we will explore:
 
@@ -69,10 +69,10 @@ Having done this we outline potential methods to analyse these data.
 We include open research activities in this project for three reasons:
 
 1. Research (in particular preprints) is likely to provide a timelier indicator of current and emerging trends in AI genomics than laggy patent and business activity data.
-2. Earlier-stage, emerging trends that might be relevant in the future are more likely to be present in research data than other sources that tell us about the techniques that are beign applied today.
+2. Earlier-stage, emerging trends that might be relevant in the future are more likely to be present in research data than other sources that tell us about the techniques that are being applied today.
 3. There are strong traditions of open publishing in genomics and AI research
 
-We recognise that publication data would, on its own, provide a skewed view of the situation and evolution of AI genomics R&D (e.g. not helping to distinguish between theoretical and applied activities, and missing R&D activities that business choose not to publish for commercial reasons). We will address these gaps by incorporating patent and business data into the project.
+We recognise that publication data would, on its own, provide a skewed view of the situation and evolution of AI genomics R&D (e.g. not helping to distinguish between theoretical and applied activities, and missing R&D activities that businesses choose not to publish for commercial reasons). We will address these gaps by incorporating patent and business data into the project.
 
 #### Collection
 
@@ -86,27 +86,27 @@ We will use [OpenAlex](https://www.openalex.org) as our core research data sourc
 
 OpenAlex is a new database but current discussions suggest that it is the best open dataset available, and that _it's coverage and accuracy_ is already comparable to established players such as Scopus or Dimensions.
 
-The main ways of interacting with the dataset are via the API, or through database snapshots. We currently envisage downloading the most recent snapshot (200GB) and storing it as collection of tables for analysis.
+The main ways of interacting with the dataset are via the API, or through database snapshots. We currently envisage downloading the most recent snapshot (200GB) and storing it as a collection of tables for analysis.
 
-We will identify papers related to AI and genomics through their `Concepts`, which are keywords assigned to the data based on a text analysis of their abstract. A preliminary exploration of the data has revealed around 400,000 papers with the `Genome` concept and `37,000` papers with the `Genome` and `Computer Science` concepts. One important task at the beginning of the project will be to generate a list of concepts that capture the field of AI & Genomics.
+We will identify papers related to AI and genomics through their `concepts`, which are keywords assigned to the data based on a text analysis of their abstract. A preliminary exploration of the data has revealed around 400,000 papers with the `Genome` concept and `37,000` papers with the `Genome` and `Computer Science` concepts. One important task at the beginning of the project will be to generate a list of concepts that capture the field of AI & Genomics.
 
 #### Processing
 
 Having collected the OpenAlex dataset, we will enrich it in the following days:
 
-- Add intitutional metadata: The institutional affiliations to OpenAlex paper include a `GRID` identifier which make it possible to enrich those institutions with metadata from [GRID](https://www.grid.ac/) (Global Research Indentifier Database), such as an institution's location at various levels of geographical resolution and its character (whether it is an educational institution, a private sector organisation, a hospital, a government agency etc.)
+- Add institutional metadata: The institutional affiliations to OpenAlex paper include a `GRID` identifier which make it possible to enrich those institutions with metadata from [GRID](https://www.grid.ac/) (Global Research Identifier Database), such as an institution's location at various levels of geographical resolution and its character (whether it is an educational institution, a private sector organisation, a hospital, a government agency, etc.)
 - Add citation data: We will collect information about the citations in a paper and the citations that it has received using [Semantic Scholar](https://www.semanticscholar.org/), a platform that uses AI to advance scientific discovery. Semantic Scholar data can be accessed by querying its API with a document identifier (which we will obtain from OpenAlex). Citation data will help us proxy a paper's influence in the academic community, and to measure the bodies of knowledge that a paper builds on (e.g. does the paper mostly cite AI research, or research from the biological sciences, does it cite particular databases, does it cite papers from the Humanities suggesting that it takes into account ethical issues?).
 - Add social influence engagement information (stretch goal): We could use [Crossref Event](https://www.crossref.org/services/event-data/) to measure level of public engagement with research publications in a variety of venues such as Twitter, Wikipedia, Reddit or WordPress. Crossref offers an [open API](https://www.eventdata.crossref.org/guide/) that can be queried with a paper's DOI (Digital Object Identifier) in order to obtain links to its social media engagements. We note that the actual content of an article's social engagements require additional data collection from its primary sources (e.g. querying the Twitter API), which we see as out of scope for this project. Here, we would simply generate an indicator with the number of social media engagements that an article has received, a proxy of public interest in it.
 
 ### Patent data
 
-Patents can helps us measure how particular AI genomics methods are being transformed into practical applications / technologies.
+Patents can help us measure how particular AI genomics methods are being transformed into practical applications / technologies.
 
 #### Collection
 
 Having scoped a range of data sources (see [online annex](https://github.com/nestauk/ai_genomics/blob/22_spec/docs/tech_spec.md)), we currently believe that the current pipeline for patent data collection and enrichment is particularly promising:
 
-1. Use the USPTO (US Patent and Trademark Office ) [Artifical Intelligence Patent Dataset](https://www.uspto.gov/ip-policy/economic-research/research-datasets/artificial-intelligence-patent-dataset), a database of AI patents filed with the USPTO, to identify AI patents.
+1. Use the USPTO (US Patent and Trademark Office ) [Artificial Intelligence Patent Dataset](https://www.uspto.gov/ip-policy/economic-research/research-datasets/artificial-intelligence-patent-dataset), a database of AI patents filed with the USPTO, to identify AI patents.
 2. Query the USPTO API to collect additional information about those patents and label as "genomics" those with IPC (International Patent Classification) codes related to genomics or research in the biological sciences.
 3. Optionally: Collect additional information about those patents from [Lens](https://www.lens.org/), a public resource about global patents and research knowledge which includes information about the institutions related to a patent. We could fuzzy-match these institutions with GRID in order to obtain their location and type of institution.
 
@@ -128,11 +128,11 @@ We will use [CrunchBase](https://www.crunchbase.com/), a database with informati
 
 We have also considered / have access to other data sources which might be relevant for the project but that we perceive, at this point, as "stretch goals" rather than core priorities. They include:
 
-- Public funding data: We have relatively easy access to public funding data from the UK ([Gateway to Research](https://gtr.ukri.org/), EU ([CORDIS](https://cordis.europa.eu/)) and the US ([NIH Reporter](https://reporter.nih.gov/)). It would be possible to analyse these data to measure levels of public support for AI genomics research and its topical focus but there are some fixed costs in ingesting and harmonising them and implementing robust definitons of AI and Genomics through a bottom-up analysis of grant descriptions / abstracts. One option would be to carry out a quantitative case study of the evolution and composition of public funding for AI genomics in the UK using the GtR data as we are particularly familiar with this source and it could be specially relevant for the project.
+- Public funding data: We have relatively easy access to public funding data from the UK ([Gateway to Research](https://gtr.ukri.org/), EU ([CORDIS](https://cordis.europa.eu/)) and the US ([NIH Reporter](https://reporter.nih.gov/)). It would be possible to analyse these data to measure levels of public support for AI genomics research and its topical focus but there are some fixed costs in ingesting and harmonising them and implementing robust definitions of AI and Genomics through a bottom-up analysis of grant descriptions / abstracts. One option would be to carry out a quantitative case study of the evolution and composition of public funding for AI genomics in the UK using the GtR data as we are particularly familiar with this source and it could be specially relevant for the project.
 - AI software and datasets: [Papers With Code](https://paperswithcode.com/) is a crowd / machine sourced platform that links AI papers to the GitHub repositories where they store their software code, and to the datasets that we used. In principle, we could use it to measure the availability of software to implement AI genomics methods, another proxy for their "technological readiness". A preliminary analysis of this data source revealed few papers / datasets of interest to the project (~100 papers, 30 datasets mentioning genomics in their description).
 - Open source software: There are ca. [1700 GitHub code repositories](https://github.com/topics/genomics) tagged with the `genomics` label, and [79,800 machine lerning repositories](https://github.com/topics/genomics). We could use the GitHub API to extract data about these repositories and analyse their content. Restrictions in the GitHub API rates mean that this would be a time-intensive task.
 - [DrugBank](https://go.drugbank.com/) is a database with detailed information about drugs, their mechanisms, their interactions, and their protein targets. In principle we could analyse it in order to identify drugs / projects / analyses e.g. of pharmacogenomics (interactions between a drug and genome) that use machine learning methods but this would only capture one dimension of AI genomics and would require a significant investment in collecting, exploring and understanding the data.
-- [Scite.ai](https://scite.ai/) is a tool that offers in-depth analysis of the citations received by a research article, including whether they are "supportive" or "contrasting". Although this dataset could help us to understand in more detail the network structure of AI genomics and the degree of consensus or disagreement between its constituent communities, we would need to license the data and spend a significant amount of time becoming familiar with it.
+- [Scite.ai](https://scite.ai/) is a tool that offers in-depth analysis of the citations received by a research article, including whether they are "supportive" or "contrasting". Although this dataset could help us to understand in more detail the network structure of AI genomics and the degree of consensus or disagreement between its constituent communities, we would need to licence the data and spend a significant amount of time becoming familiar with it.
 
 ## Analysis
 
@@ -180,21 +180,19 @@ The project outputs are:
 
 We propose to organise the project using an agile approach with the following features:
 
-- We will create a product backlog with use cases ranked by priority. The use cases will capture research questions we want to address / analytical outputs we want to generate which are decomposed into tasks (e.g. collecting specific datasets, enriching them, performing exploratory analyses and modelling, addressing research questions, carrying out robustness tests, writing up results etc.).
-- Prioritisation is a joint effort between key project stakeholders (Ada Lovelace Institute, Nuffield Council for Bioethics, AI Genomics Futures advisory board) and the Nesta Development team. Juan Mateos-Garcia will be the main liason between both groups, acting as "product manager".
+- We will create a product backlog with use cases ranked by priority. The use cases will capture research questions we want to address / analytical outputs we want to generate. Use cases are decomposed into tasks (e.g. collecting specific datasets, enriching them, performing exploratory analyses and modelling, addressing research questions, carrying out robustness tests, writing up results etc.) which we log as issues in the project GitHub repository.
+- Prioritisation between use cases / tasks / issues is a joint effort between key project stakeholders (Ada Lovelace Institute, Nuffield Council for Bioethics, AI Genomics Futures advisory board) and the Nesta Development team. Juan Mateos-Garcia will be the main liaison between both groups, acting as "product manager".
 - The basic unit of activity in the project is a two-week sprint, where the team selects and pursues top use cases from the product backlog agreed with key stakeholders. The sprint includes regular internal meetings to assess progress and an end-of-sprint review meeting with potential participation from key project stakeholders (although it might be more practical to involve stakeholders at the end of each project epic, see below for additional information).
 
 ## Timelines
 
-We propose to group the sprints into three epics each of which consists of a number of Development and Delivery (D&D) sprints where we address use cases, and a refactoring and reporting (R&R) sprint where we clean and document the code and write up results.
+We propose to group the sprints into three "epics" generating subsequently more polished and detailed versions of the final product (report). The tables below summarise the content of each epic and provide a gantt chart for the project:
 
-The tables below summarise the content of each epic and provide a gantt chart for the project:
-
-| Epic                                           | Content                                                                                                                                                                                                                                                                                                                             | Duration                        |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| 1. Data collection, processing and exploration | In this epic, we create the core datasets for the project and start their exploratory analysis. The working product at the end of the epic is the data sources section of the report and the results of exploratory analyses that help us assess data quality, identify key trends and identify opportunities to follow-on analysis | 3 D&D sprints and 1 R&R sprint. |
-| 2. Analysis and modelling                      | In this epic, we analyse the core datasets for the project. The working product at the end of the epic is the methodology and findings section of the report addressing core questions for the project                                                                                                                              | 2 D&D sprints and 1 R&R sprint  |
-| 3. Stretch goals and contingency sprint        | In this epic, we polish existing analyses and pursue stretch goals. It also provides some contingency time. The working product at the end of the epic is the final project report.                                                                                                                                                 | 1 D&D sprint and 1 R&R sprint   |
+| Epic                                           | Content                                                                                                                                                                                                                                                                                                                             | Sprint (n) |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: |
+| 1. Data collection, processing and exploration | In this epic, we create the core datasets for the project and start their exploratory analysis. The working product at the end of the epic is the data sources section of the report and the results of exploratory analyses that help us assess data quality, identify key trends and identify opportunities to follow-on analysis |     4      |
+| 2. Analysis and modelling                      | In this epic, we analyse the core datasets for the project. The working product at the end of the epic is the methodology and findings section of the report addressing core questions for the project                                                                                                                              |     3      |
+| 3. Stretch goals and contingency sprint        | In this epic, we polish existing analyses and pursue stretch goals. It also provides some contingency time. The working product at the end of the epic is the final project report.                                                                                                                                                 |     2      |
 
 ![Project Gantt chart](ai_genomics_gantt.png)
 
@@ -205,5 +203,10 @@ Assuming that the project starts on the 16/5/2022, this would mean that...
 - Final report, data and code are available on w/c 12/9/2022.
 
 ## Budget
+
+The table below presents the budget for the project. The project team will include:
+
+- Data engineers: Jack Vines (Senior Engineering Lead) and Samuel Doogan (Full-stack developer)
+- Data scientists: Juan Mateos-Garcia (Director), George Richardson (Head of Data Science), India Kerle (Junior Data Scientist)
 
 ![Project budget](ai_genomics_budget.png)
