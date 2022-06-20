@@ -29,11 +29,10 @@ def api_generator(api_root: str, concept_ids: list) -> list:
     """
     concepts_text = "|".join(concept_ids)
     page_one = f"{api_root}concepts.id:{concepts_text}"
-    print(page_one)
     total_results = requests.get(page_one).json()["meta"]["count"]
     number_of_pages = -(total_results // -200)  # ceiling division
     all_pages = [
-        f"{API_ROOT}concepts.id:{CONCEPT_IDS[0]}&per-page=200&cursor="
+        f"{API_ROOT}concepts.id:{concepts_text}&per-page=200&cursor="
         for i in range(1, number_of_pages + 1)
     ]
     return all_pages
@@ -60,15 +59,15 @@ class OpenAlexWorksFlow(FlowSpec):
             self.api_call_list = api_generator(API_ROOT, CONCEPT_IDS)
         self.next(self.retrieve_data)
 
-    @batch(cpu=2, memory=32000)
+    @batch(cpu=2, memory=48000)
     @step
     def retrieve_data(self):
         """Returns all results of the API hits"""
         self.outputs = []
         cursor = "*"  # cursor iteration required to return >10k rsults
         for call in self.api_call_list:
-            req = requests.get(f"{call}{cursor}").json()
             try:
+                req = requests.get(f"{call}{cursor}").json()
                 for result in req["results"]:
                     self.outputs.append(result)
                 cursor = req["meta"]["next_cursor"]
