@@ -6,7 +6,7 @@ author:
   - "Juan Mateos-Garcia"
   - "Jack Vines"
 date:
-  - "25 April 2022"
+  - "11 May 2022"
 figPrefix:
   - "Figure"
   - "Figures"
@@ -47,16 +47,18 @@ Section 3 sets out how we propose to deliver the project including its outputs, 
 
 We distinguish between core project activities and stretch goals.
 
-At its core, the project will create a novel dataset about AI and genomics R&D that we will analyse in order to map its landscape. In order to do this, we will collect, enrich and analyse data about research, technology development and business activities and enrich it with information about the geography and character of actors (e.g. researchers, inventors, entrepreneurs) participating in AI genomics R&D and the purpose and influence (e.g. citations, social media reach) of their R&D activities.
+At its core, the project will create a novel dataset about AI and genomics R&D that we will analyse in order to map its landscape. In order to do this, we will collect, enrich and analyse data about research, technology development and business activities and enrich it with information about the geography and character of actors (e.g. researchers, inventors, entrepreneurs) participating in AI genomics R&D and the purpose and influence (e.g. citations, social media reach) of their R&D activities. 
 
 We will analyse these data with Natural Language Processing (NLP) and machine learning methods. This will help us tag projects / patents / companies with categories of interest such as the disease areas they target, measure the composition of AI genomics R&D (e.g. key research themes and technological trajectories) and identify emerging trends that might be of particular interest to the project. This will also help us create and compare the specialisation profiles of different countries / actors / types of actors (e.g. private sector vs academic researchers). Where possible we will benchmark the situation in AI genomics R&D vs. the wider field of genomics.
 
 As stretch goals, we will explore:
 
-- Additional data sources
 - How to integrate all the datasets we are collecting in a consistent taxonomy that makes it possible to unify their analysis,
+- Additional data sources,
 - Experimental indicators capturing novelty, diversity and interdisciplinarity in AI genomics R&D and,
 - Models to explain and predict outcomes of interest.
+
+In terms of temporal coverage, we will focus our analysis on the last decade, noting that the deep learning techniques underpinning modern AI systems only started being widely adopted since ca. 2012. Having said this, all the datasets we are using go further back, enabling longer-term analyses of R&D trends if those are perceived to be relevant for the project.
 
 In the next subsection we highlight key data streams for the project: the data we plan to collect, how we will identify AI and genomics R&D in it and how we will enrich it.
 
@@ -132,7 +134,7 @@ We have also considered / have access to other data sources which might be relev
 - AI software and datasets: [Papers With Code](https://paperswithcode.com/) is a crowd / machine sourced platform that links AI papers to the GitHub repositories where they store their software code, and to the datasets that we used. In principle, we could use it to measure the availability of software to implement AI genomics methods, another proxy for their "technological readiness". A preliminary analysis of this data source revealed few papers / datasets of interest to the project (~100 papers, 30 datasets mentioning genomics in their description).
 - Open source software: There are ca. [1700 GitHub code repositories](https://github.com/topics/genomics) tagged with the `genomics` label, and [79,800 machine lerning repositories](https://github.com/topics/genomics). We could use the GitHub API to extract data about these repositories and analyse their content. Restrictions in the GitHub API rates mean that this would be a time-intensive task.
 - [DrugBank](https://go.drugbank.com/) is a database with detailed information about drugs, their mechanisms, their interactions, and their protein targets. In principle we could analyse it in order to identify drugs / projects / analyses e.g. of pharmacogenomics (interactions between a drug and genome) that use machine learning methods but this would only capture one dimension of AI genomics and would require a significant investment in collecting, exploring and understanding the data.
-- [Scite.ai](https://scite.ai/) is a tool that offers in-depth analysis of the citations received by a research article, including whether they are "supportive" or "contrasting". Although this dataset could help us to understand in more detail the network structure of AI genomics and the degree of consensus or disagreement between its constituent communities, we would need to licence the data and spend a significant amount of time becoming familiar with it.
+- [Scite.ai](https://scite.ai/) is a tool that offers in-depth analysis of the citations received by a research article, including whether they are "supportive" or "contrasting". Although this dataset could help us to understand in more detail the network structure of AI genomics and the degree of consensus or disagreement between its constituent communities, we would need to licence the data and potentially spend a significant amount of time becoming familiar with it. In the first part of the project we will explore options to access the data.
 
 ## Analysis
 
@@ -153,7 +155,10 @@ In order to do this, we will leverage a data pipeline being developed at Nesta w
 In addition to extracting named entities from abstracts, we will use other data-driven methods to characterise the composition of AI genomics sub-corpora and identify emerging themes within them. Some potential strategies for this include:
 
 - Topic modelling of article / patent abstracts and company descriptions. This method yields the themes in a corpus (collections of terms that tend to appear in the same documents) and estimates the relative importance (weight) of different topics in each document. We can use this to classify projects into their most important topics (and study the evolution of different topics over time), measure overlap between topics and calculate sophisticated indicators of research interdisciplinarity, diversity and novelty (see below for additional details).
+- Analysis of emergence: In the [Innovation Sweetspots project](https://www.nesta.org.uk/data-visualisation-and-interactive/innovation-sweet-spots/?gclid=CjwKCAjwve2TBhByEiwAaktM1J4_ttJAYyygmlXbtKFlnMF_b5AmUiCRoV_RQ6HWCHIODdMKR4BL5xoCNecQAvD_BwE), Nesta researchers have developed methods to identify "emerging topics" around low-carbon heating technologies. Their approach combines measures of volume of activity and measures of acceleration (increasing rates of growth) in a topic to classify it in a set of categories (hot, emerging, dormant, stabilising) (See figure below). We will apply this measurement framework to the analysis of trends in AI in genomics R&D.
 - Document clustering (stretch goal): [Semantic Scholar](https://www.semanticscholar.org/) and [Google Patent Dataset](https://console.cloud.google.com/marketplace/product/google_patents_public_datasets/google-patents-public-data?project=hp-data-dumps) have created vector representations of research paper abstracts and patents. These vector representations capture the "meaning" of those documents in a multidimensional space. We could use them to cluster those documents into semantically similar groups capturing specific research themes / application areas / techniques.
+
+![Typology of technology trends (note that we will be using different data sources to extract signals)](innovation_sweetspots_taxonomy.png)
 
 ### Additional analyses
 
@@ -189,18 +194,18 @@ We propose to organise the project using an agile approach with the following fe
 We propose to group the sprints into three "epics" generating subsequently more polished and detailed versions of the final product (report). The tables below summarise the content of each epic and provide a gantt chart for the project:
 
 | Epic                                           | Content                                                                                                                                                                                                                                                                                                                             | Sprint (n) |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------: |
 | 1. Data collection, processing and exploration | In this epic, we create the core datasets for the project and start their exploratory analysis. The working product at the end of the epic is the data sources section of the report and the results of exploratory analyses that help us assess data quality, identify key trends and identify opportunities to follow-on analysis |     4      |
 | 2. Analysis and modelling                      | In this epic, we analyse the core datasets for the project. The working product at the end of the epic is the methodology and findings section of the report addressing core questions for the project                                                                                                                              |     3      |
 | 3. Stretch goals and contingency sprint        | In this epic, we polish existing analyses and pursue stretch goals. It also provides some contingency time. The working product at the end of the epic is the final project report.                                                                                                                                                 |     2      |
 
-![Project Gantt chart](ai_genomics_gantt.png)
+![Project Gantt chart](ai_genomics_gantt_v2.png)
 
-Assuming that the project starts on the 16/5/2022, this would mean that...
+Assuming that the project starts on the 6/6/2022, this would mean that...
 
-- Description of data sources and descriptive analysis are available on w/c 4/7/2022.
-- Methodology and core findings are available on w/c 15/8/2022
-- Final report, data and code are available on w/c 12/9/2022.
+- Description of data sources and descriptive analysis are available on w/c 25/7/2022.
+- Methodology and core findings are available on w/c 5/9/2022
+- Final report, data and code are available on w/c 3/10/2022.
 
 ## Budget
 
