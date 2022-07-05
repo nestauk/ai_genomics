@@ -1,0 +1,2 @@
+cpc_codes_path: "inputs/patent_data/cpc/"
+genomics_cpc_codes_file: "outputs/patent_data/cpc/genomics_cpc_codes.json"
