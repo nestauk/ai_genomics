@@ -55,6 +55,6 @@ if __name__ == "__main__":
     for cpc_code in cpc_codes_not_empty:
         cpc_code_clean = clean_cpc_code(cpc_code[2])
         if any([code in cpc_code_clean for code in GENOMICS_KEYWORDS]):
-            cpc_genomics_codes[cpc_code[0]] = cpc_code_clean
+            cpc_genomics_codes[cpc_code[0]] = " ".join(cpc_code_clean)
     # save list of codes to s3
     save_to_s3(s3, bucket_name, cpc_genomics_codes, config["genomics_cpc_codes_file"])
