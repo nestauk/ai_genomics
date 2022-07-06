@@ -5,6 +5,10 @@ from typing import Dict, List
 from pandas import DataFrame
 from toolz import pipe, partial
 
+from ai_genomics import get_yaml_config, _base_config_path
+
+CONCEPT_THRES = get_yaml_config(_base_config_path)["concept_threshold"]
+
 
 def deinvert_abstract(inverted_abstract: Dict[str, List]) -> str:
     """Convert inverted abstract into normal abstract
@@ -49,7 +53,7 @@ def enrich_institutions(doc_inst: list, insts_dict: dict, variable: str):
     return [insts_dict[inst][variable] if inst != None else None for inst in doc_inst]
 
 
-def get_concepts(doc: dict, thres: float = 0.5) -> list:
+def get_concepts(doc: dict, thres: float = CONCEPT_THRES) -> list:
     """Create a list of concepts associated with a work
 
     Args:
