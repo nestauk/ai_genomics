@@ -58,7 +58,7 @@ def get_genomics_classification_codes(class_codes: list) -> dict:
 
 if __name__ == "__main__":
 
-    class_code_files = get_s3_dir_files(s3, bucket_name, "inputs/patent_data/")
+    class_code_files = get_s3_dir_files(s3, bucket_name, config["patent_class_codes_path"])
 
     cpc_codes = []
     ipc_codes = []
