@@ -40,10 +40,10 @@ def clean_class_code(cpc_code_text):
 
 def get_genomics_classification_codes(class_codes: list) -> dict:
     """Get genomics-related classification codes.
-    
+
     Inputs:
         class_codes (list): List of patent classification codes.
-    
+
     Outputs:
         genomics_codes (dict): Dict of relevant genomics-related
         classification codes.
@@ -58,7 +58,9 @@ def get_genomics_classification_codes(class_codes: list) -> dict:
 
 if __name__ == "__main__":
 
-    class_code_files = get_s3_dir_files(s3, bucket_name, config["patent_class_codes_path"])
+    class_code_files = get_s3_dir_files(
+        s3, bucket_name, config["patent_class_codes_path"]
+    )
 
     cpc_codes = []
     ipc_codes = []
