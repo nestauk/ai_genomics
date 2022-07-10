@@ -95,7 +95,7 @@ def make_query_chunks(uspto_patent_ids, n_chunks: int, table: str) -> list:
 
 def query_patent_data(
     conn, query_chunks: list
-) -> pd.DataFrame:  ##figure out slightly better error handling
+) -> pd.DataFrame:  
     """Queries genomics tables in query chunks.
     Args:
         conn: Google BigQuery connection.
@@ -110,7 +110,7 @@ def query_patent_data(
         data = (
             conn.query(uspto_query).to_dataframe().drop_duplicates("application_number")
         )
-        print(f"got query chunk {uspto_indx}!")
+        print(f"got query chunk {uspto_indx}")
         ai_genomics_patents.append(data)
 
     all_ai_genomics_patents = pd.concat(ai_genomics_patents).reset_index(drop=True)
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     # load data
     uspto_data = load_s3_data(bucket_name, config["uspto_file"])
     uspto_patent_ids = uspto_data[uspto_data.flag_patent == 1]["doc_id"]
-    print("loaded data!")
+    print("loaded data")
     ## Class codes
     # Make query chunks
     query_chunks = make_query_chunks(
@@ -132,7 +132,6 @@ if __name__ == "__main__":
     google_conn = est_conn()
     # query BigQuery
     ai_patents = query_patent_data(google_conn, query_chunks)
-    print("queried genomics related patents!")
+    print("queried genomics related patents")
     # save output
     save_to_s3(s3, bucket_name, ai_patents, config["ai_genomics_patents_file"])
-    print("saved to s3!")
