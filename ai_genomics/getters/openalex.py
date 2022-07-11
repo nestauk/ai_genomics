@@ -32,7 +32,6 @@ def get_openalex_concepts() -> list:
     Returns:
         A list of dicts. Every element is a concept with metadata.
         See here for more info: https://docs.openalex.org/about-the-data/concept
-
     """
 
     return read_json(f"{PROJECT_DIR}/inputs/openalex/concepts.json")
