@@ -21,7 +21,6 @@ def get_openalex_instits() -> list:
     Returns:
         A list of dicts. Every element is an institution with metadata.
         See here for more info: https://docs.openalex.org/about-the-data/institution
-
     """
 
     return read_json(f"{PROJECT_DIR}/inputs/openalex/institutions.json")
