@@ -8,7 +8,6 @@ def get_openalex_works() -> list:
     Returns:
         A list of dicts. Every element is a paper with metadata.
         See here for more info: https://docs.openalex.org/about-the-data/work
-
     """
 
     return read_json(
@@ -22,19 +21,17 @@ def get_openalex_instits() -> list:
     Returns:
         A list of dicts. Every element is an institution with metadata.
         See here for more info: https://docs.openalex.org/about-the-data/institution
-
     """
 
     return read_json(f"{PROJECT_DIR}/inputs/openalex/institutions.json")
 
 
 def get_openalex_concepts() -> list:
-    """Reads open alex concepts
+    """Reads OpenAlex concepts
 
     Returns:
         A list of dicts. Every element is a concept with metadata.
         See here for more info: https://docs.openalex.org/about-the-data/concept
-
     """
 
     return read_json(f"{PROJECT_DIR}/inputs/openalex/concepts.json")

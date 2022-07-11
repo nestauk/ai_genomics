@@ -94,8 +94,8 @@ def make_work_metadata(
         meta_vars: list of metadata variables to include in the dataframe
 
     Returns:
-        A dataframe where rows are works and columns are metadata
-        of interest
+        inst_df: A dataframe where rows are works and columns are metadata
+            of interest
     """
 
     inst_dict = {inst["id"]: inst for inst in inst_list}
