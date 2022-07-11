@@ -33,7 +33,7 @@ def make_query_chunks(uspto_patent_ids, n_chunks: int, table: str) -> list:
         uspto_patent_ids: List of patent IDs.
         n_chunks (int): The number of chunks generated from uspto_patent_ids.
                         Chunk string size must be less than 1024.00K characters,
-                        including comments and white space characters.
+                        including comments and white space characters. 
 
     Returns:
         uspto_queries (list): List of n_chunk size of BigQuery queries.
@@ -44,14 +44,17 @@ def make_query_chunks(uspto_patent_ids, n_chunks: int, table: str) -> list:
     )  # split based on query string limits
 
     for uspto_patent_chunk in uspto_patent_chunks:
-        ids = "'" + "', '".join([str(i) for i in uspto_patent_chunk]) + "'"
-        q = (
-            f"SELECT application_number "
-            f"FROM `{table}` "
-            f"WHERE REGEXP_EXTRACT(application_number, r'[0-9]+') IN ({ids})"
-        )
+        if len(uspto_patent_chunk) < 1024000:
+            ids = "'" + "', '".join([str(i) for i in uspto_patent_chunk]) + "'"
+            q = (
+                f"SELECT application_number "
+                f"FROM `{table}` "
+                f"WHERE REGEXP_EXTRACT(application_number, r'[0-9]+') IN ({ids})"
+            )
 
-        uspto_queries.append(q)
+            uspto_queries.append(q)
+        else:
+            print('chunk size too large - choose a larger n_chunks int')
 
     return uspto_queries
 
