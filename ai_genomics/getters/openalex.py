@@ -27,7 +27,7 @@ def get_openalex_instits() -> list:
 
 
 def get_openalex_concepts() -> list:
-    """Reads open alex concepts
+    """Reads OpenAlex concepts
 
     Returns:
         A list of dicts. Every element is a concept with metadata.
