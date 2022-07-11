@@ -8,7 +8,6 @@ def get_openalex_works() -> list:
     Returns:
         A list of dicts. Every element is a paper with metadata.
         See here for more info: https://docs.openalex.org/about-the-data/work
-
     """
 
     return read_json(
