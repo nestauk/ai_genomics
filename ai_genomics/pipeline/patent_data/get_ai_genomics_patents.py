@@ -83,7 +83,7 @@ def query_patent_data(conn, query_chunks: list, chunk_indx: int) -> pd.DataFrame
                     s3,
                     bucket_name,
                     data,
-                    f"/outputs/patent_data/ai_genomics_id_chunks/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_{str(uuid.uuid4())}.csv",
+                    f"/outputs/patent_data/ai_genomics_id_chunks/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_chunksize_{len(query_chunks)}_{str(uuid.uuid4())}.csv",
                 )
             except Forbidden:
                 print(
