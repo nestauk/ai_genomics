@@ -80,7 +80,7 @@ def make_inst_lookup(inst_dict: dict, variable: str):
     return {key: value[variable] for key, value in inst_dict.items()}
 
 
-def work_metadata_df(
+def make_work_metadata(
     work_list: list,
     inst_list: list,
     meta_vars: list = ["country_code", "type", "display_name"],
@@ -126,7 +126,6 @@ if __name__ == "__main__":
         get_openalex_works,
         get_openalex_instits,
     )
-    from ai_genomics.utils.openalex import deinvert_abstract, work_metadata_df
 
     logging.info("Checking functions")
 
@@ -137,7 +136,7 @@ if __name__ == "__main__":
 
     logging.info("Checking function to produce metadata df \n")
 
-    work_meta = work_metadata_df(works, insts)
+    work_meta = make_work_metadata(works, insts)
     logging.info(work_meta.head(n=30))
 
     logging.info("Checking deinvert abstracts function \n")
