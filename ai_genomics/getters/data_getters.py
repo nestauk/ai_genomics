@@ -12,7 +12,6 @@ from ai_genomics import bucket_name
 
 s3 = boto3.resource("s3")
 
-
 def get_s3_dir_files(s3, bucket_name, dir_name):
     """
     get a list of all files in bucket directory.
@@ -26,7 +25,6 @@ def get_s3_dir_files(s3, bucket_name, dir_name):
         dir_files.append(object_summary.key)
 
     return dir_files
-
 
 def load_s3_data(bucket_name, file_name):
     """
@@ -56,7 +54,6 @@ def load_s3_data(bucket_name, file_name):
         print(
             'Function not supported for file type other than "*.txt", "*.pickle", "*.tsv" and "*.csv"'
         )
-
 
 def save_to_s3(s3, bucket_name, output_var, output_file_dir):
 

@@ -26,4 +26,4 @@ The final output is a series of .csvs with USPTO patent IDs that have been ident
 
 The script splits AI patent IDs into query chunks because of a) bytes quota limit and b) SQL query length. It outputs each ai-genomics patent id chunk as its separate file.
 
-The script will likely break due to quota limits and will need to be rerun after waiting several hours/once the quota has been replenished. When the script is rerun, it will restart at the last query chunk saved to s3.
+The script will likely break due to quota limits and will need to be rerun after waiting several hours/once the quota has been replenished. When the script is rerun, it will restart at the index of the last query chunk saved to s3.

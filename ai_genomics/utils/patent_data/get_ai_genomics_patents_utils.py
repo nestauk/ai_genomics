@@ -1,6 +1,6 @@
 """Script to instantiate Google BigQuery client and
 functions to create bespoke genomics patents Google BigQuery
-tables.
+tables in local project.
 """
 ######################################
 from google.cloud import bigquery
@@ -12,8 +12,8 @@ import os
 
 def est_conn():
     """Instantiate Google BigQuery client
-	to query patent data.
-	"""
+    to query patent data.
+    """
     if "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
         google_creds = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 
