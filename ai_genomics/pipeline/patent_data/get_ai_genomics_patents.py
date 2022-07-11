@@ -19,7 +19,6 @@ from ai_genomics.getters.data_getters import (
 import pandas as pd
 import numpy as np
 
-import time
 from google.api_core.exceptions import Forbidden
 import uuid
 
@@ -33,7 +32,9 @@ def make_query_chunks(uspto_patent_ids, n_chunks: int, table: str) -> list:
         uspto_patent_ids: List of patent IDs.
         n_chunks (int): The number of chunks generated from uspto_patent_ids.
                         Chunk string size must be less than 1024.00K characters,
-                        including comments and white space characters. 
+                        including comments and white space characters. This means
+                        there needs to be approx. 85 query chunks to accomodate
+                        string size limits.
 
     Returns:
         uspto_queries (list): List of n_chunk size of BigQuery queries.
@@ -44,24 +45,30 @@ def make_query_chunks(uspto_patent_ids, n_chunks: int, table: str) -> list:
     )  # split based on query string limits
 
     for uspto_patent_chunk in uspto_patent_chunks:
-        if len(uspto_patent_chunk) < 1024000:
-            ids = "'" + "', '".join([str(i) for i in uspto_patent_chunk]) + "'"
-            q = (
-                f"SELECT application_number "
-                f"FROM `{table}` "
-                f"WHERE REGEXP_EXTRACT(application_number, r'[0-9]+') IN ({ids})"
-            )
+        ids = "'" + "', '".join([str(i) for i in uspto_patent_chunk]) + "'"
+        q = (
+            f"SELECT application_number "
+            f"FROM `{table}` "
+            f"WHERE REGEXP_EXTRACT(application_number, r'[0-9]+') IN ({ids})"
+        )
 
-            uspto_queries.append(q)
-        else:
-            print('chunk size too large - choose a larger n_chunks int')
+        uspto_queries.append(q)
 
-    return uspto_queries
+    if [
+        len(uspto_query_chunk)
+        for uspto_query_chunk in uspto_queries
+        if len(uspto_patent_chunk) > 1024000
+    ] != []:
+        print("A query chunk(s) too large - make n_chunk int larger.")
+    else:
+        return uspto_queries
 
 
-def query_patent_data(conn, query_chunks: list, chunk_indx: int) -> pd.DataFrame:
+def query_patent_data(
+    conn, query_chunks: list, chunk_indx: int, table: str
+) -> pd.DataFrame:
     """Queries genomics tables in query chunks. Saves each query chunk
-    as a CSV and prints chunk_indx query fails at due to Time out error.
+    as a CSV and prints chunk_indx when Time out error.
     Args:
         conn: Google BigQuery connection.
         query_chunks (list): List of sql queries.
@@ -72,8 +79,18 @@ def query_patent_data(conn, query_chunks: list, chunk_indx: int) -> pd.DataFrame
         sql tables.
     """
     ai_genomics_patents = []
-
-    if query_chunks[chunk_indx:] != []:
+    queries = [
+        chunk
+        for chunk in get_s3_dir_files(
+            s3,
+            bucket_name,
+            f"outputs/patent_data/ai_genomics_id_chunks/{table}_{len(query_chunks)}_chunksize/",
+        )
+        if "csv" in chunk
+    ]
+    if len(queries) != len(
+        query_chunks
+    ):  # if there are more chunks than chunk files...
         for uspto_indx, uspto_query in enumerate(query_chunks[chunk_indx:]):
             try:
                 data = (
@@ -86,7 +103,7 @@ def query_patent_data(conn, query_chunks: list, chunk_indx: int) -> pd.DataFrame
                     s3,
                     bucket_name,
                     data,
-                    f"/outputs/patent_data/ai_genomics_id_chunks/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_chunksize_{len(query_chunks)}_{str(uuid.uuid4())}.csv",
+                    f"/outputs/patent_data/ai_genomics_id_chunks/{len(query_chunks)}_{table}_chunksize/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_{str(uuid.uuid4())}.csv",
                 )
             except Forbidden:
                 print(
@@ -96,9 +113,10 @@ def query_patent_data(conn, query_chunks: list, chunk_indx: int) -> pd.DataFrame
     else:
         print("Queried all patent id chunks.")
 
+    return queries
+
 
 if __name__ == "__main__":
-    start = time.time()
     # est BigQuery connection
     google_conn = est_conn()
     # load data
@@ -109,19 +127,24 @@ if __name__ == "__main__":
     query_chunks = make_query_chunks(
         uspto_patent_ids, config["n_chunks"], config["sql_table"]
     )
-    # get query chunk indx based chunks already queried in s3
-    query_chunks_indxs = [
-        indx
-        for indx in get_s3_dir_files(
-            s3, bucket_name, "outputs/patent_data/ai_genomics_id_chunks/"
+    if query_chunks:
+        query_chunks_indxs = [
+            chunk
+            for chunk in get_s3_dir_files(
+                s3,
+                bucket_name,
+                f"outputs/patent_data/ai_genomics_id_chunks/{len(query_chunks)}_chunksize/",
+            )
+            if "csv" in chunk
+        ]
+        # get query chunk indx based chunks already queried in s3
+        if query_chunks_indxs != []:  # get last chunk
+            indx = len(query_chunks_indxs)
+        else:
+            indx = 0
+        # query BigQuery
+        ai_patents = query_patent_data(
+            google_conn, query_chunks, int(indx), config["sql_table"]
         )
-        if "csv" in indx
-    ]
-    if query_chunks_indxs != []:
-        for query_chunk_indx in query_chunks_indxs:
-            indx = query_chunk_indx.split("/")[-1].split("_")[4]
     else:
-        indx = 0
-    # query BigQuery
-    ai_patents = query_patent_data(google_conn, query_chunks, int(indx))
-    print("It took", time.time() - start, "seconds.")
+        pass
