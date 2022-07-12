@@ -1,2 +1,3 @@
 patent_class_codes_path: "inputs/patent_data/"
 genomics_class_codes_file: "outputs/patent_data/class_codes/genomics_class_codes.json"
+concept_threshold: 0.5
