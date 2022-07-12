@@ -103,7 +103,7 @@ def query_patent_data(
                     s3,
                     bucket_name,
                     data,
-                    f"/outputs/patent_data/ai_genomics_id_chunks/{len(query_chunks)}_{table}_chunksize/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_{str(uuid.uuid4())}.csv",
+                    f"/outputs/patent_data/ai_genomics_id_chunks/{table}{len(query_chunks)}_chunksize/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_{str(uuid.uuid4())}.csv",
                 )
             except Forbidden:
                 print(
@@ -117,6 +117,10 @@ def query_patent_data(
 
 
 if __name__ == "__main__":
+
+    # clean up BigQuery table name
+    table = config["sql_table"].replace("*", "").replace(".", "_")
+
     # est BigQuery connection
     google_conn = est_conn()
     # load data
@@ -133,7 +137,7 @@ if __name__ == "__main__":
             for chunk in get_s3_dir_files(
                 s3,
                 bucket_name,
-                f"outputs/patent_data/ai_genomics_id_chunks/{len(query_chunks)}_{table}_chunksize/",
+                f"outputs/patent_data/ai_genomics_id_chunks/{table}{len(query_chunks)}_chunksize/",
             )
             if "csv" in chunk
         ]
@@ -143,8 +147,6 @@ if __name__ == "__main__":
         else:
             indx = 0
         # query BigQuery
-        ai_patents = query_patent_data(
-            google_conn, query_chunks, int(indx), config["sql_table"]
-        )
+        ai_patents = query_patent_data(google_conn, query_chunks, int(indx), table)
     else:
         pass
