@@ -1,13 +1,42 @@
-# Functions to process OpenAlex data
+# Functions to fetch and process OpenAlex data
+import json
+import logging
+from collections import Counter
 from itertools import chain
-from typing import Dict, List
-
+from typing import Dict, List, Any
 from pandas import DataFrame
 from toolz import pipe, partial
 
+
+import ai_genomics.utils.openalex as oalex
 from ai_genomics import get_yaml_config, _base_config_path
 
 CONCEPT_THRES = get_yaml_config(_base_config_path)["concept_threshold"]
+
+OA_NAME_ID_LOOKUP = {"artificial_intelligence": "C154945302", "genetics": "C54355233"}
+
+
+def fetch_openalex(
+    s3_bucket,
+    concept_name: str = "artificial_intelligence",
+    year: int = 2007,
+) -> List[Dict]:
+    """Fetch a json object
+    Args:
+        s3_bucket where we store the data
+        concept_name: The name of the concept
+        year: the year
+
+    Returns:
+    """
+    logging.info(f"Fetching {concept_name} for year {year}")
+
+    return pipe(
+        f"inputs/openalex/{concept_name}/openalex-works_production-True_concept-{OA_NAME_ID_LOOKUP[concept_name]}_year-{year}.json",
+        s3_bucket.Object,
+        lambda _object: _object.get()["Body"].read().decode(),
+        json.loads,
+    )
 
 
 def deinvert_abstract(inverted_abstract: Dict[str, List]) -> str:
@@ -141,3 +170,34 @@ if __name__ == "__main__":
 
     logging.info("Checking deinvert abstracts function \n")
     logging.info(deinvert_abstract(works[0]["abstract_inverted_index"]))
+
+
+def year_summary(docs: list, inst_dict: dict) -> Dict[str, Any]:
+    """Produces a summary of document activity in a year
+    Args:
+        docs: list of documents published in the year
+        inst_dict: lookup between institution ids and their metadata
+
+    Returns:
+        A dict with metadata about the papers published in the year
+    """
+
+    meta_dict = {}  # type: Dict[str, Any]
+
+    meta_dict["n"] = len(docs)
+
+    meta_dict["ids"] = list([work["id"] for work in docs])
+
+    meta_dict["concepts"] = Counter(chain(*[oalex.get_concepts(work) for work in docs]))
+
+    institution_list = list(chain(*[oalex.get_institutions(work) for work in docs]))
+
+    meta_dict["institution_names"] = Counter(
+        oalex.enrich_institutions(institution_list, inst_dict, "display_name")
+    )
+
+    meta_dict["institution_countries"] = Counter(
+        oalex.enrich_institutions(institution_list, inst_dict, "country_code")
+    )
+
+    return meta_dict
