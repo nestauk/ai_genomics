@@ -8,3 +8,8 @@ tqdm
 filelock
 typer
 sh
+fsspec
+S3fs
+db-dtypes
+google-cloud-bigquery
+google-cloud-bigquery-storage

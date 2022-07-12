@@ -12,7 +12,6 @@ from ai_genomics import bucket_name
 
 s3 = boto3.resource("s3")
 
-
 def get_s3_dir_files(s3, bucket_name, dir_name):
     """
     get a list of all files in bucket directory.
@@ -26,7 +25,6 @@ def get_s3_dir_files(s3, bucket_name, dir_name):
         dir_files.append(object_summary.key)
 
     return dir_files
-
 
 def load_s3_data(bucket_name, file_name):
     """
@@ -49,21 +47,26 @@ def load_s3_data(bucket_name, file_name):
     elif fnmatch(file_name, "*.txt"):
         file = obj.get()["Body"].read().decode()
         return [f.split("\t") for f in file.split("\n")]
+    elif fnmatch(file_name, "*.json"):
+        file = obj.get()["Body"].read().decode()
+        return json.loads(file)
     else:
         print(
             'Function not supported for file type other than "*.txt", "*.pickle", "*.tsv" and "*.csv"'
         )
-
 
 def save_to_s3(s3, bucket_name, output_var, output_file_dir):
 
     obj = s3.Object(bucket_name, output_file_dir)
 
     if fnmatch(output_file_dir, "*.pkl") or fnmatch(output_file_dir, "*.pickle"):
-        byte_obj = pickle.dumps(output_var)
-        obj.put(Body=byte_obj)
+        obj.put(Body=pickle.dumps(output_var))
+    elif fnmatch(output_file_dir, "*.gz"):
+        obj.put(Body=gzip.compress(json.dumps(output_var).encode()))
+    elif fnmatch(output_file_dir, "*.txt"):
+        obj.put(Body=output_var)
     elif fnmatch(output_file_dir, "*.csv"):
         output_var.to_csv("s3://" + bucket_name + output_file_dir, index=False)
     else:
-        byte_obj = json.dumps(output_var)
-    obj.put(Body=byte_obj)
+        obj.put(Body=json.dumps(output_var))
+    print(f"Saved to s3://{bucket_name} + {output_file_dir} ...")

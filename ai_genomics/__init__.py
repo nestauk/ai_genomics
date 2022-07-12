@@ -22,6 +22,8 @@ bucket_name = "ai-genomics"
 info_out = str(PROJECT_DIR / "info.log")
 error_out = str(PROJECT_DIR / "errors.log")
 
+bucket_name = 'ai-genomics'
+
 # Read log config file
 _log_config_path = Path(__file__).parent.resolve() / "config/logging.yaml"
 _logging_config = get_yaml_config(_log_config_path)
