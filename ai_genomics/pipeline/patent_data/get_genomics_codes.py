@@ -19,19 +19,19 @@ from ai_genomics.getters.data_getters import (
 GENOMICS_KEYWORDS = ["genome", "dna", "gene", "genetic"]
 
 
-def clean_class_code(cpc_code_text):
-    """Cleans CPC definitions by:
+def clean_class_code(code_text):
+    """Cleans definitions by:
             - lowercasing;
             - replacing values;
             - removing punctuation;
             - splitting
     Inputs:
-        cpc_code_text: CPC definition to clean.
+        code_text: definition to clean
     Outputs:
-        cpc_code_text: clean CPC definition
+        code_text: clean definition
     """
     return (
-        cpc_code_text.replace("\r", "")
+        code_text.replace("\r", "")
         .lower()
         .translate(str.maketrans("", "", string.punctuation))
         .split(" ")
