@@ -133,7 +133,7 @@ if __name__ == "__main__":
             for chunk in get_s3_dir_files(
                 s3,
                 bucket_name,
-                f"outputs/patent_data/ai_genomics_id_chunks/{len(query_chunks)}_chunksize/",
+                f"outputs/patent_data/ai_genomics_id_chunks/{len(query_chunks)}_{table}_chunksize/",
             )
             if "csv" in chunk
         ]
