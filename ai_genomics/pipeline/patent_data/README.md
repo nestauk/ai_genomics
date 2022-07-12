@@ -1,5 +1,11 @@
 # Patent Data Pipeline
 
+## Getting genomics-related IPC and CPC codes
+
+IPC and CPC classificaion code data comes from two sources. For IPC classification codes, data is downloaded from the [World Intellectual Property Organizaion](https://www.wipo.int/classifications/ipc/en/ITsupport/Version20220101/index.html). For the CPC classification codes, data is downloaded from the [European Patent Office](https://www.epo.org/searching-for-patents/helpful-resources/first-time-here/classification/cpc.html#:~:text=The%20Cooperative%20Patent%20Classification%20(CPC,%2C%20groups%20and%20sub%2Dgroups.).
+
+Codes are defined as 'genomics' related if genomics keywords are in the descriptions of classification codes.
+
 ## Running get_ai_genomics
 
 To get patent IDs at the intersection of AI and genomics, we are relying on USPTO AI patent IDs and CPC/IPC classification codes related to genomics.
