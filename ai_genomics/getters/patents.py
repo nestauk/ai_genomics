@@ -50,3 +50,21 @@ def get_ai_genomics_patent_app_numbers(bucket_name: str = bucket_name) -> list:
         .drop_duplicates()["application_number"]
         .values
     )
+
+
+def get_ai_genomics_patents_with_fields(
+    bucket_name: str = bucket_name,
+    file_name: str = "inputs/patent_data/processed_patent_data/ai_genomics_patents.csv",
+) -> pd.DataFrame:
+    """From S3 loads AI in genomics patents with fields such as applicaiton number,
+    patent abstract, publication date, filing date.
+
+
+    Args:
+        bucket_name: S3 bucket name
+        file_name: S3 path to filename
+
+    Returns:
+        Dataframe of AI in genomics patents
+    """
+    return load_s3_data(bucket_name, file_name)
