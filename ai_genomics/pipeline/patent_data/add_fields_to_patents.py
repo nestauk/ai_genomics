@@ -2,7 +2,7 @@ from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import est_conn
 from ai_genomics.getters.patents import get_ai_genomics_patent_app_numbers
 from google.cloud import bigquery
 from ai_genomics.getters.data_getters import save_to_s3, s3
-from ai_genomics import bucket_name
+from ai_genomics import bucket_name as BUCKET_NAME
 
 SELECT_COLS = (
     "application_number, country_code, title_localized, abstract_localized, "
@@ -42,4 +42,4 @@ if __name__ == "__main__":
     query = make_ai_genomics_query()
     job_config = make_bigquery_job_config()
     ai_genomics_patents_info = client.query(query, job_config).to_dataframe()
-    save_to_s3(s3, bucket_name, ai_genomics_patents_info, S3_SAVE_FILENAME)
+    save_to_s3(s3, BUCKET_NAME, ai_genomics_patents_info, S3_SAVE_FILENAME)
