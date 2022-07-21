@@ -5,7 +5,7 @@ from ai_genomics.getters.data_getters import save_to_s3, s3
 from ai_genomics import bucket_name as BUCKET_NAME
 
 SELECT_COLS = (
-    "application_number, country_code, title_localized, abstract_localized, "
+    "application_number, publication_number, country_code, title_localized, abstract_localized, "
     "publication_date, filing_date, grant_date, priority_date, inventor, "
     "inventor_harmonized, assignee, assignee_harmonized, ipc, cpc, entity_status"
 )
