@@ -47,9 +47,9 @@ def make_query_chunks(uspto_patent_ids, n_chunks: int, table: str) -> list:
     for uspto_patent_chunk in uspto_patent_chunks:
         ids = "'" + "', '".join([str(i) for i in uspto_patent_chunk]) + "'"
         q = (
-            f"SELECT application_number "
+            f"SELECT publication_number "
             f"FROM `{table}` "
-            f"WHERE REGEXP_EXTRACT(application_number, r'[0-9]+') IN ({ids})"
+            f"WHERE REGEXP_EXTRACT(publication_number, r'[0-9]+') IN ({ids}) AND STARTS_WITH(publication_number, 'US-')"
         )
 
         uspto_queries.append(q)
@@ -94,9 +94,8 @@ def query_patent_data(
         for uspto_indx, uspto_query in enumerate(query_chunks[chunk_indx:]):
             try:
                 data = (
-                    conn.query(uspto_query)
-                    .to_dataframe()
-                    .drop_duplicates("application_number")
+                    conn.query(uspto_query).to_dataframe()
+                    # .drop_duplicates("doc_id")
                 )
                 print(f"got query chunk {chunk_indx + uspto_indx + 1}")
                 save_to_s3(
@@ -125,8 +124,10 @@ if __name__ == "__main__":
     google_conn = est_conn()
     # load data
     uspto_data = load_s3_data(bucket_name, config["uspto_file"])
-    uspto_patent_ids = uspto_data[uspto_data.flag_patent == 1]["doc_id"]
+    uspto_data = uspto_data[uspto_data["predict50_any_ai"] > 0]
+    uspto_patent_ids = uspto_data[uspto_data.flag_patent == 1]["doc_id"].tolist()
     print("loaded data")
+
     # Make query chunks
     query_chunks = make_query_chunks(
         uspto_patent_ids, config["n_chunks"], config["sql_table"]
