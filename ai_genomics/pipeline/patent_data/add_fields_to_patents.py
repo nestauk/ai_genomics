@@ -1,5 +1,5 @@
 from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import est_conn
-from ai_genomics.getters.patents import get_ai_genomics_patent_app_numbers
+from ai_genomics.getters.patents import get_ai_genomics_patent_pub_numbers
 from ai_genomics.getters.data_getters import save_to_s3, s3
 from ai_genomics import bucket_name as BUCKET_NAME
 from google.cloud import bigquery
@@ -11,7 +11,7 @@ SELECT_COLS = (
     "publication_date, filing_date, grant_date, priority_date, inventor, "
     "inventor_harmonized, assignee, assignee_harmonized, ipc, cpc, entity_status"
 )
-AI_GENOMICS_PATENT_APP_NUMBERS = get_ai_genomics_patent_app_numbers()
+AI_GENOMICS_PATENT_PUB_NUMBERS = get_ai_genomics_patent_pub_numbers()
 S3_SAVE_FILENAME = "/inputs/patent_data/processed_patent_data/ai_genomics_patents.csv"
 DATE_COLS = ["publication_date", "grant_date", "filing_date", "priority_date"]
 
@@ -20,21 +20,21 @@ def make_ai_genomics_query(select_cols: str = SELECT_COLS) -> str:
     """Make AI in genomics BigQuery sql query"""
     return (
         f"SELECT {select_cols} FROM `patents-public-data.patents.publications` "
-        "WHERE application_number IN UNNEST(@ai_genomics_patent_app_numbers)"
+        "WHERE publication_number IN UNNEST(@ai_genomics_patent_pub_numbers)"
     )
 
 
 def make_bigquery_job_config(
-    ai_genomics_patent_app_numbers: list = AI_GENOMICS_PATENT_APP_NUMBERS,
+    ai_genomics_patent_pub_numbers: list = AI_GENOMICS_PATENT_PUB_NUMBERS,
 ) -> bigquery.job.query.QueryJobConfig:
     """Make BigQuery job config. This enables a parameter to be fed
     into the query to overcome query length limits"""
     return bigquery.QueryJobConfig(
         query_parameters=[
             bigquery.ArrayQueryParameter(
-                "ai_genomics_patent_app_numbers",
+                "ai_genomics_patent_pub_numbers",
                 "STRING",
-                ai_genomics_patent_app_numbers,
+                ai_genomics_patent_pub_numbers,
             ),
         ]
     )

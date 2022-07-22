@@ -4,9 +4,9 @@ from ai_genomics.getters.data_getters import load_s3_data, s3, get_s3_dir_files
 import pandas as pd
 
 
-def get_ai_genomics_patent_num_csv_s3_dirs() -> list:
+def get_ai_genomics_patents_csv_s3_dirs() -> list:
     """Returns a list of S3 directories containing csvs of AI in genomics
-    patent application numbers
+    patents
     """
     return [
         path
@@ -19,19 +19,19 @@ def get_ai_genomics_patent_num_csv_s3_dirs() -> list:
     ]
 
 
-def get_ai_genomics_patent_app_numbers() -> list:
-    """Loads chunks of AI in genomics patent application numbers
+def get_ai_genomics_patent_pub_numbers() -> list:
+    """Loads chunks of AI in genomics patent publication numbers
     from S3. Combines chunks together into one dataframe.
-    Returns a list of AI in genomics patent application numbers.
+    Returns a list of AI in genomics patent publication numbers.
     """
     return list(
         pd.concat(
             [
                 load_s3_data(BUCKET_NAME, csv)
-                for csv in get_ai_genomics_patent_num_csv_s3_dirs()
+                for csv in get_ai_genomics_patents_csv_s3_dirs()
             ]
         )
-        .drop_duplicates()["application_number"]
+        .drop_duplicates()["publication_number"]
         .values
     )
 
