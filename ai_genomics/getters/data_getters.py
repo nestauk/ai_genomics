@@ -11,12 +11,21 @@ from ai_genomics import bucket_name
 
 s3 = boto3.resource("s3")
 
-def get_s3_dir_files(s3, bucket_name, dir_name):
+def get_s3_dir_files(
+    s3: boto3.resources.base.ServiceResource,
+    bucket_name: str,
+    dir_name: str
+) -> List[str]:
     """
-    get a list of all files in bucket directory.
-    s3: S3 boto3 resource
-    bucket_name: The S3 bucket name
-    dir_name: bucket directory name
+    Get a list of all files in bucket directory.
+    
+    Args:
+        s3: S3 resource
+        bucket_name: S3 bucket name
+        dir_name: S3 bucket directory name
+
+    Returns:
+        list_dir: List of file names in bucket directory
     """
     dir_files = []
     my_bucket = s3.Bucket(bucket_name)
