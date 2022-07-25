@@ -8,7 +8,6 @@ import pandas as pd
 
 from ai_genomics import bucket_name
 
-#####################################################################
 
 s3 = boto3.resource("s3")
 
