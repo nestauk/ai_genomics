@@ -1,1 +1,19 @@
 concept_threshold: 0.5
+inst_meta_vars:
+  - id,
+  - display_name
+  - country_code
+  - type
+  - homepage_url
+work_meta_vars:
+  - id
+  - doi
+  - display_name
+  - publication_year
+  - publication_date
+  - cited_by_count
+  - is_retracted
+venue_meta_vars:
+  - id
+  - display_name
+  - url
