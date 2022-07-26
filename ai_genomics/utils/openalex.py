@@ -121,7 +121,7 @@ def make_inst_metadata(inst_list: List, meta_vars: List) -> pd.DataFrame:
         inst_list,
         lambda list_of_dicts: [
             extract_obj_meta(
-                pd.Series(d),
+                d,
                 meta_vars=meta_vars,
             )
             for d in list_of_dicts
