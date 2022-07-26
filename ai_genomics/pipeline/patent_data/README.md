@@ -8,7 +8,9 @@ Codes are defined as 'genomics' related if genomics keywords are in the descript
 
 ## Running get_ai_genomics
 
-To get patent IDs at the intersection of AI and genomics, we are relying on USPTO AI patent IDs and CPC/IPC classification codes related to genomics.
+To get patent IDs at the intersection of AI and genomics, we rely on USPTO AI patent IDs and CPC/IPC classification codes related to genomics.
+
+The USPTO AI patents dataset was constructed using machine learning models for each of eight AI component technologies covering areas such as natural language processing, AI hardware, and machine learning.  
 
 The script `get_ai_genomics_patents.py` queries bespoke genomics-related patent ID tables (golden-shine-355915.genomics.ipc and golden-shine-355915.genomics.cpc) with USPTO AI patent IDs to identify USPTO AI patent IDs that also have genomics-related cpc or ipc codes.
 
@@ -22,12 +24,14 @@ Finally, before you run the `get_ai_genomics_patents.py` script, you will need t
 
 `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"`
 
+Alternatively, you could also set these credentials as an environmental variable in `.bashrc`.  
+
 then:
 
-`python get_ai_genomics_patents.py`
+`python ai_genomics/pipeline/patent_data/get_ai_genomics_patents.py`
 
 The final output is a series of .csvs with USPTO patent IDs that have been identified as AI-related and that have a genomics cpc or ipc code related to them.
 
-## Quota limits
+### Quota limits
 
 The script splits AI patent IDs into query chunks because of a) bytes quota limit and b) SQL query length. It outputs each ai-genomics patent id chunk as its own separate file. If the query chunk is too long, the script will break and you will need to change the n_chunk int in config. If querying breaks due to quota limits, wait several hours to rerun. When the script is rerun, it will restart at the index of the last query chunk of n chunksize saved to s3.

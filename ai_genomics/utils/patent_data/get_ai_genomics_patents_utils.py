@@ -1,23 +1,25 @@
-"""Script to instantiate Google BigQuery client and
-functions to create bespoke genomics patents Google BigQuery
+"""Functions to instantiate Google BigQuery client and
+create bespoke genomics patents Google BigQuery
 tables in local project.
 """
 ######################################
+from google.oauth2.service_account import Credentials
 from google.cloud import bigquery
-from google.oauth2 import service_account
 import os
 
+from ai_genomics.getters.data_getters import Error
+from typing import List
+from collections.abc import Iterable
 ######################################
 
 
 def est_conn():
-    """Instantiate Google BigQuery client
-    to query patent data.
-    """
+    """Instantiate Google BigQuery client to query patent data."""
+
     if "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
         google_creds = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 
-        credentials = service_account.Credentials.from_service_account_file(
+        credentials = Credentials.from_service_account_file(
             google_creds
         )
 
@@ -26,17 +28,19 @@ def est_conn():
         return client
 
     else:
-        print(
+        raise Error(
             "export GOOGLE_APPLICATION_CREDENTIALS directory path as global variable."
         )
 
+def clean_ipc_codes(
+    genomics_codes: dict
+    ) -> List[str]:
+    """Prepares IPC codes by replacing '000' with '/' to match Google BigQuery format.
 
-def clean_ipc_codes(genomics_codes: dict) -> list:
-    """Prepares IPC codes in format to query Google BigQuery.
-
-    Inputs:
+    Args:
         genomics_codes (dict): Dictionary of patent classification codes relevant to genomics.
-    Outputs:
+    
+    Returns:
         ipc_codes_clean (list): List of clean IPC codes relevant to genomics.
     """
     ipc_codes_clean = []
@@ -57,26 +61,27 @@ def clean_ipc_codes(genomics_codes: dict) -> list:
 
         return ipc_codes_clean
     else:
-        print("no IPC code keys in genomics_codes dict!")
+        raise Error("no IPC code keys in genomics_codes dict!")
 
 
 def make_table_query(
-    class_sys: str, classification_codes: list
-) -> str:  # used to create bespoke genomics patent BigQuery tables
-    """Queries for BigQuery console to generate new tables.
+    classification_codes: Iterable,
+    class_sys: str 
+) -> str:  
+    """Generates queries for BigQuery console to generate new tables.
 
-    Inputs:
+    Args:
         classification_codes (list): list of classification codes.
         class_sys: classification system to query.
 
-    Outputs:
+    Returns:
         q (str): string to query BigQuery console with.
     """
 
     class_str = "'" + "', '".join(classification_codes) + "'"
 
     q = (
-        f"SELECT application_number "
+        f"SELECT publication_number, application_number, {clas_sys}__u.code "
         f"FROM `patents-public-data.patents.publications`, UNNEST({class_sys}) AS {class_sys}__u "
         f"WHERE {class_sys}__u.code IN ({class_str})"
     )
