@@ -2,16 +2,13 @@
 create bespoke genomics patents Google BigQuery
 tables in local project.
 """
-######################################
 from google.oauth2.service_account import Credentials
 from google.cloud import bigquery
 import os
 
-from ai_genomics.getters.data_getters import Error
+from ai_genomics.utils.error_utils import Error
 from typing import List
 from collections.abc import Iterable
-######################################
-
 
 def est_conn():
     """Instantiate Google BigQuery client to query patent data."""
@@ -19,9 +16,7 @@ def est_conn():
     if "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
         google_creds = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 
-        credentials = Credentials.from_service_account_file(
-            google_creds
-        )
+        credentials = Credentials.from_service_account_file(google_creds)
 
         client = bigquery.Client(credentials=credentials)
 
@@ -33,41 +28,36 @@ def est_conn():
         )
 
 def clean_ipc_codes(
-    genomics_codes: dict
+    genomics_codes: List[str]
     ) -> List[str]:
     """Prepares IPC codes by replacing '000' with '/' to match Google BigQuery format.
 
     Args:
-        genomics_codes (dict): Dictionary of patent classification codes relevant to genomics.
-    
+        genomics_codes (list): List of patent classification codes relevant to genomics.
+
     Returns:
         ipc_codes_clean (list): List of clean IPC codes relevant to genomics.
     """
     ipc_codes_clean = []
-
-    if "ipc" in genomics_codes.keys():
-        for ipc_code in genomics_codes["ipc"].keys():
-            if len(ipc_code) == 14:
-                if ipc_code[6] == "0":
-                    ipc_codes_clean.append(
-                        ipc_code[:4] + ipc_code[7:8] + "/" + ipc_code[8:10]
-                    )
-                else:
-                    ipc_codes_clean.append(
-                        ipc_code[:4] + ipc_code[6:8] + "/" + ipc_code[8:10]
-                    )
+    for ipc_code in genomics_codes:
+        if len(ipc_code) == 14:
+            if ipc_code[6] == "0":
+                ipc_codes_clean.append(
+                    ipc_code[:4] + ipc_code[7:8] + "/" + ipc_code[8:10]
+                )
             else:
-                ipc_codes_clean.append(ipc_code + "/")
+                ipc_codes_clean.append(
+                    ipc_code[:4] + ipc_code[6:8] + "/" + ipc_code[8:10]
+                )
+        else:
+            ipc_codes_clean.append(ipc_code + "/")
 
-        return ipc_codes_clean
-    else:
-        raise Error("no IPC code keys in genomics_codes dict!")
-
+    return ipc_codes_clean
 
 def make_table_query(
-    classification_codes: Iterable,
-    class_sys: str 
-) -> str:  
+    classification_codes: List[str], 
+    class_sys: str
+    ) -> str:
     """Generates queries for BigQuery console to generate new tables.
 
     Args:

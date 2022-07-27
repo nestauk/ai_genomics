@@ -4,13 +4,13 @@
 
 IPC and CPC classificaion code data comes from two sources. For IPC classification codes, data is downloaded from the [World Intellectual Property Organizaion](https://www.wipo.int/classifications/ipc/en/ITsupport/Version20220101/index.html). For the CPC classification codes, data is downloaded from the [European Patent Office](https://www.epo.org/searching-for-patents/helpful-resources/first-time-here/classification/cpc.html#:~:text=The%20Cooperative%20Patent%20Classification%20(CPC,%2C%20groups%20and%20sub%2Dgroups.).
 
-Codes are defined as 'genomics' related if genomics keywords are in the descriptions of classification codes.
+Codes are defined as 'genomics' related if genomics keywords are in the descriptions of classification codes. They are then manually verified and 'bad' codes (i.e. codes related to genetic algorithms) are removed. The codes are saved as txt files in `outputs/data/codes/`.
 
 ## Running get_ai_genomics
 
 To get patent IDs at the intersection of AI and genomics, we rely on USPTO AI patent IDs and CPC/IPC classification codes related to genomics.
 
-The USPTO AI patents dataset was constructed using machine learning models for each of eight AI component technologies covering areas such as natural language processing, AI hardware, and machine learning.  
+The USPTO AI patents dataset was constructed using machine learning models for each of eight AI component technologies covering areas such as natural language processing, AI hardware, and machine learning.
 
 The script `get_ai_genomics_patents.py` queries bespoke genomics-related patent ID tables (golden-shine-355915.genomics.ipc and golden-shine-355915.genomics.cpc) with USPTO AI patent IDs to identify USPTO AI patent IDs that also have genomics-related cpc or ipc codes.
 
@@ -24,7 +24,7 @@ Finally, before you run the `get_ai_genomics_patents.py` script, you will need t
 
 `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"`
 
-Alternatively, you could also set these credentials as an environmental variable in `.bashrc`.  
+Alternatively, you could also set these credentials as an environmental variable in `.bashrc`.
 
 then:
 

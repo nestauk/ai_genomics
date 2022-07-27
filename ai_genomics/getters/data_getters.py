@@ -6,25 +6,16 @@ import json
 
 import pandas as pd
 
-from ai_genomics import bucket_name, logger
+from ai_genomics import bucket_name, logger, PROJECT_DIR
 from typing import Union, List
-
+from ai_genomics.utils.error_utils import Error
 
 S3 = boto3.resource("s3")
 
-class Error(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-    def __str__(self):
-        return self.msg
-
-def get_s3_dir_files(
-    bucket_name: str,
-    dir_name: str
-) -> List[str]:
+def get_s3_dir_files(bucket_name: str, dir_name: str) -> List[str]:
     """
     Get a list of all files in bucket directory.
-    
+
     Args:
         bucket_name: S3 bucket name
         dir_name: S3 bucket directory name
@@ -38,17 +29,15 @@ def get_s3_dir_files(
         for object_summary in my_bucket.objects.filter(Prefix=dir_name)
     ]
 
-def load_s3_data(
-    bucket_name: str, 
-    file_name: str
-    ) -> Union[pd.DataFrame, str, dict]:
+
+def load_s3_data(bucket_name: str, file_name: str) -> Union[pd.DataFrame, str, dict]:
     """
     Load data from S3 location.
-    
+
     Args:
         bucket_name: The S3 bucket name
         file_name: S3 key to load
-    
+
     Returns:
         Loaded data from S3 location.
     """
@@ -72,21 +61,19 @@ def load_s3_data(
         file = obj.get()["Body"].read().decode()
         return json.loads(file)
     else:
-        raise Error('Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"')
+        raise Error(
+            'Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"'
+        )
 
-def save_to_s3(
-    bucket_name: str, 
-    output_var, 
-    output_file_dir: str
-    ):
+def save_to_s3(bucket_name: str, output_var, output_file_dir: str):
     """
     Save data to S3 location.
-    
+
     Args:
         s3: S3 boto3 resource
         bucket_name: The S3 bucket name
         output_var: Object to be saved
-        output_file_dir: file path to save object to 
+        output_file_dir: file path to save object to
     """
 
     obj = S3.Object(bucket_name, output_file_dir)
@@ -96,9 +83,24 @@ def save_to_s3(
     elif fnmatch(output_file_dir, "*.txt"):
         obj.put(Body=output_var)
     elif fnmatch(output_file_dir, "*.csv"):
-        output_var.to_csv("s3://" + bucket_name + '/' + output_file_dir, index=False)
+        output_var.to_csv("s3://" + bucket_name + "/" + output_file_dir, index=False)
     elif fnmatch(output_file_dir, "*.json"):
         obj.put(Body=json.dumps(output_var))
     else:
-        raise Error('Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"')
+        raise Error(
+            'Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"'
+        )
     logger.info(f"Saved to s3://{bucket_name} + {output_file_dir} ...")
+
+def save_txt_file(output_file_dir: str, output_var: str):
+    """
+    Save data to local txt file.
+
+    Args:
+        output_var: Object to be saved
+        output_file_dir: file path to save object to
+    """
+    with open(PROJECT_DIR / output_file_dir, 'w') as fp:
+        for item in output_var:
+            # write each item on a new line
+            fp.write("%s\n" % item)
