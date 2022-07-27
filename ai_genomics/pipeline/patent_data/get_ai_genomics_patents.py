@@ -24,10 +24,8 @@ import uuid
 from toolz.itertoolz import partition_all
 from typing import List
 
-def make_query_chunks(
-    uspto_patent_ids: List[str], 
-    table: str) 
-    -> List[str]:
+
+def make_query_chunks(uspto_patent_ids: List[str], table: str) -> List[str]:
     """Generate BigQuery query chunks based on USPTO AI patent IDS.
 
     Args:
@@ -57,11 +55,8 @@ def make_query_chunks(
 
 
 def query_patent_data(
-    conn: bigquery.Client, 
-    query_chunks: List[str], 
-    chunk_indx: int, 
-    table: str
-    ) -> pd.DataFrame:
+    conn: bigquery.Client, query_chunks: List[str], chunk_indx: int, table: str
+) -> pd.DataFrame:
     """Queries genomics tables in query chunks. Saves each query chunk
     as a CSV and prints chunk_indx when Time out error.
 

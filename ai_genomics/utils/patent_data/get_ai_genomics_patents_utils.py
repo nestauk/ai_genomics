@@ -10,6 +10,7 @@ from ai_genomics.utils.error_utils import Error
 from typing import List
 from collections.abc import Iterable
 
+
 def est_conn():
     """Instantiate Google BigQuery client to query patent data."""
 
@@ -27,9 +28,8 @@ def est_conn():
             "export GOOGLE_APPLICATION_CREDENTIALS directory path as global variable."
         )
 
-def clean_ipc_codes(
-    genomics_codes: List[str]
-    ) -> List[str]:
+
+def clean_ipc_codes(genomics_codes: List[str]) -> List[str]:
     """Prepares IPC codes by replacing '000' with '/' to match Google BigQuery format.
 
     Args:
@@ -54,10 +54,8 @@ def clean_ipc_codes(
 
     return ipc_codes_clean
 
-def make_table_query(
-    classification_codes: List[str], 
-    class_sys: str
-    ) -> str:
+
+def make_table_query(classification_codes: List[str], class_sys: str) -> str:
     """Generates queries for BigQuery console to generate new tables.
 
     Args:
