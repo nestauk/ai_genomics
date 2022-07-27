@@ -41,7 +41,7 @@ def make_query_chunks(uspto_patent_ids: List[str], table: str) -> List[str]:
     for uspto_patent_chunk in uspto_patent_chunks:
         ids = "'" + "', '".join([str(i) for i in uspto_patent_chunk]) + "'"
         q = (
-            "SELECT publication_number "
+            "SELECT DISTINCT publication_number "
             f"FROM `{table}` "
             f"WHERE REGEXP_EXTRACT(publication_number, r'[0-9]+') IN ({ids}) AND STARTS_WITH(publication_number, 'US-')"
         )
@@ -85,7 +85,7 @@ def query_patent_data(
                 save_to_s3(
                     bucket_name,
                     data,
-                    f"/outputs/patent_data/ai_genomics_id_chunks/{table}{len(query_chunks)}_chunksize/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_{str(uuid.uuid4())}.csv",
+                    f"outputs/patent_data/ai_genomics_id_chunks/{table}{len(query_chunks)}_chunksize/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_{str(uuid.uuid4())}.csv",
                 )
             except Forbidden:
                 raise Error(
