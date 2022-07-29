@@ -24,6 +24,16 @@ import uuid
 
 #################################################
 
+AI_SUBDOMAIN_PREDICTIONS = [
+    "ai_score_ml",
+    "ai_score_evo",
+    "ai_score_nlp",
+    "ai_score_speech",
+    "ai_score_vision",
+]
+AI_THRESHOLD_LOWER = 0.95
+AI_THRESHOLD_UPPER = 1
+
 
 def make_query_chunks(uspto_patent_ids, n_chunks: int, table: str) -> list:
     """Generate BigQuery query chunks based on USPTO AI patent IDS.
@@ -115,6 +125,36 @@ def query_patent_data(
     return queries
 
 
+def make_list_of_ai_publication_ids(
+    threshold_upper: float = AI_THRESHOLD_UPPER,
+    threshold_lower: float = AI_THRESHOLD_LOWER,
+    ai_subdomain_predictions: list = AI_SUBDOMAIN_PREDICTIONS,
+) -> list:
+    """Loads USPTO patents that have been assigned probabilties of
+    being in different AI subdomains. Select for patents that have
+    probabilities with a range of specified values for a specified
+    set of subdomains.
+
+    Args:
+        threshold_upper: Upper prediction threshold for AI predictions
+        threshold_lower: Lower prediction threshold for AI predictions
+        ai_subdomain_predictions: List of AI subdomains to check thresholds
+            for
+
+    Returns:
+        A list of patent publication ids that have been classified
+            as being AI patents.
+    """
+    uspto_data = load_s3_data(bucket_name, config["uspto_file"])
+    max_ai_subdomain_pred = uspto_data[ai_subdomain_predictions].max(axis=1)
+    ai_subdomain_pred_in_range = (threshold_upper >= max_ai_subdomain_pred) & (
+        threshold_lower < max_ai_subdomain_pred
+    )
+    is_patent = uspto_data.flag_patent == 1
+    combined_conditions = ai_subdomain_pred_in_range & is_patent
+    return uspto_data[combined_conditions].doc_id.tolist()
+
+
 if __name__ == "__main__":
 
     # clean up BigQuery table name
@@ -123,9 +163,7 @@ if __name__ == "__main__":
     # est BigQuery connection
     google_conn = est_conn()
     # load data
-    uspto_data = load_s3_data(bucket_name, config["uspto_file"])
-    uspto_data = uspto_data[uspto_data["predict50_any_ai"] > 0]
-    uspto_patent_ids = uspto_data[uspto_data.flag_patent == 1]["doc_id"].tolist()
+    uspto_patent_ids = make_list_of_ai_publication_ids()
     print("loaded data")
 
     # Make query chunks
