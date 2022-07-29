@@ -1,6 +1,7 @@
 """ai_genomics/pipeline/patent_data/evaluation_sample.py
 
-Tool for exporting a sample of
+Tools for reporting on manually labelled patents as
+belonging to categories of AI and genomics (or not).
 """
 
 import click
