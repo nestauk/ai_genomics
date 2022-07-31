@@ -1,4 +1,4 @@
-numpy
+numpy==1.22
 scipy
 pandas
 matplotlib
@@ -8,3 +8,11 @@ tqdm
 filelock
 typer
 sh
+fasttext
+tomotopy
+scikit-learn
+gensim
+spacy
+umap-learn
+ratelim
+python-dotenv
