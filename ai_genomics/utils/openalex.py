@@ -184,6 +184,7 @@ def make_work_concepts(
     works_list: List,
     variable: str = "concepts",
     keys_to_keep: List = ["id", "display_name", "score"],
+    make_df: bool = True,
 ) -> pd.DataFrame:
     """
     Extracts concepts from work (could be openalex or mesh)
@@ -192,6 +193,7 @@ def make_work_concepts(
         doc_list: list of openalex
         variable: concept variable to extract
         keys_to_keep: keys to keep in the concept
+        make_df: whether to make a df or not
 
     Returns:
         A df with work-level concepts
@@ -204,7 +206,9 @@ def make_work_concepts(
             get_nested_vars(doc, variable=variable, keys_to_keep=keys_to_keep)
             for doc in doc_list
         ],
-        lambda dict_list: pd.DataFrame(chain(*dict_list)),
+        lambda dict_list: pd.DataFrame(chain(*dict_list))
+        if make_df
+        else chain(*dict_list),
     )
 
 
