@@ -2,6 +2,7 @@ import json
 
 import pandas as pd
 from typing import List, Dict, Any
+from functools import reduce
 
 from ai_genomics.utils.reading import read_json
 from ai_genomics import PROJECT_DIR
@@ -57,7 +58,7 @@ def work_metadata(discipline: str, year_list: list) -> pd.DataFrame:
 
     return pd.concat(
         [
-            pd.read_csv(f"{OALEX_PATH}/works_{discipline}_{year}.csv")
+            pd.read_csv(f"{OALEX_PATH}/works_{discipline}_{year}_augmented.csv")
             for year in year_list
         ]
     ).reset_index(drop=True)
@@ -108,3 +109,15 @@ def instit_metadata() -> pd.DataFrame:
     """Read institution metadata"""
 
     return pd.read_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv")
+
+
+def work_abstracts(discipline: str, years: List) -> Dict:
+    """Reads the abstracts for a list of years"""
+
+    return reduce(
+        lambda a, b: dict(a, **b),
+        [
+            read_json(f"{OALEX_PATH}/abstracts_{discipline}_{year}.json")
+            for year in years
+        ],
+    )
