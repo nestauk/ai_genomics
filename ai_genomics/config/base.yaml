@@ -1,6 +1,6 @@
 concept_threshold: 0.5
 inst_meta_vars:
-  - id,
+  - id
   - display_name
   - country_code
   - type
@@ -17,3 +17,49 @@ venue_meta_vars:
   - id
   - display_name
   - url
+ai_terms:
+  - " ai "
+  - " ann "
+  - " gan "
+  - " gnn "
+  - " rnn "
+  - " dnn "
+  - " nlp"
+  - natural language processing
+  - transformer
+  - encoder
+  - accuracy
+  - artificial
+  - artificial intelligence
+  - bayes
+  - classifier
+  - convolution
+  - deep
+  - generative
+  - machine
+  - machine learning
+  - predict
+  - reinforcement
+  - representation
+  - state of the art
+  - state-of-the-art
+  - pattern recognition
+  - accuracy
+  - statistical
+  - supervis
+  - train
+  - clustering
+  - federat
+  - rbf
+  - unsupervis
+ai_cats:
+  - cs.CL
+  - cs.AI
+  - cs.NE
+  - cs.CV
+  - cs.LG
+  - stat.ML
+  - cs.IR
+  - cs.SO
+  - q-bio.QM
+  - math.ST
