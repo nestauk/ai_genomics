@@ -63,3 +63,22 @@ ai_cats:
   - cs.SO
   - q-bio.QM
   - math.ST
+ai_conf_acronyms:
+  - neurips
+  - icml
+  - cvf
+  - eccv
+  - aaai
+  - pmlr
+  - sigkdd
+  - ijcai
+  - acl
+selection_criteria:
+  concepts:
+    - Artificial intelligence
+    - Machine learning
+    - Deep learning
+  thresholds:
+    - 0.3
+    - 0.71
+    - 0.1
