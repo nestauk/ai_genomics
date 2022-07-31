@@ -84,7 +84,7 @@ OpenAlex papers obtained from the [PubMed](https://pubmed.ncbi.nlm.nih.gov/) lib
 
 We have extracted all OpenAlex concepts that mention the term "genom". This yields the list portrayed in @fig:concepts.
 
-![Genome / genomics related concepts in the OpenAlex taxonomy](/genomics_concepts.png){#fig:concepts}
+![Genome / genomics related concepts in the OpenAlex taxonomy](genomics_concepts.png){#fig:concepts}
 
 Having done this, we have selected all papers in our genetics corpus with at least one genomics concept, which leaves us with 112,271 papers. An initial exploration of the data suggests a lower level of noise / false positives than was the case with the Artificial Intelligence corpus. Unfortunately, it seems that our challenge with the genomics corpus is the opposite than we faced there, which is low recall: many articles in genomics related concepts that we might have expected to find nested within the higher level genetics category that we have already collected are not present there. As an example, when we query our final AI corpus for papers with genomics-related concepts, we find 2900 papers that are not present in the genetics corpus. This suggests that we might have to collect additional data for those concepts at a finer level of resolution.
 
