@@ -23,4 +23,6 @@ mkdir inputs/data/arxiv
 aws s3 cp s3://ai-genomics/inputs/miscellaneous/arxiv_article_categories.csv inputs/data/arxiv/arxiv_article_categories.csv
 ```
 
-To fetch other article category data we use to label the OpenAlex data.
+to fetch other article category data we use to label the OpenAlex data.
+
+Run `python ai_genomics/analysis/openalex_definition.py` to implement the definitions and generate results. This includes printing stats in the console and saving relevant tables in `inputs/data`.
