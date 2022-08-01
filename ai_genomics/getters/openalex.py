@@ -3,6 +3,7 @@ import json
 import pandas as pd
 from typing import List, Dict, Any
 from functools import reduce
+from toolz import pipe
 
 from ai_genomics.utils.reading import read_json
 from ai_genomics import PROJECT_DIR
@@ -43,6 +44,20 @@ def get_openalex_concepts() -> list:
     """
 
     return read_json(f"{PROJECT_DIR}/inputs/openalex/concepts.json")
+
+
+def get_concepts_df() -> pd.DataFrame:
+    """Parses open alex concepts as a dataframe"""
+
+    KEEP_KEYS = ["id", "display_name", "level", "works_count"]
+
+    return pipe(
+        get_openalex_concepts(),
+        lambda list_dict: [
+            {k: v for k, v in _dict.items() if k in KEEP_KEYS} for _dict in list_dict
+        ],
+        pd.DataFrame,
+    )
 
 
 def work_metadata(discipline: str, year_list: list) -> pd.DataFrame:
