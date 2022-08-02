@@ -427,7 +427,7 @@ if __name__ == "__main__":
         / 1e6
     )
 
-    logging.info(f"Size of full dataset in english and with abstracts:{full_size}")
+    logging.info(f"Size of full dataset in english and with abstracts:{full_size} M")
 
     all_works_filtered = filter_works(all_works, all_abstracts)
 
@@ -439,7 +439,7 @@ if __name__ == "__main__":
         return_excluded=False,
     )
 
-    logging.info(f"provisional dataset size: {all_works_provisional.shape[0] / 1e6}M")
+    logging.info(f"provisional dataset size: {all_works_provisional.shape[0] / 1e6} M")
 
     all_works_provisional.to_csv(
         f"{PROJECT_DIR}/inputs/data/openalex/ai_openalex_corpus.csv", index=False
