@@ -22,7 +22,9 @@ We use [OpenAlex](https://www.openalex.org) as our core research data source. Op
 
 [^1]: See [here](https://docs.google.com/document/d/1OgXSLriHO3Ekz0OYoaoP_h0sPcuvV4EqX7VgLLblKe4/edit) for additional information about OpenAlex' tagging methodology.
 
-OpenAlex is a new database but current discussions suggest that it is the best open dataset available, and that it's coverage and accuracy is already comparable to established players such as Scopus or Dimensions.
+OpenAlex is a new database but current discussions suggest that it is the best open dataset available, it's coverage and accuracy is already comparable to established players such as Scopus or Dimensions, and it may [surpass MAG](https://arxiv.org/abs/2206.14168) in some aspects.
+
+OpenAlex provides an [open and accessible API](https://docs.openalex.org/api) for querying and collecting data from its corpus. Our approach has been to use broad, high-level concepts related to our areas of interest, and query the corpus of works for each of the last 15 years that have been tagged with those concepts, to build a collection of works that covers all potentially relevant papers. Through a combination of batch processing these queries in parallel, and the high level of efficiency and stability of OpenAlex's API, this collection can be done in under a day.
 
 We have collected all the OpenAlex `works` (papers) tagged with the concepts "Artificial intelligence" (around 3 million documents) and "Genetics" (453K documents) and filtered them further through the steps that we describe below:
 
