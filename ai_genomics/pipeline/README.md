@@ -25,6 +25,8 @@ aws s3 cp s3://ai-genomics/inputs/miscellaneous/arxiv_article_categories.csv inp
 
 To fetch other article category data we use to label the OpenAlex data.
 
+Run `python ai_genomics/analysis/openalex_definition.py` to implement the definitions and generate results. This includes printing stats in the console and saving relevant tables in `inputs/data`.
+
 ## CrunchBase
 
 Run `python ai_genomics/analyss/crunchbase_definitions.py` to test the impact of different definition strategies on the results. Data are fetched from S3 but not stored locally.
