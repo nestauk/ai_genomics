@@ -1,6 +1,6 @@
 # CrunchBase
 
-Our analysis of startup activity in the intersection of AI and genomics relies on [CrunchBase](https://www.crunchbase.com/), a widely database with information about just under 4.9 million technology organisations and startups and their investments. We have collected and stored all this data locally.
+Our analysis of startup activity in the intersection of AI and genomics relies on [CrunchBase](https://www.crunchbase.com/), a widely used database with information about just under 4.9 million technology organisations and startups and their investments. We have collected and stored all this data locally.
 
 ## Processing
 
