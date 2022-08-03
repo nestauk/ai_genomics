@@ -1,6 +1,5 @@
 # Script to test definitions in the crunchbase data
 
-import io
 import logging
 from typing import Set, Union
 
@@ -59,7 +58,7 @@ if __name__ == "__main__":
     ]
 
     cb_comps["description_combined"] = [
-        str(descr_short) + "_" + str(descr_long)
+        f"{str(descr_short)} {str(descr_long)}"
         for descr_short, descr_long in zip(
             cb_comps["short_description"], cb_comps["long_description"]
         )
@@ -92,7 +91,7 @@ if __name__ == "__main__":
     logging.info(f"organisations with terms in both categories:{len(ai_gen_combined)}")
 
     logging.info("Get 5 random examples")
-    store_df = []
+    sample_orgs = []
 
     for cat, name in zip(
         [ai_combined, gen_combined, ai_gen_combined],
@@ -103,23 +102,23 @@ if __name__ == "__main__":
 
         sampled = relevant.sample(5)
 
-        for _, s in sampled.iterrows():
+        for _, sampled in sampled.iterrows():
 
-            store_df.append(
+            sample_orgs.append(
                 {
                     **{
                         k: v
-                        for k, v in dict(s).items()
+                        for k, v in dict(sampled).items()
                         if k in ["name", "description_combined"]
                     },
                     **{"category": name},
                 }
             )
 
-    logging.info(pd.DataFrame(store_df).head())
+    logging.info(pd.DataFrame(sample_orgs).head())
 
     (
-        pd.DataFrame(store_df)
+        pd.DataFrame(sample_orgs)
         .assign(
             description_combined=lambda df: df["description_combined"].str[:400] + "..."
         )
