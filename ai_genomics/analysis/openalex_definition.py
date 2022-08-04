@@ -555,7 +555,76 @@ if __name__ == "__main__":
         f"AI with genomics concept through all search strategies {len(ai_genomics_all_approaches)}"
     )
 
-    ai_genomics_all_approaches.to_csv(
-        f"{PROJECT_DIR}/inputs/data/openalex/ai_genomics_all_approaches.csv",
-        index=False,
+    logging.info("Crude search for AI papers in the genetics dataset")
+    ai_terms_genetics = config["ai_terms_genetics"]
+
+    non_empty_genetics = {k: v for k, v in abstracts_genetics.items() if type(v) == str}
+    crude_genomic_ai_search = {
+        k: v
+        for k, v in non_empty_genetics.items()
+        if any(t in v for t in ai_terms_genetics)
+    }
+    genetic_ai_abstract_ids = set(crude_genomic_ai_search.keys())
+
+    logging.info(f"Genetics papers with AI terms: {len(genetic_ai_abstract_ids)}")
+
+    logging.info("Look for genetics papers with AI concepts")
+    genetic_ai_definition_ids = pipe(
+        subset_on_concepts(
+            works_meta_genetics_filtered,
+            works_concepts_genetics,
+            {"Artificial intelligence": 0, "Machine learning": 0, "Deep learning": 0},
+            inclusive=True,
+            return_excluded=False,
+        )["work_id"],
+        set,
+    )
+
+    logging.info(f"Genetics papers with AI concepts: {len(genetic_ai_definition_ids)}")
+
+    logging.info("Combine everything")
+    ai_gen_total_ids = all_genomics_ids.union(genetic_ai_abstract_ids).union(
+        genetic_ai_definition_ids
+    )
+
+    logging.info(f"Genetics papers in all approaches: {len(ai_gen_total_ids)}")
+
+    # Provisional dataset
+    ai_genomics_provisional_dataset = (
+        pd.concat(
+            [
+                all_works_provisional.loc[
+                    all_works_provisional["work_id"].isin(ai_gen_total_ids)
+                ],
+                works_meta_genetics.loc[
+                    works_meta_genetics["work_id"].isin(ai_gen_total_ids)
+                ],
+            ]
+        )
+        .drop_duplicates("work_id")
+        .reset_index(drop=True)
+    )
+
+    ai_genomics_provisional_dataset.to_csv(
+        f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv"
+    )
+
+    combined_abstracts = {**all_abstracts, **abstracts_genetics}
+
+    # Create example table
+    ai_genomics_example_table = []
+
+    for _, sampled in ai_genomics_provisional_dataset.sample(5).iterrows():
+
+        ai_genomics_example_table.append(
+            {
+                "title": sampled["display_name"],
+                "abstract (truncated)": combined_abstracts[sampled["work_id"]][:700],
+            }
+        )
+
+    logging.info(pd.DataFrame(ai_genomics_example_table).head())
+
+    pd.DataFrame(ai_genomics_example_table).to_markdown(
+        f"{PROJECT_DIR}/outputs/openalex_examples.md", index=False
     )

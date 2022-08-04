@@ -30,9 +30,11 @@ ai_terms:
   - " ann "
   - " gan "
   - " gnn "
+  - " cnn "
   - " rnn "
   - " dnn "
-  - " nlp"
+  - " nlp "
+  - " cnn "
   - natural language processing
   - transformer
   - encoder
@@ -81,6 +83,29 @@ ai_conf_acronyms:
   - sigkdd
   - ijcai
   - acl
+ai_terms_genetics:
+  - random forest
+  - " svm "
+  - logistic
+  - lasso
+  - machine learning
+  - deep learning
+  - " ai "
+  - " ann "
+  - " gan "
+  - " gnn "
+  - " rnn "
+  - " dnn "
+  - " nlp "
+  - supervised
+  - unsupervised
+  - reinforcement learning
+  - convolutional
+  - " cnn "
+  - artificial intelligence
+  - bayesian
+  - transfer learning
+  - artificial neural network
 selection_criteria:
   concepts:
     - Artificial intelligence
