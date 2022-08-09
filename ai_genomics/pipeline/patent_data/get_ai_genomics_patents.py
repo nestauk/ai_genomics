@@ -68,7 +68,7 @@ def genomics_ai_query(
         "FROM `patents-public-data.patents.publications`, UNNEST(cpc) AS cpc, UNNEST(ipc) AS ipc, "
         "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized "
         "INNER JOIN genomics_ids USING(publication_number) "
-        f"WHERE cpc.code in ({cpc_ai_ids}) OR ipc.code in ({ipc_ai_ids})  "
+        f"WHERE cpc.code in ({cpc_ai_ids}) OR ipc.code in ({ipc_ai_ids});"
     )
 
     return genomics_ai_q
@@ -126,15 +126,12 @@ if __name__ == "__main__":
             logger.info("Query results loaded to the table {}".format(full_table_name))
         except Forbidden:
             raise Error(f"Time out error. Try again in 2-3 hours.")
-    
+
     try:
         genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
-        # subset for only english titles AND abstracts
-        genomics_ai_df = genomics_ai_df[
-            (genomics_ai_df["title_language"] == "en")
-            & (genomics_ai_df["abstract_language"] == "en")
-        ]
-            # save to s3
+        # subset for only english abstracts and drop row_number
+        genomics_ai_df = genomics_ai_df[genomics_ai_df["abstract_language"] == "en"].drop(columns="row_number") #
+        # save to s3
         save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
     except Forbidden:
         raise Error(f"Time out error. Try again in 2-3 hours.")
