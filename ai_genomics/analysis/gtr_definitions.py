@@ -118,7 +118,7 @@ if __name__ == "__main__":
     logging.info(pd.DataFrame(project_examples))
 
     # Save project ids
-    with open(f"{PROJECT_DIR}/inputs/data/gtr/gtr_projects.json", "w") as f:
+    with open(GTR_INPUTS_DIR / "gtr_projects.json", "w") as f:
         json.dump(ai_genomics_combined, f)
 
     publications_from_projects = fetch_gtr("gtr_projects-outcomes_publications")
