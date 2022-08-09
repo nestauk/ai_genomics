@@ -48,9 +48,7 @@ def load_s3_data(bucket_name: str, file_name: str) -> Union[pd.DataFrame, str, d
         return pd.read_csv(f"s3://{bucket_name}/{file_name}")
     elif fnmatch(file_name, "*.tsv.zip"):
         return pd.read_csv(
-            f"s3://{bucket_name}/{file_name}",
-            compression="zip",
-            sep="\t",
+            f"s3://{bucket_name}/{file_name}", compression="zip", sep="\t",
         )
     elif fnmatch(file_name, "*.pickle") or fnmatch(file_name, "*.pkl"):
         file = obj.get()["Body"].read()
@@ -93,17 +91,3 @@ def save_to_s3(bucket_name: str, output_var, output_file_dir: str):
             'Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"'
         )
     logger.info(f"Saved to s3://{bucket_name} + {output_file_dir} ...")
-
-
-def save_txt_file(output_file_dir: str, output_var: str):
-    """
-    Save data to local txt file.
-
-    Args:
-        output_var: Object to be saved
-        output_file_dir: file path to save object to
-    """
-    with open(PROJECT_DIR / output_file_dir, "w") as fp:
-        for item in output_var:
-            # write each item on a new line
-            fp.write("%s\n" % item)

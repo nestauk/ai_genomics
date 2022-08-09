@@ -1,125 +1,117 @@
-"""Script to query google patent data with USPTO
-AI patent ids and identify patent ids that have
-genomics-related classification codes.
+"""Script to query BigQuery based on genomics related and AI related cpc/ipc codes."""
+from ai_genomics import bucket_name, logger
 
-To run script,
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"
-python get_ai_genomics_patents.py
-"""
-
-from ai_genomics import bucket_name, config, logger
 from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import est_conn
-from ai_genomics.getters.data_getters import (
-    load_s3_data,
-    save_to_s3,
-    get_s3_dir_files,
-)
 
-import pandas as pd
+from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 
 from ai_genomics.utils.error_utils import Error
-from google.cloud import bigquery
 from google.api_core.exceptions import Forbidden
-import uuid
-from toolz.itertoolz import partition_all
-from typing import List
+from typing import Dict, List
+
+S3_SAVE_FILENAME = (
+    "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv"
+)
+
+# load data
+cpc_codes = load_s3_data(bucket_name, "outputs/patent_data/class_codes/cpc.json")
+ipc_codes = load_s3_data(bucket_name, "outputs/patent_data/class_codes/ipc.json")
 
 
-def make_query_chunks(uspto_patent_ids: List[str], table: str) -> List[str]:
-    """Generate BigQuery query chunks based on USPTO AI patent IDS.
-
-    Args:
-        uspto_patent_ids: List of patent IDs.
-    Returns:
-        uspto_queries (list): List of BigQuery queries.
+def covert_list_of_codes_to_string(list_of_codes: List[str]) -> str:
+    """Converts list of relevant IPC and CPC codes to BigQuery-compliant
+            string.
     """
-    uspto_queries = []
-    uspto_patent_chunks = list(
-        partition_all(8520, uspto_patent_ids)
-    )  # split based on query string limits
-
-    for uspto_patent_chunk in uspto_patent_chunks:
-        ids = "'" + "', '".join([str(i) for i in uspto_patent_chunk]) + "'"
-        q = (
-            "SELECT DISTINCT publication_number "
-            f"FROM `{table}` "
-            f"WHERE REGEXP_EXTRACT(publication_number, r'[0-9]+') IN ({ids}) AND STARTS_WITH(publication_number, 'US-')"
-        )
-
-        if len(q) > 102400:  # resulting query must be less than 1024000 chars
-            raise Error("Query too large - make int smaller.")
-        else:
-            uspto_queries.append(q)
-
-    return uspto_queries
+    return "'" + "', '".join(list_of_codes) + "'"
 
 
-def query_patent_data(
-    conn: bigquery.Client, query_chunks: List[str], chunk_indx: int, table: str
-) -> pd.DataFrame:
-    """Queries genomics tables in query chunks. Saves each query chunk
-    as a CSV and prints chunk_indx when Time out error.
-
+def create_genomics_ai_patents_table_query(
+    cpc_codes: Dict[str, list] = cpc_codes,
+    ipc_codes: Dict[str, list] = ipc_codes,
+    table_name: str = "ai_genomics",
+) -> str:
+    """Generates query to create bespoke genomics ai table 
+            based on cpc and ipc codes. 
+    
     Args:
-        conn: Google BigQuery connection.
-        query_chunks (list): List of sql queries.
-        chunk_indx (int): query chunks indx to start querying from.
+        cpc_codes: dictionary of genomics and ai- related cpc codes.
+        ipc_codes: dictionary of genomics and ai- related ipc codes.
+        table_name: name of table to be created.
     """
-    chunks = get_s3_dir_files(
-        bucket_name,
-        f"outputs/patent_data/ai_genomics_id_chunks/{table}_{len(query_chunks)}_chunksize/",
+    cpc_ai_ids, ipc_ai_ids = (
+        covert_list_of_codes_to_string(cpc_codes["ai"]),
+        covert_list_of_codes_to_string(ipc_codes["ai"]),
     )
-    ai_genomics_patent_id_chunk_csvs = [
-        chunk for chunk in chunks if chunk.endswith("csv")
-    ]
-    if len(ai_genomics_patent_id_chunk_csvs) != len(
-        query_chunks
-    ):  # if there are more chunks than chunk files...
-        for uspto_indx, uspto_query in enumerate(query_chunks[chunk_indx:]):
-            try:
-                data = (
-                    conn.query(uspto_query).to_dataframe()
-                    # .drop_duplicates("doc_id")
-                )
-                logger.info(f"got query chunk {chunk_indx + uspto_indx + 1}")
-                save_to_s3(
-                    bucket_name,
-                    data,
-                    f"outputs/patent_data/ai_genomics_id_chunks/{table}{len(query_chunks)}_chunksize/ai_genomics_patent_ids_{chunk_indx + uspto_indx + 1}_{str(uuid.uuid4())}.csv",
-                )
-            except Forbidden:
-                raise Error(
-                    f"Time out error at {chunk_indx + uspto_indx + 1} patent chunk. Try again later."
-                )
-    else:
-        logger.info("Queried all patent id chunks.")
+    cpc_genomics_ids, ipc_genomics_ids = (
+        covert_list_of_codes_to_string(cpc_codes["genomics"]),
+        covert_list_of_codes_to_string(ipc_codes["genomics"]),
+    )
+
+    genomics_q = (
+        f"SELECT DISTINCT publication_number "
+        "FROM `patents-public-data.patents.publications`, UNNEST(cpc) AS cpc__u, UNNEST(ipc) AS ipc__u "
+        f"WHERE cpc__u.code IN ({cpc_genomics_ids}) OR "
+        f"ipc__u.code IN ({ipc_genomics_ids})"
+    )
+
+    genonmics_ai_fields = (
+        "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
+        "title_localized.text as title_text, title_localized.language as title_language, "
+        "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
+        "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
+    )
+
+    genomics_ai_q = (
+        f"CREATE TABLE golden-shine-355915.genomics.{table_name} as WITH "
+        f"genomics_ids AS ({genomics_q}) "
+        "SELECT "
+        f"{genonmics_ai_fields}"
+        "FROM `patents-public-data.patents.publications`, UNNEST(cpc) AS cpc, UNNEST(ipc) AS ipc, "
+        "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized "
+        "INNER JOIN genomics_ids USING(publication_number) "
+        f"WHERE cpc.code in ({cpc_ai_ids}) OR ipc.code in ({ipc_ai_ids})  "
+        "AND abstract_localized.language = 'en' AND abstract_localized.text = 'en'"
+    )
+
+    return genomics_ai_q
+
+
+def select_unique_ai_genomics_patents(table_name: str = "ai_genomics") -> str:
+    """Selects unique ai-genomics patents based on publication_number.
+    
+    Args:
+        table_name: name of table to query.
+    """
+    unique_ai_genomics_patents = (
+        "SELECT * FROM ("
+        "SELECT *, ROW_NUMBER() OVER (PARTITION BY publication_number) row_number "
+        f"FROM golden-shine-355915.genomics.{table_name}) "
+        "WHERE row_number = 1"
+    )
+
+    return unique_ai_genomics_patents
 
 
 if __name__ == "__main__":
+    tables = conn.list_tables("golden-shine-355915.genomics")
+    table_names = [
+        "{}.{}.{}".format(table.project, table.dataset_id, table.table_id)
+        for table in tables
+    ]
+    unique_ai_genomics_patents_q = select_unique_ai_genomics_patents()
 
-    # clean up BigQuery table name
-    table = config["sql_table"].replace("*", "").replace(".", "_")
-
-    # est BigQuery connection
-    google_conn = est_conn()
-    # load data
-    uspto_data = load_s3_data(bucket_name, config["uspto_file"])
-    uspto_data = uspto_data[uspto_data["predict50_any_ai"] > 0]
-    uspto_patent_ids = uspto_data[uspto_data.flag_patent == 1]["doc_id"].tolist()
-    print("loaded data")
-
-    # Make query chunks
-    query_chunks = make_query_chunks(uspto_patent_ids, config["sql_table"])
-
-    chunks = get_s3_dir_files(
-        bucket_name,
-        f"outputs/patent_data/ai_genomics_id_chunks/{table}{len(query_chunks)}_chunksize/",
-    )
-    query_chunks_indxs = [chunk for chunk in chunks if chunk.endswith("csv")]
-    # get query chunk indx based chunks already queried in s3
-    if query_chunks_indxs != []:  # get last chunk
-        indx = len(query_chunks_indxs)
+    if "golden-shine-355915.genomics.genomics" in table_names:
+        try:
+            genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
+        except Forbidden:
+            raise Error(f"Time out error. Try again in 2-3 hours.")
     else:
-        indx = 0
-    # query BigQuery
-    query_patent_data(google_conn, query_chunks, int(indx), table)
+        try:
+            genomics_table_q = create_genomics_ai_patents_table_query()
+            conn.query(genomics_table_q)  # create genomics table
+            # then query genomics table for data
+            genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
+        except Forbidden:
+            raise Error(f"Time out error. Try again in 2-3 hours.")
+    # save to s3
+    save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)

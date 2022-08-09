@@ -9,6 +9,10 @@ import os
 from ai_genomics.utils.error_utils import Error
 from typing import List
 from collections.abc import Iterable
+import pandas as pd
+import numpy as np
+
+DATE_COLS = ["publication_date", "grant_date", "filing_date", "priority_date"]
 
 
 def est_conn():
@@ -29,6 +33,24 @@ def est_conn():
         )
 
 
+def replace_missing_values_with_nans(ai_genomics_patents: pd.DataFrame) -> pd.DataFrame:
+    """Replace missing values in the AI in
+    genomics patents dataset with NaNs"""
+    return ai_genomics_patents.replace(
+        {date_col: 0 for date_col in DATE_COLS}, np.nan,
+    ).mask(ai_genomics_patents.applymap(str).eq("[]"))
+
+
+def convert_date_columns_to_datetime(ai_genomics_patents: pd.DataFrame) -> pd.DataFrame:
+    """Convert date columns to datetime format
+    in the AI in genomics patents dataset"""
+    for col in DATE_COLS:
+        ai_genomics_patents[col] = pd.to_datetime(
+            ai_genomics_patents[col], format="%Y%m%d"
+        )
+    return ai_genomics_patents
+
+
 def clean_ipc_codes(genomics_codes: List[str]) -> List[str]:
     """Prepares IPC codes by replacing '000' with '/' to match Google BigQuery format.
 
@@ -42,9 +64,17 @@ def clean_ipc_codes(genomics_codes: List[str]) -> List[str]:
     for ipc_code in genomics_codes:
         if len(ipc_code) == 14:
             if ipc_code[6] == "0":
-                ipc_codes_clean.append(
-                    ipc_code[:4] + ipc_code[7:8] + "/" + ipc_code[8:10]
-                )
+                if ipc_code[10:] != "0000":
+                    ipc_codes_clean.append(
+                        ipc_code[:4]
+                        + ipc_code[7:8]
+                        + "/"
+                        + ipc_code[8 : len(ipc_code) - 1]
+                    )
+                else:
+                    ipc_codes_clean.append(
+                        ipc_code[:4] + ipc_code[7:8] + "/" + ipc_code[8:10]
+                    )
             else:
                 ipc_codes_clean.append(
                     ipc_code[:4] + ipc_code[6:8] + "/" + ipc_code[8:10]
@@ -53,25 +83,3 @@ def clean_ipc_codes(genomics_codes: List[str]) -> List[str]:
             ipc_codes_clean.append(ipc_code + "/")
 
     return ipc_codes_clean
-
-
-def make_table_query(classification_codes: List[str], class_sys: str) -> str:
-    """Generates queries for BigQuery console to generate new tables.
-
-    Args:
-        classification_codes (list): list of classification codes.
-        class_sys: classification system to query.
-
-    Returns:
-        q (str): string to query BigQuery console with.
-    """
-
-    class_str = "'" + "', '".join(classification_codes) + "'"
-
-    q = (
-        f"SELECT publication_number, application_number, {clas_sys}__u.code "
-        f"FROM `patents-public-data.patents.publications`, UNNEST({class_sys}) AS {class_sys}__u "
-        f"WHERE {class_sys}__u.code IN ({class_str})"
-    )
-
-    return q
