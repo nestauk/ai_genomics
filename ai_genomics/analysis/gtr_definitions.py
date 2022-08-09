@@ -97,16 +97,13 @@ if __name__ == "__main__":
     logging.info(f"AI and genomics projects combined: {len(ai_genomics_combined)}")
 
     # Get project examples
-    project_examples = []
-
-    for sampled in random.sample(ai_genomics_combined, 5):
-
-        project_examples.append(
-            {
-                "Project title": sampled["title"],
-                "Abstract (truncated)": sampled["abstractText"][:700] + "...",
-            }
-        )
+    project_examples = [
+        {
+            "Project title": sampled["title"],
+            "Abstract (truncated)": sampled["abstractText"][:700] + "...",
+        }
+        for sampled in random.sample(ai_genomics_combined, 5)
+    ]
 
     pd.DataFrame(project_examples).to_markdown(
         f"{PROJECT_DIR}/outputs/gtr_examples.md", index=False
