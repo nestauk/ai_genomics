@@ -14,7 +14,7 @@ There are two potential strategies to identify relevant projects in the GtR data
 
 ### Identifying relevant topics
 
-There are 764 topics in the GtR data. We have identified those that could be relevant for the project usign a simple string search (see @tbl:topics for their distribution).
+There are 764 topics in the GtR data. We have identified those that could be relevant for the project using a simple string search (see @tbl:topics for their distribution).
 
 | Topic                         | Number of projects |
 | :---------------------------- | :----------------- |
