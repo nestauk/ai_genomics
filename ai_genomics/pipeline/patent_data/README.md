@@ -26,7 +26,7 @@ Finally, to identify and save AI- and genomics- related patents to s3, run:
 
 `python ai_genomics/pipeline/patent_data/get_ai_genomics_patents.py`
 
-You can pass a the name of the table to query unique ai and genomics patents from. If the table does not exist in bigquery, it will create the table then pull unique ai and genomics patents from it. If you are going to create a table, please create one in `golden-shine-355915.genomics`.
+You can pass a name of the table to query unique ai and genomics patents from. If the table does not exist in `golden-shine-355915.genomics`, it will first create the table then pull unique ai and genomics patents from it. Be careful of query limits when creating tables.
 
 ### Quota limits
 

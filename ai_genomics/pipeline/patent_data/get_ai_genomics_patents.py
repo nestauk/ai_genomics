@@ -74,7 +74,9 @@ def genomics_ai_query(
     return genomics_ai_q
 
 
-def select_unique_ai_genomics_patents(table_name: str = "golden-shine-355915.genomics.ai_genomics") -> str:
+def select_unique_ai_genomics_patents(
+    table_name: str,
+) -> str:
     """Selects unique ai-genomics patents based on publication_number.
 
     Args:
@@ -83,7 +85,7 @@ def select_unique_ai_genomics_patents(table_name: str = "golden-shine-355915.gen
     unique_ai_genomics_patents = (
         "SELECT * FROM ("
         "SELECT *, ROW_NUMBER() OVER (PARTITION BY publication_number) row_number "
-        f"FROM {table_name}) "
+        f"FROM `{table_name}`) "
         "WHERE row_number = 1"
     )
 
@@ -97,11 +99,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--table_name",
         help="the name of the table to pull ai genomics patents from",
-        default="golden-shine-355915.genomics.ai_genomics"
+        default="ai_genomics",
     )
 
     args = parser.parse_args()
-    table_name = args.table_name
+    table_name = 'golden-shine-355915.genomics.' + args.table_name
 
     conn = est_conn()
     tables = conn.list_tables("golden-shine-355915.genomics")
@@ -109,7 +111,7 @@ if __name__ == "__main__":
         "{}.{}.{}".format(table.project, table.dataset_id, table.table_id)
         for table in tables
     ]
-    unique_ai_genomics_patents_q = select_unique_ai_genomics_patents()
+    unique_ai_genomics_patents_q = select_unique_ai_genomics_patents(table_name=table_name)
 
     if table_name in table_names:
         try:
@@ -121,8 +123,9 @@ if __name__ == "__main__":
             ai_genomics_table_q = genomics_ai_query()
 
             job_config = bigquery.QueryJobConfig(destination=table_name)
-            conn.query(ai_genomics_table_q, job_config=job_config)  # create ai genomics table
-            
+            conn.query(
+                ai_genomics_table_q, job_config=job_config
+            )  # create ai genomics table
             # then query ai genomics table for unique publication_number
             genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
         except Forbidden:
