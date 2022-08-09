@@ -100,7 +100,7 @@ if __name__ == "__main__":
     ]
     unique_ai_genomics_patents_q = select_unique_ai_genomics_patents()
 
-    if "golden-shine-355915.genomics.genomics" in table_names:
+    if "golden-shine-355915.genomics.ai_genomics" in table_names:
         try:
             genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
         except Forbidden:
