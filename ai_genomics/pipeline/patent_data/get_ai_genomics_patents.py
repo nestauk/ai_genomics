@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 S3_SAVE_FILENAME = (
     "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv"
 )
+DATASET_NAME = "golden-shine-355915.genomics"
 
 # load data
 cpc_codes = load_s3_data(bucket_name, "outputs/patent_data/class_codes/cpc.json")
@@ -74,17 +75,17 @@ def genomics_ai_query(
 
 
 def select_unique_ai_genomics_patents(
-    table_name: str,
+    full_table_name: str,
 ) -> str:
     """Selects unique ai-genomics patents based on publication_number.
 
     Args:
-        table_name: name of table to query.
+        full_table_name: name of table to query.
     """
     unique_ai_genomics_patents = (
         "SELECT * FROM ("
         "SELECT *, ROW_NUMBER() OVER (PARTITION BY publication_number) row_number "
-        f"FROM `{table_name}`) "
+        f"FROM `{full_table_name}`) "
         "WHERE row_number = 1"
     )
 
@@ -102,35 +103,38 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    table_name = "golden-shine-355915.genomics." + args.table_name
+    table_name = args.table_name
+    full_table_name = DATASET_NAME + "." + table_name
 
     conn = est_conn()
-    tables = conn.list_tables("golden-shine-355915.genomics")
+    tables = conn.list_tables(DATASET_NAME)
     table_names = [
         "{}.{}.{}".format(table.project, table.dataset_id, table.table_id)
         for table in tables
     ]
     unique_ai_genomics_patents_q = select_unique_ai_genomics_patents(
-        table_name=table_name
+        full_table_name=full_table_name
     )
 
-    if table_name not in table_names:
+    if full_table_name not in table_names:
         try:
             ai_genomics_table_q = genomics_ai_query()
 
-            job_config = bigquery.QueryJobConfig(destination=table_name)
-            query_job = conn.query(
-                ai_genomics_table_q, job_config=job_config
-            )
+            job_config = bigquery.QueryJobConfig(destination=full_table_name)
+            query_job = conn.query(ai_genomics_table_q, job_config=job_config)
             query_job.result()
+            logger.info("Query results loaded to the table {}".format(full_table_name))
         except Forbidden:
             raise Error(f"Time out error. Try again in 2-3 hours.")
-    else:
-        try:
-            genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
-            #subset for only english titles AND abstracts 
-            genomics_ai_df = genomics_ai_df[(genomics_ai_df['title_language'] == 'en') & (genomics_ai_df['abstract_language'] == 'en')]
+    
+    try:
+        genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
+        # subset for only english titles AND abstracts
+        genomics_ai_df = genomics_ai_df[
+            (genomics_ai_df["title_language"] == "en")
+            & (genomics_ai_df["abstract_language"] == "en")
+        ]
             # save to s3
-            save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
-        except Forbidden:
-            raise Error(f"Time out error. Try again in 2-3 hours.")
+        save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
+    except Forbidden:
+        raise Error(f"Time out error. Try again in 2-3 hours.")
