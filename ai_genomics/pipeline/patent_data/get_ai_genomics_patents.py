@@ -1,6 +1,10 @@
 """Script to query BigQuery based on genomics related and AI related cpc/ipc codes."""
 from ai_genomics import bucket_name, logger
-from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import est_conn
+from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import (
+    est_conn,
+    replace_missing_values_with_nans,
+    convert_date_columns_to_datetime
+    )
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from ai_genomics.utils.error_utils import Error
 
@@ -130,7 +134,11 @@ if __name__ == "__main__":
     try:
         genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
         # subset for only english abstracts and drop row_number
-        genomics_ai_df = genomics_ai_df[genomics_ai_df["abstract_language"] == "en"].drop(columns="row_number") #
+        genomics_ai_df = genomics_ai_df[
+            genomics_ai_df["abstract_language"] == "en"
+        ].drop(
+            columns="row_number"
+        ).pipe(replace_missing_values_with_nans).pipe(convert_date_columns_to_datetime)  #
         # save to s3
         save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
     except Forbidden:
