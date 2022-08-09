@@ -90,12 +90,9 @@ if __name__ == "__main__":
     # We use this to catch dupes
     for _id in set([proj["id"] for proj in rel_projects]):
         for p in rel_projects:
-            if _id in used_ids:
-                pass
-            else:
-                if p["id"] == _id:
-                    ai_genomics_combined.append(p)
-                    used_ids.append(_id)
+            if _id not in used_ids and p["id"] == _id:
+                ai_genomics_combined.append(p)
+                used_ids.append(_id)
 
     logging.info(f"AI and genomics projects combined: {len(ai_genomics_combined)}")
 
