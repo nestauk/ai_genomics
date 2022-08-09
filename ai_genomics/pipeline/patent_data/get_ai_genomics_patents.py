@@ -68,7 +68,6 @@ def genomics_ai_query(
         "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized "
         "INNER JOIN genomics_ids USING(publication_number) "
         f"WHERE cpc.code in ({cpc_ai_ids}) OR ipc.code in ({ipc_ai_ids})  "
-        "AND abstract_localized.language = 'en' AND title_localized.language = 'en')"
     )
 
     return genomics_ai_q
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    table_name = 'golden-shine-355915.genomics.' + args.table_name
+    table_name = "golden-shine-355915.genomics." + args.table_name
 
     conn = est_conn()
     tables = conn.list_tables("golden-shine-355915.genomics")
@@ -111,24 +110,27 @@ if __name__ == "__main__":
         "{}.{}.{}".format(table.project, table.dataset_id, table.table_id)
         for table in tables
     ]
-    unique_ai_genomics_patents_q = select_unique_ai_genomics_patents(table_name=table_name)
+    unique_ai_genomics_patents_q = select_unique_ai_genomics_patents(
+        table_name=table_name
+    )
 
-    if table_name in table_names:
-        try:
-            genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
-        except Forbidden:
-            raise Error(f"Time out error. Try again in 2-3 hours.")
-    else:
+    if table_name not in table_names:
         try:
             ai_genomics_table_q = genomics_ai_query()
 
             job_config = bigquery.QueryJobConfig(destination=table_name)
-            conn.query(
+            query_job = conn.query(
                 ai_genomics_table_q, job_config=job_config
-            )  # create ai genomics table
-            # then query ai genomics table for unique publication_number
-            genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
+            )
+            query_job.result()
         except Forbidden:
             raise Error(f"Time out error. Try again in 2-3 hours.")
-    # save to s3
-    save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
+    else:
+        try:
+            genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
+            #subset for only english titles AND abstracts 
+            genomics_ai_df = genomics_ai_df[(genomics_ai_df['title_language'] == 'en') & (genomics_ai_df['abstract_language'] == 'en')]
+            # save to s3
+            save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
+        except Forbidden:
+            raise Error(f"Time out error. Try again in 2-3 hours.")
