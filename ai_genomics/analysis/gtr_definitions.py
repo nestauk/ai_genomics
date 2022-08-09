@@ -10,7 +10,8 @@ from collections import Counter
 from ai_genomics.pipeline.gtr import fetch_gtr
 from ai_genomics import config, PROJECT_DIR
 
-os.makedirs(f"{PROJECT_DIR}/inputs/data/gtr", exist_ok=True)
+GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
+GTR_INPUTS_DIR.mkdir(exist_ok=True)
 
 if __name__ == "__main__":
     logging.info("Reading GtR data")
