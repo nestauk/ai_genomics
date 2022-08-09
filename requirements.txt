@@ -17,3 +17,5 @@ spacy
 umap-learn
 ratelim
 python-dotenv
+altair_saver
+webdriver-manager

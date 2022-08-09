@@ -415,12 +415,12 @@ if __name__ == "__main__":
     )
 
     logging.info("Apply criteria to AI dataset")
-    all_works = work_metadata("artificial_intelligence", range(2012, 2021))
+    all_works = work_metadata("artificial_intelligence", range(2012, 2022))
     all_concepts = work_concepts(
-        "artificial_intelligence", "concepts", range(2012, 2021)
+        "artificial_intelligence", "concepts", range(2012, 2022)
     )
-    all_ai_mesh = work_concepts("artificial_intelligence", "mesh", range(2012, 2021))
-    all_abstracts = work_abstracts("artificial_intelligence", range(2012, 2021))
+    all_ai_mesh = work_concepts("artificial_intelligence", "mesh", range(2012, 2022))
+    all_abstracts = work_abstracts("artificial_intelligence", range(2012, 2022))
 
     full_size = (
         all_works.query("predicted_language=='en'").query("has_abstract==True").shape[0]
@@ -484,7 +484,7 @@ if __name__ == "__main__":
         .reset_index(drop=True)
     )
 
-    logging.info(f"genetics filtered total {len(works_meta_genetics)}")
+    logging.info(f"genetics filtered total {len(works_meta_genetics_filtered)}")
 
     # Genetics papers with genomics concepts
 
