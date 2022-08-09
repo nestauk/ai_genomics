@@ -1,6 +1,5 @@
-"""Functions to instantiate Google BigQuery client and
-create bespoke genomics patents Google BigQuery
-tables in local project.
+"""Functions to instantiate Google BigQuery client and 
+clean BigQuery results.
 """
 from google.oauth2.service_account import Credentials
 from google.cloud import bigquery
@@ -13,7 +12,6 @@ import pandas as pd
 import numpy as np
 
 DATE_COLS = ["publication_date", "grant_date", "filing_date", "priority_date"]
-
 
 def est_conn():
     """Instantiate Google BigQuery client to query patent data."""
