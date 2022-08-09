@@ -5,7 +5,6 @@ import boto3
 from typing import List, Dict
 
 from toolz import pipe
-from ai_genomics import PROJECT_DIR
 
 
 def fetch_gtr(table_name: str) -> List[Dict]:

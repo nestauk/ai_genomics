@@ -4,7 +4,6 @@ import json
 import logging
 import random
 import pandas as pd
-import os
 from collections import Counter
 
 from ai_genomics.pipeline.gtr import fetch_gtr
