@@ -108,8 +108,8 @@ if __name__ == "__main__":
     else:
         try:
             genomics_table_q = create_genomics_ai_patents_table_query()
-            conn.query(genomics_table_q)  # create genomics table
-            # then query genomics table for data
+            conn.query(genomics_table_q)  # create ai genomics table
+            # then query ai genomics table for unique publication_number
             genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
         except Forbidden:
             raise Error(f"Time out error. Try again in 2-3 hours.")
