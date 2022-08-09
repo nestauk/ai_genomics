@@ -70,7 +70,7 @@ def create_genomics_ai_patents_table_query(
         "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized "
         "INNER JOIN genomics_ids USING(publication_number) "
         f"WHERE cpc.code in ({cpc_ai_ids}) OR ipc.code in ({ipc_ai_ids})  "
-        "AND abstract_localized.language = 'en' AND abstract_localized.text = 'en'"
+        "AND abstract_localized.language = 'en' AND title_localized.language = 'en'"
     )
 
     return genomics_ai_q
