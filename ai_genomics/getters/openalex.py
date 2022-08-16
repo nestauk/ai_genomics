@@ -136,3 +136,15 @@ def work_abstracts(discipline: str, years: List) -> Dict:
             for year in years
         ],
     )
+
+
+def work_citations(discipline: str, years: List) -> Dict:
+    """Reads the citations for a list of years"""
+
+    return reduce(
+        lambda a, b: dict(a, **b),
+        [
+            read_json(f"{OALEX_PATH}/citations_{discipline}_{year}.json")
+            for year in years
+        ],
+    )
