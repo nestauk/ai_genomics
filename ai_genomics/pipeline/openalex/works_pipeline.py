@@ -39,10 +39,7 @@ def generate_queries(concepts, years):
         query_list : list of all queries
     """
     concepts_joined = "|".join(concepts)
-    query_list = []
-    for year in years:
-        query_list.append(f'{concepts_joined},publication_year:{year}')
-    return query_list
+    return [f'{concepts_joined},publication_year:{year}' for year in years]
 
 
 def api_generator(api_root: str, concept_ids: list) -> list:
@@ -63,8 +60,8 @@ def api_generator(api_root: str, concept_ids: list) -> list:
     print(total_results)
     number_of_pages = -(total_results // -200)  # ceiling division
     all_pages = [
-        f"{API_ROOT}concepts.id:{concepts_text}&per-page=200&cursor="
-        for i in range(1, number_of_pages + 1)
+        f"{api_root}concepts.id:{concepts_text}&per-page=200&cursor="
+        for _ in range(1, number_of_pages + 1)
     ]
     return all_pages
 
