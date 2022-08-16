@@ -86,7 +86,7 @@ ai_conf_acronyms:
 ai_terms_genetics:
   - random forest
   - " svm "
-  - logistic
+  - logistic regress
   - lasso
   - machine learning
   - deep learning
