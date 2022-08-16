@@ -1,8 +1,17 @@
+import json
+
+import pandas as pd
+from typing import List, Dict, Any
+from functools import reduce
+from toolz import pipe
+
 from ai_genomics.utils.reading import read_json
 from ai_genomics import PROJECT_DIR
 
+OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
 
-def get_openalex_works() -> list:
+
+def get_openalex_works() -> List[Dict[Any, Any]]:
     """Reads OpenAlex works (papers)
 
     Returns:
@@ -35,3 +44,107 @@ def get_openalex_concepts() -> list:
     """
 
     return read_json(f"{PROJECT_DIR}/inputs/openalex/concepts.json")
+
+
+def get_concepts_df() -> pd.DataFrame:
+    """Parses open alex concepts as a dataframe"""
+
+    KEEP_KEYS = ["id", "display_name", "level", "works_count"]
+
+    return pipe(
+        get_openalex_concepts(),
+        lambda list_dict: [
+            {k: v for k, v in _dict.items() if k in KEEP_KEYS} for _dict in list_dict
+        ],
+        pd.DataFrame,
+    )
+
+
+def work_metadata(discipline: str, year_list: list) -> pd.DataFrame:
+    """Reads metadata about openalex works
+
+    Args:
+        discipline: The discipline of the work (AI or genetics)
+        year_list: publication years
+
+    Returns:
+        A df with the metadata
+    """
+
+    return pd.concat(
+        [
+            pd.read_csv(f"{OALEX_PATH}/works_{discipline}_{year}_augmented.csv")
+            for year in year_list
+        ]
+    ).reset_index(drop=True)
+
+
+def work_concepts(discipline: str, concept: str, year_list: list) -> pd.DataFrame:
+    """Reads the concepts associated to openalex works
+
+    Args:
+        discipline: The discipline of the work (AI or genetics)
+        concept: whether we are collecting OpenAlex concepts or mesh terms
+        year_list: publication years
+
+    Returns:
+        A dataframe looking up works and concepts
+
+    """
+
+    return pd.concat(
+        [
+            pd.read_csv(f"{OALEX_PATH}/{concept}_{discipline}_{year}.csv")
+            for year in year_list
+        ]
+    ).reset_index(drop=True)
+
+
+def work_authorship(discipline: str, year_list: list) -> pd.DataFrame:
+    """
+    Reads the authors and institutions associated with an openalex work
+
+    Args:
+        discipline: The discipline of the work (AI or genetics)
+        year_list: publication years
+
+    Returns:
+        A dataframe with authors and institution ids
+    """
+
+    return pd.concat(
+        [
+            pd.read_csv(f"{OALEX_PATH}/authorships_{discipline}_{year}.csv")
+            for year in year_list
+        ]
+    ).reset_index(drop=True)
+
+
+def instit_metadata() -> pd.DataFrame:
+    """Read institution metadata"""
+
+    return pd.read_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv")
+
+
+def work_abstracts(discipline: str, years: List) -> Dict:
+    """Reads the abstracts for a list of years"""
+
+    return reduce(
+        lambda a, b: dict(a, **b),
+        [
+            read_json(f"{OALEX_PATH}/abstracts_{discipline}_{year}.json")
+            for year in years
+        ],
+    )
+
+
+def work_citations(discipline: str, years: List) -> Dict:
+    """Reads the citations for a list of years"""
+
+    return reduce(
+        lambda a, b: dict(a, **b),
+        [
+            read_json(f"{OALEX_PATH}/citations_{discipline}_{year}.json")
+            for year in years
+        ],
+    )
