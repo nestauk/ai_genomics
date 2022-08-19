@@ -4,14 +4,13 @@ clean BigQuery results.
 from google.oauth2.service_account import Credentials
 from google.cloud import bigquery
 import os
-
-from ai_genomics.utils.error_utils import Error
+from ai_genomics import logger
 from typing import List
-from collections.abc import Iterable
 import pandas as pd
 import numpy as np
 
 DATE_COLS = ["publication_date", "grant_date", "filing_date", "priority_date"]
+
 
 def est_conn():
     """Instantiate Google BigQuery client to query patent data."""
@@ -26,7 +25,7 @@ def est_conn():
         return client
 
     else:
-        raise Error(
+        logger.exception(
             "export GOOGLE_APPLICATION_CREDENTIALS directory path as global variable."
         )
 
@@ -35,7 +34,8 @@ def replace_missing_values_with_nans(ai_genomics_patents: pd.DataFrame) -> pd.Da
     """Replace missing values in the AI in
     genomics patents dataset with NaNs"""
     return ai_genomics_patents.replace(
-        {date_col: 0 for date_col in DATE_COLS}, np.nan,
+        {date_col: 0 for date_col in DATE_COLS},
+        np.nan,
     ).mask(ai_genomics_patents.applymap(str).eq("[]"))
 
 

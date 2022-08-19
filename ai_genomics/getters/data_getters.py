@@ -5,7 +5,6 @@ import json
 import pandas as pd
 from ai_genomics import logger
 from typing import Union, List
-from ai_genomics.utils.error_utils import Error
 
 S3 = boto3.resource("s3")
 
@@ -59,7 +58,7 @@ def load_s3_data(bucket_name: str, file_name: str) -> Union[pd.DataFrame, str, d
         file = obj.get()["Body"].read().decode()
         return json.loads(file)
     else:
-        raise Error(
+        logger.exception(
             'Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"'
         )
 
@@ -86,7 +85,7 @@ def save_to_s3(bucket_name: str, output_var, output_file_dir: str):
     elif fnmatch(output_file_dir, "*.json"):
         obj.put(Body=json.dumps(output_var))
     else:
-        raise Error(
+        logger.exception(
             'Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"'
         )
     logger.info(f"Saved to s3://{bucket_name} + {output_file_dir} ...")

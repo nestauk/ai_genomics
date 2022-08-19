@@ -6,8 +6,6 @@ from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import (
     convert_date_columns_to_datetime,
 )
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
-from ai_genomics.utils.error_utils import Error
-
 from google.api_core.exceptions import Forbidden
 from google.cloud import bigquery
 from typing import Dict, List
@@ -129,7 +127,7 @@ if __name__ == "__main__":
             query_job.result()
             logger.info("Query results loaded to the table {}".format(full_table_name))
         except Forbidden:
-            raise Error(f"Time out error. Try again in 2-3 hours.")
+            logger.exception("Time out error. Try again in 2-3 hours.")
 
     try:
         genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
@@ -143,4 +141,4 @@ if __name__ == "__main__":
         # save to s3
         save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
     except Forbidden:
-        raise Error(f"Time out error. Try again in 2-3 hours.")
+        logger.exception("Time out error. Try again in 2-3 hours.")
