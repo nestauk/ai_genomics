@@ -123,3 +123,6 @@ target/
 
 # NPM
 node_modules/
+
+# Google Cloud credentials
+/credentials/

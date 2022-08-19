@@ -9,3 +9,9 @@ filelock
 typer
 sh
 tabulate
+fsspec
+S3fs
+db-dtypes
+google-cloud-bigquery
+google-cloud-bigquery-storage
+google-api-core
