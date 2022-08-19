@@ -12,3 +12,4 @@ uspto_file: "inputs/patent_data/uspto/ai_model_predictions.tsv.zip"
 ai_genomics_patents_file: "/outputs/patent_data/ai_genomics_patent_ids.csv"
 sql_table: "golden-shine-355915.genomics.*"
 patent_class_codes_path: "inputs/patent_data/"
+
