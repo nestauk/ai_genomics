@@ -44,8 +44,11 @@ def genomics_ai_query(
             based on cpc and ipc codes.
 
     Args:
-        cpc_codes: dictionary of genomics and ai- related cpc codes.
-        ipc_codes: dictionary of genomics and ai- related ipc codes.
+        cpc_codes: dictionary of genomics and ai related cpc codes.
+        ipc_codes: dictionary of genomics and ai related ipc codes.
+
+    Returns:
+        BigQuery query to select genomics and ai related patents.
     """
     cpc_ai_ids, ipc_ai_ids = (
         covert_list_of_codes_to_string(cpc_codes["ai"]),
@@ -80,10 +83,8 @@ def genomics_ai_query(
 def select_unique_ai_genomics_patents(
     full_table_name: str,
 ) -> str:
-    """Selects unique ai-genomics patents based on publication_number.
-
-    Args:
-        full_table_name: name of table to query.
+    """Returns BigQuery query to select unique ai-genomics patents
+    based on publication_number from specified full_table_name
     """
     unique_ai_genomics_patents = (
         "SELECT * FROM ("
