@@ -5,17 +5,14 @@ exact match and manual pruning/adding.
 To run: python get_ai_genomics_codes.py
 """
 import string
-
-from ai_genomics import bucket_name, config, PROJECT_DIR, logger
+from ai_genomics import bucket_name, config
 from ai_genomics.getters.data_getters import (
     get_s3_dir_files,
     load_s3_data,
     save_to_s3,
 )
 from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import clean_ipc_codes
-
 from typing import List, Dict
-from toolz.functoolz import pipe
 import re
 
 AI_KEYWORDS = ["machine learning", "artificial intelligence", "neural network"]
