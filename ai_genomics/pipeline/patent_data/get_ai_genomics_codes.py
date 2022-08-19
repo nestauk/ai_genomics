@@ -95,11 +95,11 @@ def clean_class_code(code_text: str) -> str:
             - replacing values;
             - removing punctuation;
 
-    Inputs:
-        code_text: definition to clean
+    Args:
+        code_text: Definition to clean
 
-    Outputs:
-        code_text: clean definition
+    Returns:
+        Clean definition
     """
     return (
         code_text.replace("\r", "")
@@ -109,7 +109,11 @@ def clean_class_code(code_text: str) -> str:
 
 
 def make_keywords_regex_pattern(keywords: List[str]) -> str:
-    """Makes regex pattern given a list of keywords or phrases"""
+    """Makes regex pattern given a list of keywords or phrases
+
+    Example:
+        make_keywords_regex_pattern(['genome', 'dna']) -> '\\bgenome\\b|\\bdna\\b'
+    """
     return "|".join(f"\\b{k}\\b" for k in keywords)
 
 
@@ -119,9 +123,15 @@ def get_classification_codes(
 ) -> Dict[str, list]:
     """Get keyword-related classification codes per classification system.
 
-    Inputs:
-        class_codes: List of patent classification codes and descriptions of a given classification system.
-        bad_codes: List of 'bad' patent classification codes of a given classification system
+    Args:
+        class_codes: List of patent classification codes and
+            descriptions of a given classification system.
+        bad_codes: List of 'bad' patent classification codes
+            of a given classification system
+
+    Returns:
+         Dictionary containing keys for genomics and ai with values
+            of a list of classification codes
     """
     classification_codes = {label: [] for label in ("genomics", "ai")}
     ai_pattern, genomics_pattern = (
