@@ -1,12 +1,9 @@
-import os
 import pickle
 from fnmatch import fnmatch
 import boto3
 import json
-
 import pandas as pd
-
-from ai_genomics import bucket_name, logger, PROJECT_DIR
+from ai_genomics import logger
 from typing import Union, List
 from ai_genomics.utils.error_utils import Error
 
@@ -48,7 +45,9 @@ def load_s3_data(bucket_name: str, file_name: str) -> Union[pd.DataFrame, str, d
         return pd.read_csv(f"s3://{bucket_name}/{file_name}")
     elif fnmatch(file_name, "*.tsv.zip"):
         return pd.read_csv(
-            f"s3://{bucket_name}/{file_name}", compression="zip", sep="\t",
+            f"s3://{bucket_name}/{file_name}",
+            compression="zip",
+            sep="\t",
         )
     elif fnmatch(file_name, "*.pickle") or fnmatch(file_name, "*.pkl"):
         file = obj.get()["Body"].read()
