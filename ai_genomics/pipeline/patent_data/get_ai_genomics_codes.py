@@ -141,9 +141,11 @@ def get_classification_codes(
 
     for i, code in enumerate(class_codes):
         code_clean = clean_class_code(code[1])
-        if re.findall(genomics_pattern, code_clean):
-            if class_codes[i][0] not in bad_codes:
-                classification_codes["genomics"].append(class_codes[i][0])
+        if (
+            re.findall(genomics_pattern, code_clean)
+            and class_codes[i][0] not in bad_codes
+        ):
+            classification_codes["genomics"].append(class_codes[i][0])
         if re.findall(ai_pattern, code_clean):
             classification_codes["ai"].append(class_codes[i][0])
 
