@@ -23,6 +23,7 @@ AI_KEYWORDS = ["machine learning", "artificial intelligence", "neural network"]
 GENOMICS_KEYWORDS = ["genome", "dna", "gene", "genetic"]
 
 GOOD_GENOMICS_CPC_CODES = ["C12Q1/6869", "G16B20/20", "G16B5/20"]
+
 GOOD_AI_CPC_CODES = [
     "Y10S706/902",
     "Y10S706/908",
@@ -96,8 +97,10 @@ def clean_class_code(code_text: str) -> str:
             - lowercasing;
             - replacing values;
             - removing punctuation;
+
     Inputs:
         code_text: definition to clean
+
     Outputs:
         code_text: clean definition
     """
@@ -114,13 +117,14 @@ def make_keywords_regex_pattern(keywords: List[str]) -> str:
 
 
 def get_classification_codes(
-    class_codes: List[str], bad_codes: List[str],
+    class_codes: List[str],
+    bad_codes: List[str],
 ) -> Dict[str, list]:
     """Get keyword-related classification codes per classification system.
 
     Inputs:
         class_codes: List of patent classification codes and descriptions of a given classification system.
-        bad_codes: List of 'bad' patent classification codes of a given classification system 
+        bad_codes: List of 'bad' patent classification codes of a given classification system
     """
     classification_codes = {label: [] for label in ("genomics", "ai")}
     ai_pattern, genomics_pattern = (
