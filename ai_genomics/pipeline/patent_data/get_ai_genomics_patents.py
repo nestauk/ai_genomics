@@ -18,9 +18,15 @@ S3_SAVE_FILENAME = (
 )
 DATASET_NAME = "golden-shine-355915.genomics"
 
-# load data
-cpc_codes = load_s3_data(bucket_name, "outputs/patent_data/class_codes/cpc.json")
-ipc_codes = load_s3_data(bucket_name, "outputs/patent_data/class_codes/ipc.json")
+GENOMICS_AI_FIELDS = (
+    "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
+    "title_localized.text as title_text, title_localized.language as title_language, "
+    "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
+    "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
+)
+
+CPC_CODES = load_s3_data(bucket_name, "outputs/patent_data/class_codes/cpc.json")
+IPC_CODES = load_s3_data(bucket_name, "outputs/patent_data/class_codes/ipc.json")
 
 
 def covert_list_of_codes_to_string(list_of_codes: List[str]) -> str:
@@ -31,8 +37,8 @@ def covert_list_of_codes_to_string(list_of_codes: List[str]) -> str:
 
 
 def genomics_ai_query(
-    cpc_codes: Dict[str, list] = cpc_codes,
-    ipc_codes: Dict[str, list] = ipc_codes,
+    cpc_codes: Dict[str, list] = CPC_CODES,
+    ipc_codes: Dict[str, list] = IPC_CODES,
 ) -> str:
     """Generates query to create bespoke genomics ai table
             based on cpc and ipc codes.
@@ -57,18 +63,11 @@ def genomics_ai_query(
         f"ipc__u.code IN ({ipc_genomics_ids})"
     )
 
-    genonmics_ai_fields = (
-        "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
-        "title_localized.text as title_text, title_localized.language as title_language, "
-        "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
-        "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
-    )
-
     genomics_ai_q = (
         f"WITH "
         f"genomics_ids AS ({genomics_q}) "
         "SELECT "
-        f"{genonmics_ai_fields}"
+        f"{GENOMICS_AI_FIELDS}"
         "FROM `patents-public-data.patents.publications`, UNNEST(cpc) AS cpc, UNNEST(ipc) AS ipc, "
         "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized "
         "INNER JOIN genomics_ids USING(publication_number) "
