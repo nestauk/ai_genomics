@@ -1,4 +1,4 @@
-"""Functions to instantiate Google BigQuery client and 
+"""Functions to instantiate Google BigQuery client and
 clean BigQuery results.
 """
 from google.oauth2.service_account import Credentials

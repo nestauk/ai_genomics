@@ -106,14 +106,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     table_name = args.table_name
-    full_table_name = DATASET_NAME + "." + table_name
+    full_table_name = f"{DATASET_NAME}.{table_name}"
 
     conn = est_conn()
     tables = conn.list_tables(DATASET_NAME)
     table_names = [
-        "{}.{}.{}".format(table.project, table.dataset_id, table.table_id)
-        for table in tables
+        f"{table.project}.{table.dataset_id}.{table.table_id}" for table in tables
     ]
+
     unique_ai_genomics_patents_q = select_unique_ai_genomics_patents(
         full_table_name=full_table_name
     )
@@ -125,7 +125,7 @@ if __name__ == "__main__":
             job_config = bigquery.QueryJobConfig(destination=full_table_name)
             query_job = conn.query(ai_genomics_table_q, job_config=job_config)
             query_job.result()
-            logger.info("Query results loaded to the table {}".format(full_table_name))
+            logger.info(f"Query results loaded to the table {full_table_name}")
         except Forbidden:
             logger.exception("Time out error. Try again in 2-3 hours.")
 
