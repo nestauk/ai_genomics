@@ -91,9 +91,9 @@ if __name__ == "__main__":
     project_examples = ai_genomics_combined.sample(5)[["title", "abstractText"]].rename(
         columns={"title": "Project title"}
     )
-    project_examples["Abstract (truncated)"] = project_examples["abstractText"].str[
-        :700
-    ]
+    project_examples["Abstract (truncated)"] = (
+        project_examples["abstractText"].str[:700] + "..."
+    )
     project_examples = project_examples[["Project title", "Abstract (truncated)"]]
     project_examples.to_markdown(f"{PROJECT_DIR}/outputs/gtr_examples.md", index=False)
 
