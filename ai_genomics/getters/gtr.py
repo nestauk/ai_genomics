@@ -20,5 +20,5 @@ def get_ai_genomics_gtr_data(data_type: str) -> pd.DataFrame:
         ).rename(columns=lambda x: re.sub(r"(?<!^)(?=[A-Z])", "_", x).lower())
     except ValueError:
         logger.error(
-            "FileNotFoundError: To create the file, run ai_genomics/analysis/gtr_definitions.py to generate the file"
+            "ValueError: To create the file, run ai_genomics/analysis/gtr_definitions.py to generate the file"
         )
