@@ -7,9 +7,48 @@ ai_cb_terms:
 genom_cb_terms:
   - genomic
   - genome
-
+gtr_topic_search:
+  - genom
+  - genetic
+  - artificial intelligence
+gtr_genom_concepts:
+  - Genomics
+  - Functional genomics
+  - Environmental Genomics
+  - Genome organisation
+gtr_ai_concepts:
+  - Artificial Intelligence
+gtr_ai_abstract:
+  - random forest
+  - " svm "
+  - logistic
+  - lasso
+  - machine learning
+  - deep learning
+  - " ai "
+  - " ann "
+  - " gan "
+  - " gnn "
+  - " rnn "
+  - " dnn "
+  - " nlp "
+  - supervised
+  - unsupervised
+  - reinforcement learning
+  - convolutional
+  - " cnn "
+  - artificial intelligence
+  - bayesian
+  - transfer learning
+  - artificial neural network
+  - data science
+  - data analytics
+  - predictive analytics
+gtr_genom_abstract:
+  - genomics
+  - genome
+  - gwas
 uspto_file: "inputs/patent_data/uspto/ai_model_predictions.tsv.zip"
 ai_genomics_patents_file: "/outputs/patent_data/ai_genomics_patent_ids.csv"
 sql_table: "golden-shine-355915.genomics.*"
 patent_class_codes_path: "inputs/patent_data/"
-
