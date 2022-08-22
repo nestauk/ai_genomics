@@ -1,8 +1,6 @@
 # Script to explore AI definition
 
-import json
 import logging
-import random
 import pandas as pd
 from collections import Counter
 
@@ -56,13 +54,14 @@ if __name__ == "__main__":
     ai_projs_abstr, genom_projs_abstr = [
         set(
             [
-                element["id"]
-                for element in projects
+                gtr_id
+                for gtr_id, abstract_text, title in zip(
+                    projects["id"].values(),
+                    projects["abstractText"].values(),
+                    projects["title"].values(),
+                )
                 if any(  # If any of the abstract terms are in the abstract or title
-                    t
-                    in str(element["abstractText"]).lower()
-                    + str(element["title"]).lower()
-                    for t in terms
+                    t in str(abstract_text).lower() + str(title).lower() for t in terms
                 )
             ]
         )
@@ -76,49 +75,44 @@ if __name__ == "__main__":
     )
 
     #  Intersection of the two sets
-    unified_projects = set(
-        ai_projs_abstr.union(ai_topics) & genom_projs_abstr.union(genomics_topics)
+    unified_projects = list(
+        set(ai_projs_abstr.union(ai_topics) & genom_projs_abstr.union(genomics_topics))
     )
 
-    # Extract projects (NB there are duplicates in the projects list)
-    rel_projects = [proj for proj in projects if proj["id"] in unified_projects]
-
-    ai_genomics_combined = []
-    used_ids = []
-
-    # We use this to catch dupes
-    for _id in set([proj["id"] for proj in rel_projects]):
-        for p in rel_projects:
-            if _id not in used_ids and p["id"] == _id:
-                ai_genomics_combined.append(p)
-                used_ids.append(_id)
+    ai_genomics_combined = (
+        pd.DataFrame.from_dict(projects)
+        .query(f"id in {unified_projects}")
+        .reset_index(drop=True)
+    )
 
     logging.info(f"AI and genomics projects combined: {len(ai_genomics_combined)}")
 
     # Get project examples
-    project_examples = [
-        {
-            "Project title": sampled["title"],
-            "Abstract (truncated)": sampled["abstractText"][:700] + "...",
-        }
-        for sampled in random.sample(ai_genomics_combined, 5)
-    ]
-
-    pd.DataFrame(project_examples).to_markdown(
-        f"{PROJECT_DIR}/outputs/gtr_examples.md", index=False
+    project_examples = ai_genomics_combined.sample(5)[["title", "abstractText"]].rename(
+        columns={"title": "Project title"}
     )
+    project_examples["Abstract (truncated)"] = project_examples["abstractText"].str[
+        :700
+    ]
+    project_examples = project_examples[["Project title", "Abstract (truncated)"]]
+    project_examples.to_markdown(f"{PROJECT_DIR}/outputs/gtr_examples.md", index=False)
 
-    logging.info(pd.DataFrame(project_examples))
+    logging.info(project_examples)
 
     # Save project ids
-    with open(GTR_INPUTS_DIR / "gtr_projects.json", "w") as f:
-        json.dump(ai_genomics_combined, f)
-
-    publications_from_projects = fetch_gtr("gtr_projects-outcomes_publications")
+    ai_genomics_combined.to_json(GTR_INPUTS_DIR / "gtr_ai_genomics_projects.json")
 
     # Get publications from projects
-    genom_publs = [
-        pap for pap in publications_from_projects if pap["project_id"] in used_ids
-    ]
+    publications_from_projects = fetch_gtr("gtr_projects-outcomes_publications")
 
-    logging.info(f"Genomics publications: {len(genom_publs)}")
+    genom_publs = pd.DataFrame(
+        [
+            pap
+            for pap in publications_from_projects
+            if pap["project_id"] in ai_genomics_combined.id.to_list()
+        ]
+    )
+
+    logging.info(f"AI and genomics publications: {len(genom_publs)}")
+
+    genom_publs.to_json(GTR_INPUTS_DIR / "gtr_ai_genomics_publications.json")
