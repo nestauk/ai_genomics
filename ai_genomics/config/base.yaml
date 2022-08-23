@@ -87,6 +87,21 @@ ai_terms_genetics:
   - random forest
   - " svm "
   - logistic regress
+gtr_topic_search:
+  - genom
+  - genetic
+  - artificial intelligence
+gtr_genom_concepts:
+  - Genomics
+  - Functional genomics
+  - Environmental Genomics
+  - Genome organisation
+gtr_ai_concepts:
+  - Artificial Intelligence
+gtr_ai_abstract:
+  - random forest
+  - " svm "
+  - "logistic "
   - lasso
   - machine learning
   - deep learning
@@ -115,3 +130,14 @@ selection_criteria:
     - 0.3
     - 0.71
     - 0.1
+  - data science
+  - data analytics
+  - predictive analytics
+gtr_genom_abstract:
+  - genomics
+  - genome
+  - gwas
+uspto_file: "inputs/patent_data/uspto/ai_model_predictions.tsv.zip"
+ai_genomics_patents_file: "/outputs/patent_data/ai_genomics_patent_ids.csv"
+sql_table: "golden-shine-355915.genomics.*"
+patent_class_codes_path: "inputs/patent_data/"
