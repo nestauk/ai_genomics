@@ -22,7 +22,7 @@ Run
 ```bash
 mkdir inputs/data/arxiv
 aws s3 cp s3://ai-genomics/inputs/miscellaneous/arxiv_article_categories.csv inputs/data/arxiv/arxiv_article_categories.csv
-```
+aws s3 cp s3://ai-genomics/inputs/openalex/concepts.json inputs/openalex/concepts.json
 
 To fetch other article category data we use to label the OpenAlex data.
 
