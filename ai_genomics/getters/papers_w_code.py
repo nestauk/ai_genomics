@@ -31,7 +31,7 @@ def parse_date_string(date_string: str, _format: str = "%Y-%m-%d") -> datetime.d
     """Parses a date string"""
 
     return (
-        datetime.datetime.strptime(date_string, "%Y-%m-%d")
+        datetime.datetime.strptime(date_string, _format)
         if pd.isnull(date_string) is False
         else np.nan
     )
