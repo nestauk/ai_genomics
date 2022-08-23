@@ -9,7 +9,8 @@ Download the FastText language identification model with
 ```bash
 wget --directory-prefix inputs/models/ https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz
 ```
-
+Download the OpenAlex institutions file from s3 with
+`aws s3 cp s3://ai-genomics/inputs/openalex/institutions.json inputs/openalex/`
 Run `python ai_genomics/pipeline/make_year_summary.py` to collect and parse the OpenAlex data. The outputs are a collection of csv tables and json objects that will be saved in `inputs/data/openalex`.
 
 Run `python ai_genomics/pipeline/augment_work_metadata.py` to augment the work (article) data with language and abstract presence data.
