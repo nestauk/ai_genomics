@@ -28,7 +28,7 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
     oalex_works = openalex.fetch_openalex(concept_name, year)
 
     logging.info("Processing and saving")
-    # works
+    # Works
     (
         openalex.make_work_corpus_metadata(oalex_works).to_csv(
             f"{OALEX_PATH}/works_{concept_name}_{year}.csv", index=False
