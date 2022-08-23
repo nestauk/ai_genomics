@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+from functools import partial
 
 from toolz import pipe
 
