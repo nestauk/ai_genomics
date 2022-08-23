@@ -4,8 +4,6 @@ import json
 import logging
 import os
 
-import boto3
-import pandas as pd
 from toolz import pipe
 
 from ai_genomics.utils import openalex
