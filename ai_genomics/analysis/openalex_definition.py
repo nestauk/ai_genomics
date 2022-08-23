@@ -239,7 +239,7 @@ def subset_on_concepts(
         concepts_df: dataframe of openalex concepts
         abstracts: dictionary of abstracts
         selected_concepts: dictionary with concepts and score thresholds
-        inclusive: flag to addopt an or or and criterion when selecting papers
+        inclusive: flag to adopt an or or and criterion when selecting papers
             (inclusive includes any papers above score for any concept,
             exclusive requires all papers to be above score in the concept)
         return_excluded: flag to also return excluded concepts
