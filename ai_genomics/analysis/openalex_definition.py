@@ -180,7 +180,7 @@ def definition_evaluation(
             logging.info(r[0])
             logging.info("===")
             logging.info("\n")
-            for ind, row in r[1].iterrows():
+            for _, row in r[1].iterrows():
 
                 logging.info(row["display_name"])
                 logging.info("".join(["-"] * len(row["display_name"])))
