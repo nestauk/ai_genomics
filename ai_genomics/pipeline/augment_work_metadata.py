@@ -43,10 +43,7 @@ if __name__ == "__main__":
 
             logging.info(f"processing works for {discipline} and {year}")
 
-            if (
-                os.path.exists(f"{OALEX_PATH}/works_{discipline}_{year}_augmented.csv")
-                is True
-            ):
+            if os.path.exists(f"{OALEX_PATH}/works_{discipline}_{year}_augmented.csv"):
                 logging.info("Already exists")
 
             else:
