@@ -50,7 +50,7 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
         with open(f"{OALEX_PATH}/concepts_{concept_name}_{year}.json", "w") as outfile:
             json.dump(openalex.make_work_concepts(oalex_works, make_df), outfile)
 
-    # mesh
+    # Mesh
     (
         openalex.make_work_concepts(
             oalex_works, variable="mesh", keys_to_keep=openalex.MESH_VARS
