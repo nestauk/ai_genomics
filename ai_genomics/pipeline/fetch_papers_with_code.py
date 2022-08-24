@@ -1,10 +1,8 @@
-# Scropt to fetch papers with code data
+# Script to fetch papers with code data
 
-import json
-import gzip
 import requests
 import os
-
+import logging
 from ai_genomics import PROJECT_DIR
 
 URL = "https://production-media.paperswithcode.com/about/papers-with-abstracts.json.gz"
