@@ -6,7 +6,8 @@ from functools import reduce
 from toolz import pipe
 
 from ai_genomics.utils.reading import read_json
-from ai_genomics import PROJECT_DIR
+from ai_genomics import PROJECT_DIR, logger
+import pandas as pd
 
 OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
 
@@ -135,4 +136,36 @@ def work_abstracts(discipline: str, years: List) -> Dict:
             read_json(f"{OALEX_PATH}/abstracts_{discipline}_{year}.json")
             for year in years
         ],
+    )
+
+
+def get_openalex_ai_genomics_works() -> pd.DataFrame:
+    """Returns dataframe of AI in genomics OpenAlex works"""
+    try:
+        return pd.read_csv(
+            f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv", index_col=0
+        ).drop(columns=["index"])
+    except FileNotFoundError:
+        logger.error(
+            "FileNotFoundError: To create the missing file, run ai_genomics/analysis/openalex_definition.py"
+        )
+
+
+def get_openalex_abstracts(field: str, year: int) -> pd.DataFrame:
+    """Returns dataframe of abstracts of specified field and year
+
+    Args:
+        field: "artificial_intelligence" or "genetics"
+        year: Year e.g 2017
+
+    Returns:
+        Dataframe with columns work_id, abstract
+    """
+    return (
+        pd.read_json(
+            f"{PROJECT_DIR}/inputs/data/openalex/abstracts_{field}_{year}.json",
+            orient="index",
+        )
+        .reset_index()
+        .rename(columns={"index": "work_id", 0: "abstract"})
     )
