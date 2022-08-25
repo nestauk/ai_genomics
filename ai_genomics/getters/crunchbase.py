@@ -13,5 +13,5 @@ def get_ai_genomics_crunchbase_org_ids() -> pd.DataFrame:
         )
     except FileNotFoundError:
         logger.error(
-            "FileNotFoundError: To create the file, run ai_genomics/analysis/crunchbase_definitions.py"
+            "FileNotFoundError: To create the missing file, run ai_genomics/analysis/crunchbase_definitions.py"
         )
