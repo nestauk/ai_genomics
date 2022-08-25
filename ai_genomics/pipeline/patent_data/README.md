@@ -28,6 +28,8 @@ Finally, to identify and save AI- and genomics- related patents to s3, run:
 
 You can pass a name of the table to query unique ai and genomics patents from. If the table does not exist in `golden-shine-355915.genomics`, it will first create the table then pull unique ai and genomics patents from it. Be careful of query limits when creating tables.
 
+The AI and genomics patents can be loaded using `ai_genomics.getters.patents.get_ai_genomics_patents`.
+
 ### Quota limits
 
 If you have a free account, you will hit up against quota limits. Simply wait a few hours to re-run `get_ai_genomics_patents.py`
