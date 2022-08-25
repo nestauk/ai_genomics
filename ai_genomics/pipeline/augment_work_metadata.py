@@ -3,7 +3,7 @@ import logging
 import os
 from toolz import pipe
 from functools import partial
-from typing import List, Dict
+from typing import Dict
 
 import fasttext
 import numpy as np
