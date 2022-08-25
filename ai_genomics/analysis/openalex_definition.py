@@ -1,9 +1,6 @@
 # Script to generate openalex definitions
 
-from distutils.errors import LibError
 import logging
-import random
-import re
 from itertools import product, permutations
 from toolz import pipe
 from typing import Dict, Tuple, Union
