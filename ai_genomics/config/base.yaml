@@ -7,6 +7,86 @@ ai_cb_terms:
 genom_cb_terms:
   - genomic
   - genome
+inst_meta_vars:
+  - id
+  - display_name
+  - country_code
+  - type
+  - homepage_url
+work_meta_vars:
+  - id
+  - doi
+  - display_name
+  - publication_year
+  - publication_date
+  - cited_by_count
+  - is_retracted
+venue_meta_vars:
+  - id
+  - display_name
+  - url
+ai_terms:
+  - " ai "
+  - " ann "
+  - " gan "
+  - " gnn "
+  - " cnn "
+  - " rnn "
+  - " dnn "
+  - " nlp "
+  - " cnn "
+  - natural language processing
+  - transformer
+  - encoder
+  - accuracy
+  - artificial
+  - artificial intelligence
+  - bayes
+  - classifier
+  - convolution
+  - deep
+  - generative
+  - machine
+  - machine learning
+  - predict
+  - reinforcement
+  - representation
+  - state of the art
+  - state-of-the-art
+  - pattern recognition
+  - accuracy
+  - statistical
+  - supervis
+  - train
+  - clustering
+  - federat
+  - rbf
+  - unsupervis
+ai_cats:
+  - cs.CL
+  - cs.AI
+  - cs.NE
+  - cs.CV
+  - cs.LG
+  - stat.ML
+  - cs.IR
+  - cs.SO
+  - q-bio.QM
+  - math.ST
+ai_conf_acronyms:
+  - neurips
+  - icml
+  - cvf
+  - eccv
+  - aaai
+  - pmlr
+  - sigkdd
+  - ijcai
+  - acl
+ai_terms_genetics:
+  - random forest
+  - " svm "
+  - logistic regress
 gtr_topic_search:
   - genom
   - genetic
@@ -21,7 +101,7 @@ gtr_ai_concepts:
 gtr_ai_abstract:
   - random forest
   - " svm "
-  - logistic
+  - "logistic "
   - lasso
   - machine learning
   - deep learning
@@ -44,6 +124,15 @@ gtr_ai_abstract:
   - data science
   - data analytics
   - predictive analytics
+selection_criteria:
+  concepts:
+    - Artificial intelligence
+    - Machine learning
+    - Deep learning
+  thresholds:
+    - 0.3
+    - 0.71
+    - 0.1
 gtr_genom_abstract:
   - genomics
   - genome

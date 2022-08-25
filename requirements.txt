@@ -1,4 +1,4 @@
-numpy
+numpy==1.22
 scipy
 pandas
 matplotlib
@@ -9,6 +9,16 @@ filelock
 typer
 sh
 tabulate
+fasttext
+tomotopy
+scikit-learn
+gensim
+spacy
+umap-learn
+ratelim
+python-dotenv
+altair_saver
+webdriver-manager
 fsspec
 S3fs
 db-dtypes
