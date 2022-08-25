@@ -358,7 +358,7 @@ if __name__ == "__main__":
     # This stitches the concepts and permutations of thresholds to do grid search
 
     search_multi = [
-        {k: val for k, val in zip(config["selection_criteria"]["concepts"], vals)}
+        dict(zip(config["selection_criteria"]["concepts"], vals))
         for vals in list(
             permutations(np.arange(*config["selection_criteria"]["thresholds"]))
         )
