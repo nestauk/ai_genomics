@@ -133,7 +133,6 @@ selection_criteria:
     - 0.3
     - 0.71
     - 0.1
-
 gtr_genom_abstract:
   - genomics
   - genome
