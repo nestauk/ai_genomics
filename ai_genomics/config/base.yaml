@@ -121,6 +121,9 @@ gtr_ai_abstract:
   - bayesian
   - transfer learning
   - artificial neural network
+  - data science
+  - data analytics
+  - predictive analytics
 selection_criteria:
   concepts:
     - Artificial intelligence
@@ -130,9 +133,7 @@ selection_criteria:
     - 0.3
     - 0.71
     - 0.1
-  - data science
-  - data analytics
-  - predictive analytics
+
 gtr_genom_abstract:
   - genomics
   - genome
