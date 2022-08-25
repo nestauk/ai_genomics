@@ -218,7 +218,7 @@ def definition_evaluation(
         "f1_score": f1_score,
     }
 
-return (eval_results, included) if return_included else eval_results
+    return (eval_results, included) if return_included else eval_results
 
 
 def subset_on_concepts(
