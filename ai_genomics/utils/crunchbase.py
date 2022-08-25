@@ -21,7 +21,9 @@ def fetch_crunchbase(
     )
 
 
-def parse_s3_table(s3_object) -> pd.DataFrame:
+def parse_s3_table(
+    s3_object,
+) -> pd.DataFrame:
     """Parses an s3 object into a pandas dataframe"""
     return pipe(
         s3_object,
