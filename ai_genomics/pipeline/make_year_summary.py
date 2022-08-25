@@ -86,11 +86,4 @@ if __name__ == "__main__":
 
     for year in range(2007, 2022):
         for concept_name in ["artificial_intelligence", "genetics"]:
-
-            make_df = (
-                True
-                if (year == 2021) & (concept_name == "artificial_intelligence")
-                else True
-            )
-
-            fetch_save_year(concept_name, year, make_df)
+            fetch_save_year(concept_name, year, make_df=True)
