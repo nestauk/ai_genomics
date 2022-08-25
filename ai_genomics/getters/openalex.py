@@ -149,23 +149,3 @@ def get_openalex_ai_genomics_works() -> pd.DataFrame:
         logger.error(
             "FileNotFoundError: To create the missing file, run ai_genomics/analysis/openalex_definition.py"
         )
-
-
-def get_openalex_abstracts(field: str, year: int) -> pd.DataFrame:
-    """Returns dataframe of abstracts of specified field and year
-
-    Args:
-        field: "artificial_intelligence" or "genetics"
-        year: Year e.g 2017
-
-    Returns:
-        Dataframe with columns work_id, abstract
-    """
-    return (
-        pd.read_json(
-            f"{PROJECT_DIR}/inputs/data/openalex/abstracts_{field}_{year}.json",
-            orient="index",
-        )
-        .reset_index()
-        .rename(columns={"index": "work_id", 0: "abstract"})
-    )
