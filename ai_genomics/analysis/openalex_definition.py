@@ -605,16 +605,13 @@ if __name__ == "__main__":
     combined_abstracts = {**all_abstracts, **abstracts_genetics}
 
     # Create example table
-    ai_genomics_example_table = []
-
-    for _, sampled in ai_genomics_provisional_dataset.sample(5).iterrows():
-
-        ai_genomics_example_table.append(
-            {
-                "title": sampled["display_name"],
-                "abstract (truncated)": combined_abstracts[sampled["work_id"]][:700],
-            }
-        )
+    ai_genomics_example_table = [
+        {
+            "title": sampled["display_name"],
+            "abstract (truncated)": combined_abstracts[sampled["work_id"]][:700],
+        }
+        for _, sampled in ai_genomics_provisional_dataset.sample(5).iterrows()
+    ]
 
     logging.info(pd.DataFrame(ai_genomics_example_table).head())
 
