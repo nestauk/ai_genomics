@@ -20,7 +20,7 @@ def openalex_abstracts_dict_to_df(openalex_abstracts: dict) -> pd.DataFrame:
     )
 
 
-def make_ai_genomics_openalex_samples(sample_size=SAMPLE_SIZE) -> pd.DataFrame:
+def make_ai_genomics_openalex_samples(sample_size: int = SAMPLE_SIZE) -> pd.DataFrame:
     """Returns a sample of AI Genomics OpenAlex work abstracts"""
     oa_ai_abstracts = work_abstracts(discipline="artificial_intelligence", years=YEARS)
     oa_genomics_abstracts = work_abstracts(discipline="genetics", years=YEARS)
@@ -44,7 +44,7 @@ def make_ai_genomics_openalex_samples(sample_size=SAMPLE_SIZE) -> pd.DataFrame:
     )
 
 
-def make_ai_genomics_gtr_samples(sample_size=SAMPLE_SIZE) -> pd.DataFrame:
+def make_ai_genomics_gtr_samples(sample_size: int = SAMPLE_SIZE) -> pd.DataFrame:
     """Returns a sample of AI Genomics Gateway to Research project abstracts"""
     return (
         get_ai_genomics_gtr_data("projects")[["id", "abstract_text"]]
@@ -53,7 +53,7 @@ def make_ai_genomics_gtr_samples(sample_size=SAMPLE_SIZE) -> pd.DataFrame:
     )
 
 
-def make_ai_genomics_patent_samples(sample_size=SAMPLE_SIZE) -> pd.DataFrame:
+def make_ai_genomics_patent_samples(sample_size: int = SAMPLE_SIZE) -> pd.DataFrame:
     """Returns a sample of AI Genomics patent abstracts"""
     return (
         get_ai_genomics_patents()[["publication_number", "abstract_text"]]
@@ -62,7 +62,7 @@ def make_ai_genomics_patent_samples(sample_size=SAMPLE_SIZE) -> pd.DataFrame:
     )
 
 
-def make_ai_genomics_cb_samples(sample_size=SAMPLE_SIZE) -> pd.DataFrame:
+def make_ai_genomics_cb_samples(sample_size: int = SAMPLE_SIZE) -> pd.DataFrame:
     """Returns a sample of AI Genomics Crunchbase company descriptions"""
     cb_orgs = parse_s3_table(fetch_crunchbase("orgs"))[
         ["id", "long_description", "short_description"]
