@@ -9,9 +9,10 @@ Download the FastText language identification model with
 ```bash
 wget --directory-prefix inputs/models/ https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz
 ```
+
 Download the OpenAlex institutions file from s3 with
 `aws s3 cp s3://ai-genomics/inputs/openalex/institutions.json inputs/openalex/`
-Run `python ai_genomics/pipeline/make_year_summary.py` to collect and parse the OpenAlex data. The outputs are a collection of csv tables and json objects that will be saved in `inputs/data/openalex`.
+Run `python ai_genomics/pipeline/make_year_summary.py` to collect and parse the OpenAlex data. The outputs are a collection of csv tables and json objects that will be saved in `inputs/data/openalex`. Note, this step takes quite a long time (4+ hours on an M1 mac).
 
 Run `python ai_genomics/pipeline/augment_work_metadata.py` to augment the work (article) data with language and abstract presence data.
 
@@ -33,3 +34,4 @@ Run `python ai_genomics/analysis/openalex_definition.py` to implement the defini
 Run `python ai_genomics/analysis/crunchbase_definitions.py` to test the impact of different definition strategies on the results. Data are fetched from S3 but not stored locally.
 
 Run `python ai_genomics/analysis/gtr_definitions.py` to print a summary of AI / genomics projects in the GtR data. This also saves a list of project in the intersection of AI and genomics in `inputs/data/gtr/gtr_ai_genomics_projects.json`.
+```
