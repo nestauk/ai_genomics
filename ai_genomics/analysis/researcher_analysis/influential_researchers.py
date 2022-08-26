@@ -11,7 +11,13 @@ import ai_genomics.getters.openalex as oalex
 
 TARGET_PATH = f"{PROJECT_DIR}/outputs/data/experts"
 
-os.makedirs(TARGET_PATH, exist_ok=True)
+VARS_TO_KEEP = [
+    "auth_display_name",
+    "auth_id",
+    "auth_orcid",
+    "display_name",
+    "num_pubs",
+]
 
 
 def ai_genomics_table() -> pd.DataFrame:
@@ -133,20 +139,14 @@ if __name__ == "__main__":
     ai_genom_ids = set(ai_proc["work_id"])
     ai_genom_ids_cited = set(ai_proc.query("high_cit==True")["work_id"])
 
-    vars_to_keep = [
-        "auth_display_name",
-        "auth_id",
-        "auth_orcid",
-        "display_name",
-        "num_pubs",
-    ]
-
+    # Save files
+    os.makedirs(TARGET_PATH, exist_ok=True)
     for _ids, title in zip(
         [ai_genom_ids, ai_genom_ids_cited],
         ["top_openalex_uk_authors", "top_openalex_uk_authors_cited"],
     ):
         tab = get_top_authors(oalex_author_2, _ids, country="GB").head(n=50)[
-            vars_to_keep
+            VARS_TO_KEEP
         ]
         logging.info(tab.head())
 
