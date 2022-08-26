@@ -143,7 +143,7 @@ if __name__ == "__main__":
     os.makedirs(TARGET_PATH, exist_ok=True)
     for _ids, title in zip(
         [ai_genom_ids, ai_genom_ids_cited],
-        ["top_openalex_uk_authors", "top_openalex_uk_authors_cited"],
+        ["openalex_uk_authors_most_pubs", "openalex_uk_authors_most_high_cited_pubs"],
     ):
         tab = get_top_authors(oalex_author_2, _ids, country="GB").head(n=50)[
             VARS_TO_KEEP
