@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import numpy as np
 from ai_genomics import PROJECT_DIR
-from typing import List, Dict
+from typing import List
 
 import ai_genomics.getters.openalex as oalex
 
