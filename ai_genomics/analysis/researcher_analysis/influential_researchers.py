@@ -30,9 +30,9 @@ def high_cited(cit_distr: pd.Series, q: float) -> List[bool]:
     whether each author has high cited papers
     """
 
-    thres = np.quantile(cit_distr, q)
+    threshold = np.quantile(cit_distr, q)
 
-    return [c > thres for c in cit_distr]
+    return [citations > threshold for citations in cit_distr]
 
 
 def load_all_oalex(oalex_getter, id_name: str):
