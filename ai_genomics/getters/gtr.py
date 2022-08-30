@@ -1,7 +1,23 @@
-from ai_genomics import PROJECT_DIR, logger
+from ai_genomics import PROJECT_DIR, bucket_name as BUCKET_NAME, logger
+from ai_genomics.getters.data_getters import load_s3_data
 import pandas as pd
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
+
+
+def get_gtr_from_s3(entity_type: str) -> pd.DataFrame:
+    """Get Gateway to Research data from S3
+
+    Args:
+        entity_type: Which GtR dataset to load,
+            for example "organisations" or "persons"
+
+    Returns:
+        Dataframe of specified GtR data
+    """
+    return pd.DataFrame.from_dict(
+        load_s3_data(BUCKET_NAME, f"inputs/gtr/gtr_projects-{entity_type}.json")
+    )
 
 
 def get_ai_genomics_gtr_data(entity_type: str) -> pd.DataFrame:
