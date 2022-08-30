@@ -1,6 +1,6 @@
 # AI Genomics expert people and organisations
 
-The python files in this directory, generate csvs of AI genomics related people and organisations from the AI genomics processed data sources. The AI and genomics definitions for the datasets we have used is provisional and could change.
+The python files in this directory generate csvs of AI genomics related people and organisations from the AI genomics processed data sources. The AI and genomics definitions for the datasets we have used is provisional and could change.
 
 ## OpenAlex
 
