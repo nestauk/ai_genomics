@@ -3,12 +3,19 @@
 import logging
 import pandas as pd
 from collections import Counter
+import re
 
 from ai_genomics.pipeline.gtr import fetch_gtr
 from ai_genomics import config, PROJECT_DIR
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
 GTR_INPUTS_DIR.mkdir(exist_ok=True)
+
+
+def camel_case_to_snake_case_col_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Turn column names from camelCase to snake_case"""
+    return df.rename(columns=lambda x: re.sub(r"(?<!^)(?=[A-Z])", "_", x).lower())
+
 
 if __name__ == "__main__":
     logging.info("Reading GtR data")
@@ -100,7 +107,9 @@ if __name__ == "__main__":
     logging.info(project_examples)
 
     # Save project ids
-    ai_genomics_combined.to_json(GTR_INPUTS_DIR / "gtr_ai_genomics_projects.json")
+    ai_genomics_combined.pipe(camel_case_to_snake_case_col_names).to_json(
+        GTR_INPUTS_DIR / "gtr_ai_genomics_projects.json"
+    )
 
     # Get publications from projects
     publications_from_projects = fetch_gtr("gtr_projects-outcomes_publications")
@@ -115,4 +124,6 @@ if __name__ == "__main__":
 
     logging.info(f"AI and genomics publications: {len(genom_publs)}")
 
-    genom_publs.to_json(GTR_INPUTS_DIR / "gtr_ai_genomics_publications.json")
+    genom_publs.pipe(camel_case_to_snake_case_col_names).to_json(
+        GTR_INPUTS_DIR / "gtr_ai_genomics_publications.json"
+    )
