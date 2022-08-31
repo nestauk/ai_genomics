@@ -88,9 +88,13 @@ def load_sample_tags(
 if __name__ == "__main__":
 
     # first, add concepts to sample of openalex data
-    # oa_sample_concepts = get_openalex_sample_concepts()
-    # logger.info('extracted open alex concepts for openalex sample')
-    # save_to_s3(BUCKET_NAME, oa_sample_concepts, 'inputs/ai_genomics_samples/samples_with_oa_tags/ai_genomics_openalex_samples_with_oa_tags.csv')
+    oa_sample_concepts = get_openalex_sample_concepts()
+    logger.info("extracted open alex concepts for openalex sample")
+    save_to_s3(
+        BUCKET_NAME,
+        oa_sample_concepts,
+        "inputs/ai_genomics_samples/samples_with_oa_tags/ai_genomics_openalex_samples_with_oa_tags.csv",
+    )
 
     # then generate validation dataset to label
     oa_samples = load_sample_tags()
