@@ -18,7 +18,8 @@ def get_ai_genomics_gtr_data(data_type: str) -> pd.DataFrame:
         return pd.read_json(
             GTR_INPUTS_DIR / f"gtr_ai_genomics_{data_type}.json"
         ).rename(columns=lambda x: re.sub(r"(?<!^)(?=[A-Z])", "_", x).lower())
-    except ValueError:
+    except ValueError as e:
         logger.error(
             "ValueError: To create the missing file, run ai_genomics/analysis/gtr_definitions.py"
         )
+        raise e

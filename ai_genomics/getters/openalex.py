@@ -145,7 +145,8 @@ def get_openalex_ai_genomics_works() -> pd.DataFrame:
         return pd.read_csv(
             f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv", index_col=0
         ).drop(columns=["index"])
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         logger.error(
             "FileNotFoundError: To create the missing file, run ai_genomics/analysis/openalex_definition.py"
         )
+        raise e
