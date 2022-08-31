@@ -19,14 +19,14 @@ We have used the AI and genomics patents dataset to identify the top 20 assignee
 
 We have used the AI and genomics Crunchbase dataset to identify:
 
-- investor organisations
-- people related to the investor organisations
-- top funded companies
-- people related to the top funded companies
+- 9 investor organisations
+- 31 people related to the investor organisations
+- top 20 most funded companies
+- 125 people related to the top 20 most funded companies
 
 Each of these tables has a column `cb_url` which links to the Crunchbase website which can provide additional information about the person or organisation.
 
 ## Gateway to Research people
 
 Unfortunately, the AI and genomics Gateway to Research projects we have found do not have GtR organisations relating to them. There is also not many people relating to the projects.
-We have therefore prepared a table of the AI and genomics GtR projects with added people information where possible.
+We have therefore prepared a table of the AI and genomics GtR projects with added people information where possible which results in a list of 50 people.
