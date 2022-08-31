@@ -8,6 +8,7 @@ from ai_genomics import PROJECT_DIR
 from typing import List
 
 import ai_genomics.getters.openalex as oalex
+from ai_genomics.getters.openalex import get_openalex_ai_genomics_works
 
 TARGET_PATH = f"{PROJECT_DIR}/outputs/data/experts"
 
@@ -18,11 +19,6 @@ VARS_TO_KEEP = [
     "display_name",
     "num_pubs",
 ]
-
-
-def ai_genomics_table() -> pd.DataFrame:
-    """Placeholder getter for the AI genomics data"""
-    return pd.read_csv(f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv")
 
 
 def high_cited(cit_distr: pd.Series, q: float) -> List[bool]:
@@ -84,7 +80,7 @@ if __name__ == "__main__":
     # citation distribution in each year (to control for the
     # fact that older papers have more time to accumulate citations)
     ai_proc = (
-        ai_genomics_table()
+        get_openalex_ai_genomics_works()
         .groupby("publication_year")
         .apply(
             lambda df: df.assign(
