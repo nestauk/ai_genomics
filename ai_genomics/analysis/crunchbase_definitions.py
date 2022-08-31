@@ -89,7 +89,9 @@ if __name__ == "__main__":
 
     # Save AI genomics crunchbase org ids
     CB_INPUTS_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(ai_gen_combined).to_csv(CB_INPUTS_DATA_DIR / "ai_genomics_org_ids.csv")
+    pd.DataFrame(ai_gen_combined, columns=["cb_org_id"]).to_csv(
+        CB_INPUTS_DATA_DIR / "ai_genomics_org_ids.csv", index=False
+    )
 
     logging.info(f"Genomics terms combined: {len(gen_combined)}")
     logging.info(f"Artificial intelligence terms organisations: {len(ai_combined)}")

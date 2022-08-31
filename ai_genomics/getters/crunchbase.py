@@ -7,9 +7,6 @@ def get_ai_genomics_crunchbase_org_ids() -> pd.DataFrame:
     try:
         return pd.read_csv(
             PROJECT_DIR / "inputs/data/crunchbase/ai_genomics_org_ids.csv",
-            index_col=0,
-            names=["cb_org_id"],
-            skiprows=[0],
         )
     except FileNotFoundError as e:
         logger.error(
