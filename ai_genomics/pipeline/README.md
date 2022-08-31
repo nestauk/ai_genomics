@@ -31,7 +31,7 @@ To fetch other article category data we use to label the OpenAlex data.
 
 Run `python ai_genomics/analysis/openalex_definition.py` to implement the definitions and generate results. This includes printing stats in the console and saving relevant tables in `inputs/data`. This will also save figures to `outputs/figures`, the provisional ai genomics OpenAlex dataset to `outputs/ai_genomics_provisional_dataset.csv` and examples from the dataset to `outputs/openalex_examples.md`.
 
-The AI and genomics OpenAlex works can be loaded using `ai_genomics.getters.openalex.get_openalex_ai_genomics_works`
+The AI and genomics OpenAlex works can be loaded using `ai_genomics.getters.openalex.get_openalex_ai_genomics_works`.
 
 ## CrunchBase
 
