@@ -23,6 +23,15 @@ def assignee_string_to_list(patents: pd.DataFrame) -> pd.DataFrame:
     return patents
 
 
+def replace_sq_brackets_and_dbl_quotes(patents: pd.DataFrame) -> pd.DataFrame:
+    """Replace [] and "" from assignee text
+    For example, ["Myriad Womens Health, Inc."]
+    becomes Myriad Womens Health, Inc.
+    """
+    patents["assignee"] = patents["assignee"].str.replace('^\["|"\]$', "", regex=True)
+    return patents
+
+
 def find_top_n_most_assigned_patents(patents: pd.DataFrame, n: int) -> pd.DataFrame:
     """Find top n most assigned to patents assignees
 
@@ -35,9 +44,9 @@ def find_top_n_most_assigned_patents(patents: pd.DataFrame, n: int) -> pd.DataFr
     Returns:
         Top n most assigned to patents assignees
     """
-
     return (
         patents.explode("assignee")
+        .pipe(replace_sq_brackets_and_dbl_quotes)
         .groupby("assignee")["publication_number"]
         .count()
         .sort_values(ascending=False)
