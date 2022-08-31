@@ -79,15 +79,17 @@ def genomics_ai_query(
 
 
 def select_unique_ai_genomics_patents(
-    full_table_name: str,
+    full_table_name: str = "golden-shine-355915.genomics.ai_genomics",
 ) -> str:
     """Returns BigQuery query to select unique ai-genomics patents
     based on publication_number from specified full_table_name
     """
     unique_ai_genomics_patents = (
+        f"with english_ai_genomics as (select * from {full_table_name} "
+        "WHERE title_language = 'en' AND abstract_language = 'en') "
         "SELECT * FROM ("
         "SELECT *, ROW_NUMBER() OVER (PARTITION BY publication_number) row_number "
-        f"FROM `{full_table_name}`) "
+        f"FROM english_ai_genomics) "
         "WHERE row_number = 1"
     )
 
@@ -131,13 +133,11 @@ if __name__ == "__main__":
 
     try:
         genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
-        # subset for only english abstracts and drop row_number
         genomics_ai_df = (
-            genomics_ai_df[genomics_ai_df["abstract_language"] == "en"]
-            .drop(columns="row_number")
+            genomics_ai_df.drop(columns="row_number")
             .pipe(replace_missing_values_with_nans)
             .pipe(convert_date_columns_to_datetime)
-        )  #
+        )
         # save to s3
         save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
     except Forbidden:

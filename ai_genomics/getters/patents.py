@@ -1,5 +1,4 @@
 from ai_genomics import bucket_name as BUCKET_NAME
-import pandas as pd
 from ai_genomics.getters.data_getters import load_s3_data
 
 
@@ -8,6 +7,8 @@ def get_ai_genomics_patents() -> pd.DataFrame:
     with columns such as:
         - application_number
         - publication_number
+        - full list of cpc codes
+        - full list of ipc codes
         - abstract_text
         - publication_date
         - inventor
@@ -15,5 +16,5 @@ def get_ai_genomics_patents() -> pd.DataFrame:
     """
     return load_s3_data(
         BUCKET_NAME,
-        "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv",
+        "inputs/patent_data/processed_patent_data/ai_genomics_patents_full_cpc_ipc_codes.csv",
     )
