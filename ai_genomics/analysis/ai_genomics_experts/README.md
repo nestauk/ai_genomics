@@ -13,7 +13,7 @@ We have queried our provisional AI and genomics OpenAlex corpus to identify the 
 
 ## Patents
 
-We have used the AI and genomics patents dataset to identify the assignees who are related to the most patent publication numbers.
+We have used the AI and genomics patents dataset to identify the top 20 assignees who are related to the most patent publications.
 
 ## Crunchbase people and organisations
 
