@@ -598,8 +598,8 @@ if __name__ == "__main__":
         .reset_index(drop=True)
     )
 
-    ai_genomics_provisional_dataset.to_csv(
-        f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv"
+    ai_genomics_provisional_dataset.drop(columns=["index"]).to_csv(
+        f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv", index=False
     )
 
     combined_abstracts = {**all_abstracts, **abstracts_genetics}

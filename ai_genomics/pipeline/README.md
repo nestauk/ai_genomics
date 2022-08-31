@@ -29,10 +29,18 @@ aws s3 cp s3://ai-genomics/inputs/openalex/concepts.json inputs/openalex/concept
 
 To fetch other article category data we use to label the OpenAlex data.
 
-Run `python ai_genomics/analysis/openalex_definition.py` to implement the definitions and generate results. This includes printing stats in the console and saving relevant tables in `inputs/data`. This will also save figures to `outputs/figures`, the provisional ai genomics OpenAlex dataset to `outputs/ai_genomics_provisional_dataset.csv` and examples from the dataset to `outputs/openalex_examples.md`,
+Run `python ai_genomics/analysis/openalex_definition.py` to implement the definitions and generate results. This includes printing stats in the console and saving relevant tables in `inputs/data`. This will also save figures to `outputs/figures`, the provisional ai genomics OpenAlex dataset to `outputs/ai_genomics_provisional_dataset.csv` and examples from the dataset to `outputs/openalex_examples.md`.
+
+The AI and genomics OpenAlex works can be loaded using `ai_genomics.getters.openalex.get_openalex_ai_genomics_works`.
 
 ## CrunchBase
 
 Run `python ai_genomics/analysis/crunchbase_definitions.py` to test the impact of different definition strategies on the results. Data are fetched from S3 but not stored locally.
 
+The AI and genomics Crunchbase organisation ids can be loaded using `ai_genomics.getters.crunchbase.get_ai_genomics_crunchbase_org_ids`.
+
+## Gateway to Research
+
 Run `python ai_genomics/analysis/gtr_definitions.py` to print a summary of AI / genomics projects in the GtR data. This also saves a list of project in the intersection of AI and genomics in `inputs/data/gtr/gtr_ai_genomics_projects.json`.
+
+The AI and genomics GtR projects and publications can be loaded using `ai_genomics.getters.gtr.get_ai_genomics_gtr_data`.

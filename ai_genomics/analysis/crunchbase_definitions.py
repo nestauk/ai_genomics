@@ -11,6 +11,8 @@ from ai_genomics.utils.crunchbase import fetch_crunchbase, parse_s3_table
 
 from ai_genomics import PROJECT_DIR, config
 
+CB_INPUTS_DATA_DIR = PROJECT_DIR / "inputs/data/crunchbase/"
+
 
 def search_terms(abstract: str, terms: Set) -> Union[bool, float]:
     """Checks if a string contains any of the terms in a set.
@@ -33,7 +35,6 @@ def search_terms(abstract: str, terms: Set) -> Union[bool, float]:
 
 
 if __name__ == "__main__":
-
     logging.info("Check organisations in relevant categories")
 
     cb_cat_comps = pipe(fetch_crunchbase("org_cats"), parse_s3_table)
@@ -85,6 +86,12 @@ if __name__ == "__main__":
     ai_combined = ai_cats.union(ai_descr)
     gen_combined = gen_cats.union(genom_descr)
     ai_gen_combined = ai_combined & gen_combined
+
+    # Save AI genomics crunchbase org ids
+    CB_INPUTS_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(ai_gen_combined, columns=["cb_org_id"]).to_csv(
+        CB_INPUTS_DATA_DIR / "ai_genomics_org_ids.csv", index=False
+    )
 
     logging.info(f"Genomics terms combined: {len(gen_combined)}")
     logging.info(f"Artificial intelligence terms organisations: {len(ai_combined)}")
