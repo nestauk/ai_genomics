@@ -6,7 +6,7 @@ EXPERTS_PATH = PROJECT_DIR / "outputs/data/experts/"
 
 
 def process_gtr_people(gtr_people: pd.DataFrame) -> pd.DataFrame:
-    """Add new column combining first name and surnam, select relevant columns"""
+    """Add new column combining first name and surname, select relevant columns"""
     return gtr_people.assign(full_name=lambda x: x.firstName + " " + x.surname)[
         ["project_id", "full_name", "rel"]
     ].rename(columns={"rel": "person_rel"})
