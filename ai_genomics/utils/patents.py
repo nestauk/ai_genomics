@@ -12,6 +12,13 @@ import numpy as np
 DATE_COLS = ["publication_date", "grant_date", "filing_date", "priority_date"]
 
 
+def convert_list_of_codes_to_string(list_of_codes: List[str]) -> str:
+    """Converts list of relevant IPC and CPC codes to BigQuery-compliant
+    string.
+    """
+    return "'" + "', '".join(list_of_codes) + "'"
+
+
 def est_conn():
     """Instantiate Google BigQuery client to query patent data."""
 
@@ -34,8 +41,7 @@ def replace_missing_values_with_nans(ai_genomics_patents: pd.DataFrame) -> pd.Da
     """Replace missing values in the AI in
     genomics patents dataset with NaNs"""
     return ai_genomics_patents.replace(
-        {date_col: 0 for date_col in DATE_COLS},
-        np.nan,
+        {date_col: 0 for date_col in DATE_COLS}, np.nan,
     ).mask(ai_genomics_patents.applymap(str).eq("[]"))
 
 
