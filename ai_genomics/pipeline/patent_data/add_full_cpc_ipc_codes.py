@@ -11,11 +11,11 @@ from ai_genomics.getters.patents import get_ai_genomics_patents
 from ai_genomics.utils.patents import est_conn, convert_list_of_codes_to_string
 
 ai_genomics_patents = get_ai_genomics_patents()
-ai_genomics_publicaion_number = ai_genomics_patents.publication_number
+ai_genomics_publication_numbers = ai_genomics_patents.publication_number
 
 
-def get_full_cpc_ipc_codes_query(
-    ai_genomics_publication_numbers: List[str] = ai_genomics_patents,
+def get_full_cpc_ipc_codlses_query(
+    ai_genomics_publication_numbers: List[str] = ai_genomics_publication_numbers,
 ) -> str:
     """Generates query to retrieve full list of CPC and IPC codes per patent publication number.
     Args:
@@ -34,7 +34,6 @@ def get_full_cpc_ipc_codes_query(
         "UNNEST(cpc) cpc, UNNEST(ipc) ipc "
         f"WHERE publication_number in ({ai_genomics_publication_numbers_formatted})"
     )
-
     return full_cpc_ipc_q
 
 
@@ -54,7 +53,6 @@ def add_full_cpc_ipc_codes(
     ai_genomics_full_codes = pd.merge(
         full_cpc_ipc_codes_agg, ai_genomics_df, on="publication_number"
     )
-
     return (
         pd.merge(full_cpc_ipc_codes_agg, ai_genomics_df, on="publication_number")
         .drop(["cpc_code_y", "ipc_code_y"], axis=1)
