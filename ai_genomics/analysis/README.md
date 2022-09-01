@@ -1,5 +1,9 @@
 # AI and genomics analysis
 
+## Data scoping
+
+Initial data scoping for sources across patents, semantic scholar, text enrichement and OpenAlex can be found in `ai_genomics/analysis/data_scoping/`.
+
 ## Reading the results
 
 You can find individual report sections, figures and a pdf with a rendered version of the report in `outputs/figures`.

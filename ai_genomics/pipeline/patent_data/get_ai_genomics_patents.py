@@ -4,6 +4,7 @@ from ai_genomics.utils.patents import (
     est_conn,
     replace_missing_values_with_nans,
     convert_date_columns_to_datetime,
+    convert_list_of_codes_to_string,
 )
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from google.api_core.exceptions import Forbidden
@@ -17,7 +18,7 @@ S3_SAVE_FILENAME = (
 DATASET_NAME = "golden-shine-355915.genomics"
 
 GENOMICS_AI_FIELDS = (
-    "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
+    "publication_number, application_number, family_id, cpc.code as cpc_code, ipc.code as ipc_code, "
     "title_localized.text as title_text, title_localized.language as title_language, "
     "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
     "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
@@ -28,7 +29,8 @@ IPC_CODES = load_s3_data(bucket_name, "outputs/patent_data/class_codes/ipc.json"
 
 
 def genomics_ai_query(
-    cpc_codes: Dict[str, list] = CPC_CODES, ipc_codes: Dict[str, list] = IPC_CODES,
+    cpc_codes: Dict[str, list] = CPC_CODES,
+    ipc_codes: Dict[str, list] = IPC_CODES,
 ) -> str:
     """Generates query to create bespoke genomics ai table
             based on cpc and ipc codes.
@@ -41,12 +43,12 @@ def genomics_ai_query(
         BigQuery query to select genomics and ai related patents.
     """
     cpc_ai_ids, ipc_ai_ids = (
-        covert_list_of_codes_to_string(cpc_codes["ai"]),
-        covert_list_of_codes_to_string(ipc_codes["ai"]),
+        convert_list_of_codes_to_string(cpc_codes["ai"]),
+        convert_list_of_codes_to_string(ipc_codes["ai"]),
     )
     cpc_genomics_ids, ipc_genomics_ids = (
-        covert_list_of_codes_to_string(cpc_codes["genomics"]),
-        covert_list_of_codes_to_string(ipc_codes["genomics"]),
+        convert_list_of_codes_to_string(cpc_codes["genomics"]),
+        convert_list_of_codes_to_string(ipc_codes["genomics"]),
     )
 
     genomics_q = (
