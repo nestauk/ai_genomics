@@ -1,6 +1,6 @@
 """Script to query BigQuery based on genomics related and AI related cpc/ipc codes."""
 from ai_genomics import bucket_name, logger
-from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import (
+from ai_genomics.utils.patents import (
     est_conn,
     replace_missing_values_with_nans,
     convert_date_columns_to_datetime,
@@ -27,16 +27,8 @@ CPC_CODES = load_s3_data(bucket_name, "outputs/patent_data/class_codes/cpc.json"
 IPC_CODES = load_s3_data(bucket_name, "outputs/patent_data/class_codes/ipc.json")
 
 
-def covert_list_of_codes_to_string(list_of_codes: List[str]) -> str:
-    """Converts list of relevant IPC and CPC codes to BigQuery-compliant
-    string.
-    """
-    return "'" + "', '".join(list_of_codes) + "'"
-
-
 def genomics_ai_query(
-    cpc_codes: Dict[str, list] = CPC_CODES,
-    ipc_codes: Dict[str, list] = IPC_CODES,
+    cpc_codes: Dict[str, list] = CPC_CODES, ipc_codes: Dict[str, list] = IPC_CODES,
 ) -> str:
     """Generates query to create bespoke genomics ai table
             based on cpc and ipc codes.
@@ -79,15 +71,17 @@ def genomics_ai_query(
 
 
 def select_unique_ai_genomics_patents(
-    full_table_name: str,
+    full_table_name: str = "golden-shine-355915.genomics.ai_genomics",
 ) -> str:
     """Returns BigQuery query to select unique ai-genomics patents
     based on publication_number from specified full_table_name
     """
     unique_ai_genomics_patents = (
+        f"with english_ai_genomics as (select * from {full_table_name} "
+        "WHERE title_language = 'en' AND abstract_language = 'en') "
         "SELECT * FROM ("
         "SELECT *, ROW_NUMBER() OVER (PARTITION BY publication_number) row_number "
-        f"FROM `{full_table_name}`) "
+        f"FROM english_ai_genomics) "
         "WHERE row_number = 1"
     )
 
@@ -131,13 +125,11 @@ if __name__ == "__main__":
 
     try:
         genomics_ai_df = conn.query(unique_ai_genomics_patents_q).to_dataframe()
-        # subset for only english abstracts and drop row_number
         genomics_ai_df = (
-            genomics_ai_df[genomics_ai_df["abstract_language"] == "en"]
-            .drop(columns="row_number")
+            genomics_ai_df.drop(columns="row_number")
             .pipe(replace_missing_values_with_nans)
             .pipe(convert_date_columns_to_datetime)
-        )  #
+        )
         # save to s3
         save_to_s3(bucket_name, genomics_ai_df, S3_SAVE_FILENAME)
     except Forbidden:

@@ -8,7 +8,7 @@ Codes are defined as 'genomics' related if genomics keywords are in the descript
 
 Codes are defined as "ai" related if ai keywords are are in the descriptions of classification codes. They are then manually verified and 'good' codes are also added.
 
-To generate AI and genomics- related CPC and IPC codes, run:
+To generate AI and genomics related CPC and IPC codes, run:
 
 `python ai_genomics/pipeline/patent_data/get_ai_genomics_codes.py`
 
@@ -22,13 +22,17 @@ Before you run the `get_ai_genomics_patents.py` script, you will need to export 
 
 Alternatively, you could also set these credentials as an environmental variable in `.bashrc`.
 
-Finally, to identify and save AI- and genomics- related patents to s3, run:
+To identify and save AI and genomics related patents to s3, run:
 
 `python ai_genomics/pipeline/patent_data/get_ai_genomics_patents.py`
 
 You can pass a name of the table to query unique ai and genomics patents from. If the table does not exist in `golden-shine-355915.genomics`, it will first create the table then pull unique ai and genomics patents from it. Be careful of query limits when creating tables.
 
 The AI and genomics patents can be loaded using `ai_genomics.getters.patents.get_ai_genomics_patents`.
+
+Finally, add the full list of CPC and IPC codes associated to a publication number, run:
+
+`python ai_genomics/pipeline/patent_data/add_full_cpc_ipc_codes.py`
 
 ### Quota limits
 

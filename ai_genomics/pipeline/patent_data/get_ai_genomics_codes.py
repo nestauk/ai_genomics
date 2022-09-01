@@ -11,7 +11,7 @@ from ai_genomics.getters.data_getters import (
     load_s3_data,
     save_to_s3,
 )
-from ai_genomics.utils.patent_data.get_ai_genomics_patents_utils import clean_ipc_codes
+from ai_genomics.utils.patents import clean_ipc_codes
 from typing import List, Dict
 import re
 
@@ -118,8 +118,7 @@ def make_keywords_regex_pattern(keywords: List[str]) -> str:
 
 
 def get_classification_codes(
-    class_codes: List[str],
-    bad_codes: List[str],
+    class_codes: List[str], bad_codes: List[str],
 ) -> Dict[str, list]:
     """Get keyword-related classification codes per classification system.
 
