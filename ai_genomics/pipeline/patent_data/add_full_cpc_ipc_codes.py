@@ -14,7 +14,7 @@ ai_genomics_patents = get_ai_genomics_patents()
 ai_genomics_publication_numbers = ai_genomics_patents.publication_number
 
 
-def get_full_cpc_ipc_codlses_query(
+def get_full_cpc_ipc_codes_query(
     ai_genomics_publication_numbers: List[str] = ai_genomics_publication_numbers,
 ) -> str:
     """Generates query to retrieve full list of CPC and IPC codes per patent publication number.
