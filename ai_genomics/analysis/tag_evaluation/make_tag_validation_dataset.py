@@ -4,24 +4,30 @@ sample of sample of texts with DBpedia and OpenAlex tags."""
 
 from ai_genomics.getters.data_getters import load_s3_data, get_s3_dir_files, save_to_s3
 
-from ai_genomics import bucket_name as BUCKET_NAME, logger
+from ai_genomics import bucket_name, logger
 from typing import List, Union
 import pandas as pd
 import requests
 
-SAMPLES_DIR = get_s3_dir_files(BUCKET_NAME, "inputs/ai_genomics_samples/")
+SAMPLES_DIR = get_s3_dir_files(bucket_name, "inputs/ai_genomics_samples/")
 OA_SAMPLE = load_s3_data(
-    BUCKET_NAME, "inputs/ai_genomics_samples/ai_genomics_openalex_samples.csv"
+    bucket_name, "inputs/ai_genomics_samples/ai_genomics_openalex_samples.csv"
 )
 
 
-def make_openalex_api_url(work_url):
+def make_openalex_api_url(work_url: str) -> str:
     """Convert openalex sample work id into json-compatible url."""
     return f"https://api.openalex.org/works/{work_url.split('/')[-1]}"
 
 
 def get_openalex_sample_concepts(oa_sample: pd.DataFrame = OA_SAMPLE) -> pd.DataFrame:
-    """Get tags and associated scores per openalex work_url."""
+    """Calls OpenAlex API to get concepts per OpenAlex sample work id.
+        Returns OpenAlex sample with associated concepts, concept
+        scores and concept levels.
+
+    Args:
+        oa_sample: DataFrame of OpenAlex text samples
+    """
     oa_sample["api_url"] = oa_sample["work_id"].apply(make_openalex_api_url)
 
     oa_tags = []
@@ -56,11 +62,11 @@ def load_sample_tags(
     tags_dir: str = "oa_tags", sample_dirs: List[str] = SAMPLES_DIR
 ) -> pd.DataFrame:
     """Load and concatenate dataset samples with tags extracted.
+        returns a standardised dataframe of descriptions,
+        tags extracted and the data source
     Args:
-        tags_dir (str): the tag method type as described in file names
-        sample_dirs (list): A list of file names in S3 dataset samples directory
-    Returns:
-        A standardised dataframe of descriptions, tags extracted and the data source
+        tags_dir: the tag method type as described in file names
+        sample_dirs: A list of file names in S3 dataset samples directory
     """
     dfs = []
     for sample_dir in sample_dirs:
@@ -91,7 +97,7 @@ if __name__ == "__main__":
     oa_sample_concepts = get_openalex_sample_concepts()
     logger.info("extracted open alex concepts for openalex sample")
     save_to_s3(
-        BUCKET_NAME,
+        bucket_name,
         oa_sample_concepts,
         "inputs/ai_genomics_samples/samples_with_oa_tags/ai_genomics_openalex_samples_with_oa_tags.csv",
     )
@@ -110,7 +116,7 @@ if __name__ == "__main__":
     oa_db_sample_sample = (
         oa_db_sample[["description", "oa_tags", "db_tags", "data_source"]]
         .groupby("data_source")
-        .sample(20)
+        .sample(20, random_state=42)
         .reset_index(drop=True)
     )
 
@@ -118,7 +124,7 @@ if __name__ == "__main__":
         "generated sample of sample of texts with extracted OpenAlex and DBpedia tags."
     )
     save_to_s3(
-        BUCKET_NAME,
+        bucket_name,
         oa_db_sample_sample,
         "inputs/ai_genomics_samples/ai_genomics_sample_validation_set.csv",
     )
