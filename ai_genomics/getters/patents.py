@@ -1,5 +1,6 @@
 from ai_genomics import bucket_name as BUCKET_NAME
 from ai_genomics.getters.data_getters import load_s3_data
+import pandas as pd
 
 
 def get_ai_genomics_patents() -> pd.DataFrame:
