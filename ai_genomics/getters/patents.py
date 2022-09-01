@@ -17,5 +17,5 @@ def get_ai_genomics_patents() -> pd.DataFrame:
     """
     return load_s3_data(
         BUCKET_NAME,
-        "inputs/patent_data/processed_patent_data/ai_genomics_patents_full_cpc_ipc_codes.csv",
+        "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv",
     )

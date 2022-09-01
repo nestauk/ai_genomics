@@ -5,19 +5,17 @@ from re import A
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from ai_genomics import logger, bucket_name
 import pandas as pd
-from collections.abc import Sequence
+from typing import List
+from ai_genomics.getters.patents import get_ai_genomics_patents
 
 from ai_genomics.utils.patents import est_conn, convert_list_of_codes_to_string
 
-ai_genomics_patents = load_s3_data(
-    bucket_name,
-    "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv",
-)
-ai_genomics_publicaion_number = ai_genomics_patents.publicaiton_number
+ai_genomics_patents = get_ai_genomics_patents()
+ai_genomics_publicaion_number = ai_genomics_patents.publication_number
 
 
 def get_full_cpc_ipc_codes_query(
-    ai_genomics_publication_numbers: Sequence[str] = ai_genomics_patents,
+    ai_genomics_publication_numbers: List[str] = ai_genomics_patents,
 ) -> str:
     """Generates query to retrieve full list of CPC and IPC codes per patent publication number.
     Args:
