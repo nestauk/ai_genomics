@@ -125,6 +125,7 @@ if __name__ == "__main__":
         "outputs/patent_data/class_codes/ipc_with_definitions.json",
     )
 
+    # this is buggy - to fix
     formatted_ipc_codes = dict()
     for topic in ("ai", "genomics"):
         formatted_ipc_codes[topic] = {
