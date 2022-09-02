@@ -1,5 +1,9 @@
 """Script to query BigQuery based on genomics related and AI related cpc/ipc codes."""
 from ai_genomics import bucket_name, logger
+from ai_genomics.getters.patents import (
+    get_ai_genomics_cpc_codes,
+    get_ai_genomics_ipc_codes_formatted,
+)
 from ai_genomics.utils.patents import (
     est_conn,
     replace_missing_values_with_nans,
@@ -23,12 +27,13 @@ GENOMICS_AI_FIELDS = (
     "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
 )
 
-CPC_CODES = load_s3_data(bucket_name, "outputs/patent_data/class_codes/cpc.json")
-IPC_CODES = load_s3_data(bucket_name, "outputs/patent_data/class_codes/ipc.json")
+CPC_CODES = get_ai_genomics_cpc_codes()
+IPC_CODES = get_ai_genomics_ipc_codes_formatted()
 
 
 def genomics_ai_query(
-    cpc_codes: Dict[str, list] = CPC_CODES, ipc_codes: Dict[str, list] = IPC_CODES,
+    cpc_codes: Dict[str, list] = CPC_CODES,
+    ipc_codes: Dict[str, list] = IPC_CODES,
 ) -> str:
     """Generates query to create bespoke genomics ai table
             based on cpc and ipc codes.
@@ -41,12 +46,12 @@ def genomics_ai_query(
         BigQuery query to select genomics and ai related patents.
     """
     cpc_ai_ids, ipc_ai_ids = (
-        covert_list_of_codes_to_string(cpc_codes["ai"]),
-        covert_list_of_codes_to_string(ipc_codes["ai"]),
+        covert_list_of_codes_to_string(list(cpc_codes["ai"].keys())),
+        covert_list_of_codes_to_string(list(ipc_codes["ai"].keys())),
     )
     cpc_genomics_ids, ipc_genomics_ids = (
-        covert_list_of_codes_to_string(cpc_codes["genomics"]),
-        covert_list_of_codes_to_string(ipc_codes["genomics"]),
+        covert_list_of_codes_to_string(list(cpc_codes["genomics"]).keys()),
+        covert_list_of_codes_to_string(list(ipc_codes["genomics"].keys())),
     )
 
     genomics_q = (
