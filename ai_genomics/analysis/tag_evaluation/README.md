@@ -33,7 +33,7 @@ Examples of **DBpedia false negatives** include:
 
 novel medicine, synthetic biology, precision oncology, pairwise comparison, precision medicine
 
-Note that the much higher OpenAlex false positive % should be taken with a pinch of salt given no thresholding occurred with this tag method. The % of texts with at least one false negative associated to it is marginally higher for OpenAlex tags.
+Note that the much higher OpenAlex false positive % should be taken with a pinch of salt given no thresholding occurred with this tag method.
 
 ### Conclusions and considerations
 
