@@ -8,6 +8,7 @@ from ai_genomics.utils.patents import (
     est_conn,
     replace_missing_values_with_nans,
     convert_date_columns_to_datetime,
+    convert_list_of_codes_to_string,
 )
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from google.api_core.exceptions import Forbidden
@@ -46,12 +47,12 @@ def genomics_ai_query(
         BigQuery query to select genomics and ai related patents.
     """
     cpc_ai_ids, ipc_ai_ids = (
-        covert_list_of_codes_to_string(list(cpc_codes["ai"].keys())),
-        covert_list_of_codes_to_string(list(ipc_codes["ai"].keys())),
+        convert_list_of_codes_to_string(list(cpc_codes["ai"].keys())),
+        convert_list_of_codes_to_string(list(ipc_codes["ai"].keys())),
     )
     cpc_genomics_ids, ipc_genomics_ids = (
-        covert_list_of_codes_to_string(list(cpc_codes["genomics"]).keys()),
-        covert_list_of_codes_to_string(list(ipc_codes["genomics"].keys())),
+        convert_list_of_codes_to_string(list(cpc_codes["genomics"].keys())),
+        convert_list_of_codes_to_string(list(ipc_codes["genomics"].keys())),
     )
 
     genomics_q = (
@@ -82,11 +83,9 @@ def select_unique_ai_genomics_patents(
     based on publication_number from specified full_table_name
     """
     unique_ai_genomics_patents = (
-        f"with english_ai_genomics as (select * from {full_table_name} "
-        "WHERE title_language = 'en' AND abstract_language = 'en') "
         "SELECT * FROM ("
         "SELECT *, ROW_NUMBER() OVER (PARTITION BY publication_number) row_number "
-        f"FROM english_ai_genomics) "
+        f"FROM {full_table_name}) "
         "WHERE row_number = 1"
     )
 
