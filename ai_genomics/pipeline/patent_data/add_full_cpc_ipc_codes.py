@@ -1,7 +1,7 @@
 """
 This script adds the full list of CPC and IPC codes per patent number to the AI and Genomics patents dataset saved in S3.
 """
-from re import A
+import re
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from ai_genomics import logger, bucket_name
 import pandas as pd
@@ -14,7 +14,7 @@ ai_genomics_patents = get_ai_genomics_patents()
 ai_genomics_publication_numbers = ai_genomics_patents.publication_number
 
 
-def get_full_cpc_ipc_codlses_query(
+def get_full_cpc_ipc_codes_query(
     ai_genomics_publication_numbers: List[str] = ai_genomics_publication_numbers,
 ) -> str:
     """Generates query to retrieve full list of CPC and IPC codes per patent publication number.
