@@ -113,6 +113,12 @@ if __name__ == "__main__":
         ipc_codes_not_empty, bad_genomics_codes=BAD_GENOMICS_IPC_CODES
     )
 
+    formatted_ipc_codes = dict()
+    for topic in ("ai", "genomics"):
+        formatted_ipc_codes[topic] = dict(
+            zip(clean_ipc_codes(ipc_codes[topic].keys()), ipc_codes[topic].values())
+        )
+
     # save with definitions and ipc clean codes with definitions
     save_to_s3(
         bucket_name,
@@ -124,13 +130,6 @@ if __name__ == "__main__":
         ipc_codes,
         "outputs/patent_data/class_codes/ipc_with_definitions.json",
     )
-
-    # this is buggy - to fix
-    formatted_ipc_codes = dict()
-    for topic in ("ai", "genomics"):
-        formatted_ipc_codes[topic] = {
-            k: clean_ipc_codes(v) for k, v in ipc_codes[topic].items()
-        }
 
     save_to_s3(
         bucket_name,
