@@ -1,7 +1,10 @@
 from ai_genomics import bucket_name
 from ai_genomics.getters.data_getters import load_s3_data
+from ai_genomics.pipeline.patent_data.cpc_lookup import CPC_LOOKUP_PATH
 import pandas as pd
-from typing import Mapping, Union
+from typing import Mapping, Union, Dict
+import json
+
 
 
 def get_ai_genomics_patents() -> pd.DataFrame:
@@ -80,3 +83,11 @@ def get_ai_genomics_ipc_codes_formatted() -> Mapping[
         bucket_name,
         "outputs/patent_data/class_codes/ipc_formatted_with_definitions.json",
     )
+
+
+def get_cpc_lookup() -> Dict:
+    """Loads a lookup between CPC codes and their descriptions and parent
+    codes.
+    """
+    with open(CPC_LOOKUP_PATH, "r") as f:
+        return json.load(f)
