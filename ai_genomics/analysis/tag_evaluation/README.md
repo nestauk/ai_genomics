@@ -1,12 +1,12 @@
 # Tagging Evaluation
 
-Two different types of tagging methods were explored to extract tags from texts across datasets (OpenAlex, crunchbase, patents, GtR): **DBpedia** and **Open Alex tagger**.
+Two different types of tagging methods were explored to extract tags from texts across datasets (OpenAlex, Crunchbase, patents, Gateway to Research): **DBpedia Spotlight** and **Open Alex concept tagger**.
 
 To compare the two different tagging methods, four different datasets of 100 texts per dataset were generated: 100 crunchbase company descriptions, patent abstracts, GtR abstracts and OpenAlex, book chapter/papers. OpenAlex and DBpedia tags were then extracted per text. Only DBpedia tags with a score of at least 60 were generated.
 
 Finally, a sample of a sample was generated (80 texts and their associated tags per tag method) and then labelled (40 texts and their associated tags per tag method) for false positives and false negatives per tagging method.
 
-Across the four datasets, 18 crunchbase texts were labelled; 13 patents were labelled; 3 gtr texts were labelled; and 6 openalex datasets were labelled. False positives were identified if they had nothing to do with the text at hand. Therefore, (where relevant) vaguer tags such as computer science and biology were considered true positives. Meanwhile, false negatives were derived from skimming the text and comparing the two tag lists.
+Across the four datasets, 18 crunchbase texts were labelled; 13 patents were labelled; 3 gtr texts were labelled; and 6 openalex datasets were labelled. False positives were identified if they had nothing to do with the text at hand. Therefore, (where relevant) vaguer tags such as computer science and biology were considered true positives. Meanwhile, false negatives were derived from skimming the text and comparing the two tag lists. Columns of OpenAlex tags above 0.5, 0.6 and 0.7 thresholds were later added to the labelled dataset.
 
 ### Results
 
