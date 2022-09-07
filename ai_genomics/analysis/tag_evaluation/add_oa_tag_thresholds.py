@@ -18,12 +18,12 @@ def get_oa_tags_above_threshold(
     oa_samples: pd.DataFrame, threshold: int
 ) -> pd.DataFrame:
     """Generates column of OpenAlex tags above a threshold."""
-    tag_indx_above_threshold = oa_samples["scores"].apply(
+    oa_samples["scores"] = oa_samples["scores"].apply(
         lambda x: [i for i, score in enumerate(x) if score > threshold]
     )
     oa_samples[f"oa_tags_above_{threshold}"] = [
         [tags[i] for i in tag_indx]
-        for tag_indx, tags in zip(tag_indx_above_threshold, oa_samples["tags"])
+        for tag_indx, tags in zip(oa_samples["scores"], oa_samples["tags"])
     ]
 
     return oa_samples
