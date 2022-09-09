@@ -1,63 +1,62 @@
 """
-This script adds the full list of CPC and IPC codes per patent number to the AI and Genomics patents dataset saved in S3.
+This script adds the full list of CPC and IPC codes per patent number to patents datasets in S3.
 """
 import re
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from ai_genomics import logger, bucket_name
 import pandas as pd
 from typing import List
-from ai_genomics.getters.patents import get_ai_genomics_patents
-
+from ai_genomics.getters.patents import (
+    get_ai_genomics_patents,
+    get_ai_sample_patents,
+    get_genomics_sample_patents,
+)
 from ai_genomics.utils.patents import est_conn, convert_list_of_codes_to_string
 
-ai_genomics_patents = get_ai_genomics_patents()
-ai_genomics_publication_numbers = ai_genomics_patents.publication_number
+AI_GENOMICS_PATENTS = get_ai_genomics_patents()
+AI_SAMPLE_PATENTS = get_ai_sample_patents()
+GENOMICS_SAMPLE_PATENTS = get_genomics_sample_patents()
 
 
-def get_full_cpc_ipc_codes_query(
-    ai_genomics_publication_numbers: List[str] = ai_genomics_publication_numbers,
-) -> str:
-    """Generates query to retrieve full list of CPC and IPC codes per patent publication number.
+def add_full_cpc_ipc_codes(
+    conn,
+    patents_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """Adds full list of CPC and IPC codes per patent publication number.
     Args:
-        ai_genomics_publication_numbers: a list of AI and Genomics publication numbers
+        patents_df: The patents dataframe to add full list of CPC and IPC codes to
     Returns:
-        full_cpc_ipc_q: The BigQuery query to retrive a full list of CPC and IPC codes
+        full_cpc_ipc: The patents dataframe with a full list of CPC and IPC codes
     """
 
-    ai_genomics_publication_numbers_formatted = convert_list_of_codes_to_string(
-        ai_genomics_publication_numbers
+    publication_numbers_formatted = convert_list_of_codes_to_string(
+        patents_df.publication_number
     )
 
     full_cpc_ipc_q = (
         "select publication_number, cpc.code as cpc_code, ipc.code as ipc_code "
         "from patents-public-data.patents.publications, "
         "UNNEST(cpc) cpc, UNNEST(ipc) ipc "
-        f"WHERE publication_number in ({ai_genomics_publication_numbers_formatted})"
+        f"WHERE publication_number in ({publication_numbers_formatted})"
     )
-    return full_cpc_ipc_q
 
+    full_cpc_ipc_codes = conn.query(full_cpc_ipc_q).to_dataframe()
 
-def add_full_cpc_ipc_codes(
-    full_cpc_ipc_df: pd.DataFrame, ai_genomics_df: pd.DataFrame = ai_genomics_patents
-) -> pd.DataFrame:
-    """Adds full list of CPC and IPC codes per patent publication number to ai genomics dataset.
-        Returns DataFrame of ai genomics patents with full list of cpc and ipc codes.
-    Args:
-        full_cpc_ipc_df: Dataframe of ai genomics patent numbers, cpc and ipc codes
-        ai_genomics_df: Dataframe of ai genomics patents
-    """
+    logger.info(
+        "pulled full cpc and ipc codes per patent publication number from Google BigQuery."
+    )
 
     full_cpc_ipc_codes_agg = (
-        full_cpc_ipc_df.groupby("publication_number").agg(set).reset_index()
+        full_cpc_ipc_codes.groupby("publication_number").agg(set).reset_index()
     )
-    ai_genomics_full_codes = pd.merge(
-        full_cpc_ipc_codes_agg, ai_genomics_df, on="publication_number"
-    )
-    return (
-        pd.merge(full_cpc_ipc_codes_agg, ai_genomics_df, on="publication_number")
+
+    patents_full_codes = (
+        pd.merge(full_cpc_ipc_codes_agg, patents_df, on="publication_number")
         .drop(["cpc_code_y", "ipc_code_y"], axis=1)
         .rename(columns={"cpc_code_x": "cpc_codes", "ipc_code_x": "ipc_codes"})
     )
+
+    return patents_full_codes
 
 
 if __name__ == "__main__":
@@ -65,17 +64,22 @@ if __name__ == "__main__":
     # establish conn
     conn = est_conn()
 
-    full_cpc_ipc_q = get_full_cpc_ipc_codes_query()
-    full_cpc_ipc_codes = conn.query(full_cpc_ipc_q).to_dataframe()
-    logger.info(
-        "pulled full cpc and ipc codes per AI Genomics publication number from Google BigQuery."
-    )
-
-    ai_genomics_full_codes = add_full_cpc_ipc_codes(full_cpc_ipc_codes)
-    logger.info("merged AI genomics dataframe with full cpc and ipc codes.")
+    ai_genomics_full_codes = add_full_cpc_ipc_codes(conn, AI_GENOMICS_PATENTS)
+    ai_sample_full_codes = add_full_cpc_ipc_codes(conn, AI_SAMPLE_PATENTS)
+    genomics_sample_full_codes = add_full_cpc_ipc_codes(conn, GENOMICS_SAMPLE_PATENTS)
 
     save_to_s3(
         bucket_name,
         ai_genomics_full_codes,
         "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv",
+    )
+    save_to_s3(
+        bucket_name,
+        ai_sample_full_codes,
+        "inputs/patent_data/processed_patent_data/ai_sample_patents_cpc_ipc_codes.csv",
+    )
+    save_to_s3(
+        bucket_name,
+        genomics_sample_full_codes,
+        "inputs/patent_data/processed_patent_data/genomics_sample_patents_cpc_ipc_codes.csv",
     )
