@@ -7,7 +7,7 @@ from collections import Counter
 import re
 from toolz import pipe
 
-from ai_genomics.pipeline.gtr import fetch_gtr
+from ai_genomics.pipeline.gtr.gtr_utils import fetch_gtr
 from ai_genomics import config, PROJECT_DIR
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
@@ -155,7 +155,9 @@ if __name__ == "__main__":
         .to_csv(GTR_OUTPUTS_DIR / GTR_PROJ_NAME, index=False)
     )
 
-    send_output_to_s3(str(GTR_OUTPUTS_DIR / GTR_PROJ_NAME), GTR_PROJ_NAME)
+    send_output_to_s3(
+        str(GTR_OUTPUTS_DIR / GTR_PROJ_NAME), f"crunchbase/{GTR_PROJ_NAME}"
+    )
 
     # Get publications from projects
     publications_from_projects = fetch_gtr("gtr_projects-outcomes_publications")
