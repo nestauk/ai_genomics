@@ -41,7 +41,7 @@ def fetch_openalex(
     logging.info(f"Fetching {concept_name} for year {year}")
 
     return pipe(
-        f"inputs/openalex/{concept_name}/openalex-works_production-True_concept-{OA_NAME_ID_LOOKUP[concept_name]}_year-{year}.json",
+        f"inputs/openalex/{concept_name}/openalex-works_production-True_year-{year}.json",
         ai_genomics_bucket.Object,
         lambda _object: _object.get()["Body"].read().decode(),
         json.loads,

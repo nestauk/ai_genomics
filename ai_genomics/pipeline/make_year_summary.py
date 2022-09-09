@@ -84,6 +84,6 @@ if __name__ == "__main__":
         partial(openalex.make_inst_metadata, meta_vars=openalex.INST_META_VARS),
     ).to_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv", index=False)
 
-    for year in range(2007, 2022):
+    for year in range(2007, 2023):
         for concept_name in ["artificial_intelligence", "genetics"]:
             fetch_save_year(concept_name, year, make_df=True)
