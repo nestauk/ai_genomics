@@ -5,7 +5,7 @@ import pandas as pd
 from collections import Counter
 import re
 
-from ai_genomics.pipeline.gtr import fetch_gtr
+from ai_genomics.pipeline.gtr.gtr_utils import fetch_gtr
 from ai_genomics import config, PROJECT_DIR
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
