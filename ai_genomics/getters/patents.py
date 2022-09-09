@@ -22,6 +22,42 @@ def get_ai_genomics_patents() -> pd.DataFrame:
     )
 
 
+def get_ai_sample_patents() -> pd.DataFrame:
+    """From S3 loads dataframe of a sample of AI patents (random 10%)
+    with columns such as:
+        - application_number
+        - publication_number
+        - full list of cpc codes
+        - full list of ipc codes
+        - abstract_text
+        - publication_date
+        - inventor
+        - assignee
+    """
+    return load_s3_data(
+        bucket_name,
+        "inputs/patent_data/processed_patent_data/ai_sample_patents_cpc_ipc_codes.csv",
+    )
+
+
+def get_genomics_sample_patents() -> pd.DataFrame:
+    """From S3 loads dataframe of a sample of genomics patents (random 2%)
+    with columns such as:
+        - application_number
+        - publication_number
+        - full list of cpc codes
+        - full list of ipc codes
+        - abstract_text
+        - publication_date
+        - inventor
+        - assignee
+    """
+    return load_s3_data(
+        bucket_name,
+        "inputs/patent_data/processed_patent_data/genomics_sample_patents_cpc_ipc_codes.csv",
+    )
+
+
 def get_ai_genomics_cpc_codes() -> Mapping[str, Mapping[str, Union[str, str]]]:
     """From S3 loads AI in genomics cpc codes"""
     return load_s3_data(
