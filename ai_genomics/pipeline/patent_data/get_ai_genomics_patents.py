@@ -1,5 +1,5 @@
 """Script to query BigQuery based on genomics related and AI related cpc/ipc codes."""
-from ai_genomics import bucket_name, logger
+from ai_genomics import bucket_name
 from ai_genomics.getters.patents import (
     get_ai_genomics_cpc_codes,
     get_ai_genomics_ipc_codes_formatted,
@@ -11,9 +11,7 @@ from ai_genomics.utils.patents import (
     convert_list_of_codes_to_string,
 )
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
-from google.api_core.exceptions import Forbidden
-from google.cloud import bigquery
-from typing import Dict, List
+from typing import Dict
 import pandas as pd
 
 GENOMICS_AI_FIELDS = (
