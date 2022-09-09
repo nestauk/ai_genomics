@@ -23,7 +23,7 @@ def get_ai_genomics_crunchbase_org_ids() -> pd.DataFrame:
         raise e
 
 
-def get_ai_genomics_crunchbase_companies(local: bool = True) -> pd.DataFrame:
+def get_ai_genomics_crunchbase_orgs(local: bool = True) -> pd.DataFrame:
     """Reads a table with information about AI, Genomics or AI and genomics companies
 
     Args:
