@@ -3,7 +3,6 @@ from ai_genomics import bucket_name, logger
 from ai_genomics.getters.patents import (
     get_ai_genomics_cpc_codes,
     get_ai_genomics_ipc_codes_formatted,
-    GENOMICS_AI_FIELDS,
 )
 from ai_genomics.utils.patents import (
     est_conn,
@@ -14,6 +13,13 @@ from ai_genomics.utils.patents import (
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from typing import Dict
 import pandas as pd
+
+GENOMICS_AI_FIELDS = (
+    "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
+    "title_localized.text as title_text, title_localized.language as title_language, "
+    "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
+    "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
+)
 
 CPC_CODES = get_ai_genomics_cpc_codes()
 IPC_CODES = get_ai_genomics_ipc_codes_formatted()
