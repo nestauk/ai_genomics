@@ -49,7 +49,7 @@ install: .cookiecutter/state/conda-create .cookiecutter/state/setup-git .cookiec
 .PHONY: inputs-pull
 ## Pull `inputs/` from S3
 inputs-pull:
-	$(call execute_in_env, aws s3 sync s3://${BUCKET}/inputs inputs --exclude openalex/artificial_intelligence --exclude openalex/genomics )
+	$(call execute_in_env, aws s3 sync s3://${BUCKET}/inputs inputs --exclude openalex/* )
 
 .PHONY: inputs-push
 ## Push `inputs/` to S3 (WARNING: this may overwrite existing files!)
