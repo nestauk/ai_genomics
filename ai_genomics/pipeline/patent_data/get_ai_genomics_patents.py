@@ -1,8 +1,9 @@
 """Script to query BigQuery based on genomics related and AI related cpc/ipc codes."""
-from ai_genomics import bucket_name
+from ai_genomics import bucket_name, logger
 from ai_genomics.getters.patents import (
     get_ai_genomics_cpc_codes,
     get_ai_genomics_ipc_codes_formatted,
+    GENOMICS_AI_FIELDS,
 )
 from ai_genomics.utils.patents import (
     est_conn,
@@ -13,13 +14,6 @@ from ai_genomics.utils.patents import (
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from typing import Dict
 import pandas as pd
-
-GENOMICS_AI_FIELDS = (
-    "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
-    "title_localized.text as title_text, title_localized.language as title_language, "
-    "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
-    "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
-)
 
 CPC_CODES = get_ai_genomics_cpc_codes()
 IPC_CODES = get_ai_genomics_ipc_codes_formatted()
@@ -106,9 +100,18 @@ def get_patents(
     conn,
     table_name: str = "ai_genomics",
 ) -> pd.DataFrame:
-    """Returns DataFrame to select unique patents
-    based on publication_number from specified table name
     """
+    Gets unique patent documents from a specified
+    table name in BigQuery.
+
+    Args:
+        conn: BigQuery connection
+        table_name: Name of table to get patents from
+
+    Returns:
+        df: A dataframe of unique patent documents
+    """
+
     unique_patents = (
         "SELECT * FROM ("
         "SELECT *, ROW_NUMBER() OVER (PARTITION BY publication_number) row_number "
@@ -131,8 +134,13 @@ if __name__ == "__main__":
     conn = est_conn()
 
     ai_genomics_patents = get_patents(conn)
+    logger.info("got AI genomics patent documents")
+
     ai_patents_sample = get_patents(conn, table_name="ai_sample")
+    logger.info("got AI patent documents from ai_sample table")
+
     genomics_patents_sample = get_patents(conn, table_name="genomics_sample")
+    logger.info("got genomics patent documents from genomics_sample table")
 
     for table_name, table in zip(
         ("ai_genomics", "ai_sample", "genomics_sample"),

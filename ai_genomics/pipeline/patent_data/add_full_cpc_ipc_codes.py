@@ -68,18 +68,9 @@ if __name__ == "__main__":
     ai_sample_full_codes = add_full_cpc_ipc_codes(conn, AI_SAMPLE_PATENTS)
     genomics_sample_full_codes = add_full_cpc_ipc_codes(conn, GENOMICS_SAMPLE_PATENTS)
 
-    save_to_s3(
-        bucket_name,
-        ai_genomics_full_codes,
-        "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv",
-    )
-    save_to_s3(
-        bucket_name,
-        ai_sample_full_codes,
-        "inputs/patent_data/processed_patent_data/ai_sample_patents_cpc_ipc_codes.csv",
-    )
-    save_to_s3(
-        bucket_name,
-        genomics_sample_full_codes,
-        "inputs/patent_data/processed_patent_data/genomics_sample_patents_cpc_ipc_codes.csv",
-    )
+    for table_name, table in zip(
+        ("ai_genomics", "ai_sample", "genomics_sample"),
+        (ai_genomics_full_codes, ai_sample_full_codes, genomics_sample_full_codes),
+    ):
+        full_table_name = f"inputs/patent_data/processed_patent_data/{table_name}_patents_cpc_ipc_codes.csv"
+        save_to_s3(bucket_name, table, full_table_name)

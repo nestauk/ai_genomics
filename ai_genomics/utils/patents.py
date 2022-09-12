@@ -10,6 +10,13 @@ import pandas as pd
 import numpy as np
 import string
 
+GENOMICS_AI_FIELDS = (
+    "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
+    "title_localized.text as title_text, title_localized.language as title_language, "
+    "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
+    "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
+)
+
 DATE_COLS = ["publication_date", "grant_date", "filing_date", "priority_date"]
 
 AI_KEYWORDS = ["machine learning", "artificial intelligence", "neural network"]
