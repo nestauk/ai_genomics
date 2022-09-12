@@ -36,7 +36,7 @@ def load_all_oalex(oalex_getter, id_name: str):
     return (
         pd.concat(
             [
-                oalex_getter(disc, year_list=range(2012, 2022))
+                oalex_getter(disc, year_list=range(2007, 2022))
                 for disc in ["artificial_intelligence", "genetics"]
             ]
         )

@@ -6,14 +6,14 @@ import os
 from functools import partial
 
 from toolz import pipe
+from metaflow import FlowSpec, step, batch
 
 from ai_genomics.utils import openalex
 from ai_genomics import PROJECT_DIR
 from ai_genomics.getters.openalex import get_openalex_instits
 
 
-OA_NAME_ID_LOOKUP = {"artificial_intelligence": "C154945302", "genetics": "C54355233"}
-OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
+OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex/"
 
 
 def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
@@ -75,15 +75,35 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
         json.dump(openalex.make_deinverted_abstracts(oalex_works), outfile)
 
 
-if __name__ == "__main__":
+class MakeYearSummaryFlow(FlowSpec):
+    @step
+    def start(self):
+        self.next(self.make_directories)
 
-    os.makedirs(OALEX_PATH, exist_ok=True)
+    @step
+    def make_directories(self):
+        os.makedirs(OALEX_PATH, exist_ok=True)
+        pipe(
+            get_openalex_instits(),
+            partial(openalex.make_inst_metadata, meta_vars=openalex.INST_META_VARS),
+        ).to_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv", index=False)
+        self.years = list(range(2007, 2022))
+        self.next(self.fetch_save_year, foreach="years")
 
-    pipe(
-        get_openalex_instits(),
-        partial(openalex.make_inst_metadata, meta_vars=openalex.INST_META_VARS),
-    ).to_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv", index=False)
-
-    for year in range(2007, 2022):
+    @step
+    def fetch_save_year(self):
         for concept_name in ["artificial_intelligence", "genetics"]:
-            fetch_save_year(concept_name, year, make_df=True)
+            fetch_save_year(concept_name, self.input, make_df=True)
+        self.next(self.join)
+
+    @step
+    def join(self, inputs):
+        self.next(self.end)
+
+    @step
+    def end(self):
+        pass
+
+
+if __name__ == "__main__":
+    MakeYearSummaryFlow()
