@@ -19,9 +19,11 @@ ratelim
 python-dotenv
 altair_saver
 webdriver-manager
-fsspec
-S3fs
 db-dtypes
 google-cloud-bigquery
 google-cloud-bigquery-storage
 google-api-core
+boto3==1.24.7
+fsspec==2022.5.0
+s3fs==2022.5.0
+pandas==1.4.2
