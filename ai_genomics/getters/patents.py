@@ -41,7 +41,7 @@ def get_ai_sample_patents() -> pd.DataFrame:
 
 
 def get_genomics_sample_patents() -> pd.DataFrame:
-    """From S3 loads dataframe of a sample of genomics patents (random 2%)
+    """From S3 loads dataframe of a sample of genomics patents (random 3%)
     with columns such as:
         - application_number
         - publication_number
