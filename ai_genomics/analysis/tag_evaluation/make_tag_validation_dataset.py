@@ -5,7 +5,7 @@ sample of sample of texts with DBpedia and OpenAlex tags."""
 from ai_genomics.getters.data_getters import load_s3_data, get_s3_dir_files, save_to_s3
 
 from ai_genomics import bucket_name, logger
-from typing import List, Union
+from typing import List
 import pandas as pd
 import requests
 import ast
@@ -21,7 +21,7 @@ def make_openalex_api_url(work_url: str) -> str:
     return f"https://api.openalex.org/works/{work_url.split('/')[-1]}"
 
 
-def get_openalex_sample_concept(api_url):
+def get_openalex_sample_concept(api_url: str) -> List[str]:
     """Calls OpenAlex API to get concepts for a given OpenAlex API URL."""
     oa_response = requests.get(api_url)
     if not oa_response.ok:
@@ -86,9 +86,7 @@ def load_sample_tags(
                     "entities": "tags",
                 }
             )
-            sample_with_tags["data_source"] = sample_with_tags[
-                "data_source"
-            ] = sample_dir.split("/")[-1].split("_")[2]
+            sample_with_tags["data_source"] = sample_dir.split("/")[-1].split("_")[2]
             if "scores" in sample_with_tags.columns:
                 sample_with_tags = sample_with_tags[
                     ["description", "tags", "scores", "data_source"]

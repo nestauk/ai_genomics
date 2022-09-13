@@ -15,13 +15,23 @@ LABELLED_TAG_EVALUATION_DATASET = load_s3_data(
 
 
 def get_oa_tags_above_threshold(
-    oa_samples: pd.DataFrame, threshold: int
+    oa_samples: pd.DataFrame, min_threshold: int
 ) -> pd.DataFrame:
-    """Generates column of OpenAlex tags above a threshold."""
+    """Generates column of OpenAlex tags above a minimum threshold.
+
+    Args:
+        oa_samples: DataFrame of labelled texts with extracted
+                        OpenAlex tags.
+        min_threshold: OpenAlex tags must have a score greater than
+                        or equal to this to be included.
+    Returns:
+        oa_samples with columns of OpenAlex tags above a minimum
+            threshold
+    """
     oa_samples["scores"] = oa_samples["scores"].apply(
-        lambda x: [i for i, score in enumerate(x) if score > threshold]
+        lambda x: [i for i, score in enumerate(x) if score >= min_threshold]
     )
-    oa_samples[f"oa_tags_above_{threshold}"] = [
+    oa_samples[f"oa_tags_above_{min_threshold}"] = [
         [tags[i] for i in tag_indx]
         for tag_indx, tags in zip(oa_samples["scores"], oa_samples["tags"])
     ]
