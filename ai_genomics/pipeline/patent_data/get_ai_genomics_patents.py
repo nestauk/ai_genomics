@@ -18,7 +18,10 @@ GENOMICS_AI_FIELDS = (
     "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
     "title_localized.text as title_text, title_localized.language as title_language, "
     "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
-    "publication_date, filing_date, grant_date, priority_date, inventor, assignee, entity_status "
+    "publication_date, filing_date, grant_date, priority_date, inventor_harmonized.name "
+    "as inventor_name, inventor_harmonized.country_code as inventor_country, "
+    "assignee_harmonized.name as assignee_name, assignee_harmonized.country_code as assignee_country, "
+    "entity_status"
 )
 
 CPC_CODES = get_ai_genomics_cpc_codes()
@@ -49,7 +52,8 @@ def code_query(
         f"SELECT {GENOMICS_AI_FIELDS} "
         f"FROM `patents-public-data.patents.publications` TABLESAMPLE SYSTEM ({sample} PERCENT), "
         " UNNEST(cpc) AS cpc, UNNEST(ipc) AS ipc, "
-        "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized "
+        "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized, "
+        "UNNEST(inventor_harmonized) inventor_harmonized, UNNEST(assignee_harmonized) assignee_harmonized "
         f"WHERE cpc.code IN ({cpc_ids}) OR "
         f"ipc.code IN ({ipc_ids})"
     )
@@ -92,9 +96,10 @@ def genomics_ai_query(
         f"WITH "
         f"genomics_ids AS ({genomics_q}) "
         "SELECT "
-        f"{GENOMICS_AI_FIELDS}"
+        f"{GENOMICS_AI_FIELDS} "
         "FROM `patents-public-data.patents.publications`, UNNEST(cpc) AS cpc, UNNEST(ipc) AS ipc, "
-        "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized "
+        "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized, "
+        "UNNEST(inventor_harmonized) inventor_harmonized, UNNEST(assignee_harmonized) assignee_harmonized "
         "INNER JOIN genomics_ids USING(publication_number) "
         f"WHERE cpc.code in ({cpc_ai_ids}) OR ipc.code in ({ipc_ai_ids});"
     )
