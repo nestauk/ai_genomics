@@ -2,7 +2,7 @@
 This script adds the full list of CPC and IPC codes per patent number to patents datasets in S3.
 """
 import re
-from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
+from ai_genomics.getters.data_getters import save_to_s3
 from ai_genomics import logger, bucket_name
 import pandas as pd
 from typing import List
@@ -25,10 +25,10 @@ def add_full_cpc_ipc_codes(
     """Adds full list of CPC and IPC codes per patent publication number.
     Args:
         patents_df: The patents dataframe to add full list of CPC and IPC codes to
+        conn: Google BigQuery coonection
     Returns:
         full_cpc_ipc: The patents dataframe with a full list of CPC and IPC codes
     """
-
     publication_numbers_formatted = convert_list_of_codes_to_string(
         patents_df.publication_number
     )
