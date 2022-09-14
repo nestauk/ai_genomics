@@ -1,4 +1,4 @@
-"""Script to post process extracted entities using
+"""Class to post process extracted entities using
 spacy's pretrained NER model where expected input of extracted
 entities is {id: [entities]} and expected output is {id: [clean_entities]}
 
@@ -14,7 +14,7 @@ clean_entitites = {123324: ['genomics', 'RNA'],
                     14234: ['machine learning', 'personalised medicine'],
                     1666: ['deep neural networks', 'genetics']}
 
-If script is run, evaluates labelled entities and applies clean_entities
+If .py is run, evaluates labelled entities and applies clean_entities
 to toy extracted entity dictionary.
 """
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
@@ -26,7 +26,7 @@ import spacy
 from datetime import datetime as date
 import itertools
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
-from typing import List
+from typing import List, Dict
 
 BAD_ENTS = ["ORG", "GPE", "MONEY", "LOC", "PERSON"]
 
@@ -111,7 +111,7 @@ class EntityCleaner:
 
         return labelled_ents
 
-    def predict(self, entities_list):
+    def predict(self, entities_list: List[str]) -> List[int]:
         """predict whether entity is good (==0) or not (==1) for a given entities list"""
         labels = []
         for i, ent in enumerate(entities_list):
@@ -129,14 +129,16 @@ class EntityCleaner:
 
         return labels
 
-    def clean_entities(self, entities_list):
+    def clean_entities(self, entities_list: List[str]) -> List[str]:
         """filters entities list based on predicted 'bad' entities"""
 
         ent_preds = self.predict(entities_list)
 
         return [entities_list[i] for i, pred in enumerate(ent_preds) if pred != 1]
 
-    def evaluate(self, y_true: List[int] = None, y_pred: List[int] = None):
+    def evaluate(
+        self, y_true: List[int] = None, y_pred: List[int] = None
+    ) -> Dict[str, int]:
         """evaluate pretrained NER model based on labelled entities
 
         If no y_true and y_pred passed, use formatted labelled entities dataset.
@@ -185,5 +187,5 @@ if __name__ == "__main__":
 
     clean_entities = {
         text_id: ec.clean_entities(entity) for text_id, entity in entities.items()
-    }  # apply clean entities to list
+    }  # apply clean entities to list and print results
     print(clean_entities)
