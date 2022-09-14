@@ -1,12 +1,14 @@
 """ai_genomics/pipeline/validation/utils.py
 Utilities for creating samples to be manually validated.
 """
-from typing import Dict, Generator, Union
-from ai_genomics import PROJECT_DIR
 import numpy as np
 import os
 import pandas as pd
 from toolz.functoolz import pipe
+from typing import Dict, Generator, Union
+
+from ai_genomics import PROJECT_DIR
+from ai_genomics import logger
 
 
 def patent_code_to_description_lookup(classification: str = "ipc") -> Dict:
@@ -23,7 +25,10 @@ def patent_code_to_description_lookup(classification: str = "ipc") -> Dict:
 
     allowed_classifications = ["ipc", "cpc"]
     if classification not in allowed_classifications:
-        raise ValueError(f"Allowed classifications are {allowed_classifications}.")
+        err_msg = f"Allowed classifications are {allowed_classifications}."
+        error = ValueError(err_msg)
+        logger.error(err_msg, exc_info=error)
+        raise error
 
     lookup_dir = PROJECT_DIR / f"inputs/patent_data/{classification}"
     files = os.listdir(lookup_dir)
