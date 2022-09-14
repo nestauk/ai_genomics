@@ -25,3 +25,5 @@ db-dtypes
 google-cloud-bigquery
 google-cloud-bigquery-storage
 google-api-core
+beautifulsoup4
+lxml
