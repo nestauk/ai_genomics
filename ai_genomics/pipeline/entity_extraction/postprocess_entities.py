@@ -100,14 +100,14 @@ class EntityCleaner:
                 self.clean_entity_col
             )
 
-        labelled_ents = dict()
-        for i, (ent, bad_ent) in enumerate(
-            zip(self.labelled_entities.entities, self.labelled_entities.bad_entities)
+        labelled_ents = list()
+        for ent, bad_ent in zip(
+            self.labelled_entities.entities, self.labelled_entities.bad_entities
         ):
             bad_ent_indx = [ent.index(e) for e in bad_ent]
-            labelled_ents[i] = [
-                1 if indx in bad_ent_indx else 0 for indx, e in enumerate(ent)
-            ]
+            labelled_ents.extend(
+                [1 if indx in bad_ent_indx else 0 for indx, e in enumerate(ent)]
+            )
 
         return labelled_ents
 
@@ -143,7 +143,6 @@ class EntityCleaner:
         """
         if not y_true:
             y_true = self.format_labelled_data()
-            y_true = list(itertools.chain(*y_true.values()))
 
         if not y_pred:
             labelled_ents_lookup = self.labelled_entities["entities"].to_dict()
