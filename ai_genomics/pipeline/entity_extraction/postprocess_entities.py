@@ -14,7 +14,8 @@ clean_entitites = {123324: ['genomics', 'RNA'],
                     14234: ['machine learning', 'personalised medicine'],
                     1666: ['deep neural networks', 'genetics']}
 
-If script is run, evaluates labelled entities
+If script is run, evaluates labelled entities and applies clean_entities
+to toy extracted entity dictionary.
 """
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
 from ai_genomics import bucket_name, logger
