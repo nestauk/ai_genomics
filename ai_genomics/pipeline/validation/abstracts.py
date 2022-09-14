@@ -21,23 +21,14 @@ if __name__ == "__main__":
     out_dir = PROJECT_DIR / "inputs/validation"
     make_path_if_not_exist(out_dir)
 
-    patent_drop_cols = [
-        "cpc_codes",
-        "ipc_codes",
-        "publication_date",
-        "filing_date",
-        "grant_date",
-        "priority_date",
-        "entity_status",
-        "title_language",
-        "abstract_language",
-        "application_number",
-    ]
+    patent_keep_cols = ["publication_number", "title_text", "abstract_text"]
 
     patents = (
         get_ai_genomics_patents()
         .query("title_language == 'en' & abstract_language == 'en'")
-        .drop(patent_drop_cols, axis=1)
+        .loc[:, patent_keep_cols]
+        .assign(Source="patent")
+        .drop_duplicates(subset="abstract_text")
         .rename(
             columns={
                 "publication_number": "ID",
@@ -45,7 +36,6 @@ if __name__ == "__main__":
                 "abstract_text": "Abstract",
             },
         )
-        .assign(Source="patent")
     )
 
     col_order = ["Source", "ID", "Title", "Abstract"]
@@ -62,25 +52,6 @@ if __name__ == "__main__":
             index=False,
         )
 
-    openalex_drop_cols = [
-        "Unnamed: 0.1",
-        "index",
-        "Unnamed: 0",
-        "doi",
-        "publication_year",
-        "publication_date",
-        "cited_by_count",
-        "is_retracted",
-        "venue_id",
-        "venue_display_name",
-        "venue_url",
-        "predicted_language",
-        "language_probability",
-        "has_abstract",
-        "arxiv_id",
-        "ambiguous",
-    ]
-
     oa_abstracts = _get_openalex_ai_genomics_abstracts()
     oa_abstracts = pd.DataFrame(
         {
@@ -89,10 +60,12 @@ if __name__ == "__main__":
             "Source": "publication",
         },
     )
+
+    oa_keep_cols = ["display_name", "work_id"]
     works = (
         _get_openalex_ai_genomics_works()
         .query("predicted_language == 'en'")
-        .drop(columns=openalex_drop_cols, axis=1)
+        .loc[:, oa_keep_cols]
         .rename(columns={"display_name": "Title", "work_id": "ID"})
         .merge(oa_abstracts, on="ID")
     )
