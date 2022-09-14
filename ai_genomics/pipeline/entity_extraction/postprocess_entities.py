@@ -39,15 +39,28 @@ class EntityCleaner:
 
     Attributes
     --------
-    entity_lookup_path: s3 location of a given entity lookup file
-    bad_ents: list of spaCy entities to remove
+    entity_lookup_path: s3 location of labelled entities file
+    bad_ents: list of spaCy entity types to remove
+
     Methods
     --------
-    load_data: Load entitiy dictionary where key is id and
-    value is list of entities.
-    remove_bad_entities: remove entities based on list of
-    bad_entities types
-    evaluate: calculate overall accuracy of 'good' and 'bad' entities
+    clean_entity_col(entity_col): cleans up entity column in labelled
+                                    dataset to just extract entity
+                                    and ignore entity score.
+    format_labelled_data: Formats labelled dataset to be a dictionary
+                            where key is id and value is list of
+                            predicted entities where 1 == bad entity
+                            and 0 == good entity.
+    predict(entity_list): predicts 1== bad entity or 0 == good entity
+                            based on spaCy's pretrained NER model.
+                            entity is 'bad' if its entity type is in
+                            bad_ents.
+    clean_entities(entity_list): given the entity prediction, return
+                                    entity list with only 'good' predictions.
+    evaluate(y_pred, y_true): calculates f1, recall, accuracy and precision
+                                of two lists of binaries. If no y_pred and
+                                y_true lists are passed, use formatted
+                                labelled dataset in s3.
     """
 
     def __init__(
