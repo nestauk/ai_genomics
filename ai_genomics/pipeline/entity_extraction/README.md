@@ -17,4 +17,5 @@ clean_entities = {text_id: ec.clean_entities(entity) for text_id, entity in enti
 
 where `entities = {id: [entities]}`
 
-You can also run the script (`python ai_genomics/pipeline/entity_extraction/postprocess_entities.py`) to print results from a labelled dataset with labelled entities as entities to keep or remove.
+You can also run the script (`python ai_genomics/pipeline/entity_extraction/postprocess_entities.py`) to print
+accuracy, f1, recall and precision from the labelled dataset with labelled 'good' or 'bad' entities.
