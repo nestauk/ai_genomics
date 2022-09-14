@@ -150,3 +150,34 @@ def get_openalex_ai_genomics_works() -> pd.DataFrame:
             "FileNotFoundError: To create the missing file, run ai_genomics/analysis/openalex_definition.py"
         )
         raise e
+
+
+def _get_openalex_ai_genomics_works() -> pd.DataFrame:
+    """TEMPORARY
+    Returns dataframe of AI in genomics OpenAlex works.
+    """
+    return pd.read_csv(
+        f"{PROJECT_DIR}/inputs/oalex-tables-prov/oalex_ai_genomics_works_prov.csv",
+    )
+
+
+def _get_openalex_ai_genomics_concepts() -> pd.DataFrame:
+    """TEMPORARY
+    Returns dataframe of AI in genomics OpenAlex concepts.
+    """
+    return pd.read_csv(
+        f"{PROJECT_DIR}/inputs/oalex-tables-prov/oalex_ai_genomics_concepts_prov.csv",
+    )
+
+
+def _get_openalex_ai_genomics_abstracts() -> pd.DataFrame:
+    """TEMPORARY
+    Returns dataframe of AI in genomics OpenAlex inverted abstracts.
+    """
+    fin = (
+        f"{PROJECT_DIR}/inputs/oalex-tables-prov/oalex_ai_genomics_abstracts_prov.json"
+    )
+    with open(fin, "r") as f:
+        data = json.load(f)
+
+    return data
