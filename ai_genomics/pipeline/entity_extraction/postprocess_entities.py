@@ -76,7 +76,7 @@ class EntityCleaner:
         self.save_eval = save_eval
 
     def clean_entity_col(self, entities):
-        """FOR LABELLED DATA - extracts entity from bad_entities col"""
+        """FOR LABELLED DATA - cleans and extracts entity from entity col"""
 
         entities = ast.literal_eval(entities)
         if isinstance(entities, tuple):
