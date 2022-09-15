@@ -161,7 +161,7 @@ def convert_date_columns_to_datetime(ai_genomics_patents: pd.DataFrame) -> pd.Da
     in the AI in genomics patents dataset"""
     for col in DATE_COLS:
         ai_genomics_patents[col] = pd.to_datetime(
-            ai_genomics_patents[col], format="%Y%m%d"
+            ai_genomics_patents[col], format="%Y%m%d", errors="ignore"
         )
     return ai_genomics_patents
 
