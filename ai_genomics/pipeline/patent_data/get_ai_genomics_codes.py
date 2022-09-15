@@ -1,8 +1,8 @@
 """
-Simple script to extract cpc and ipc codes related to genomics and AI via
+Script to extract cpc and ipc codes related to genomics and AI via
 exact match and manual pruning/adding.
 
-To run: python get_ai_genomics_codes.py
+To run: python ai_genomics/pipeline/patent_data/get_ai_genomics_codes.py
 """
 import string
 from ai_genomics import bucket_name, config
@@ -11,142 +11,76 @@ from ai_genomics.getters.data_getters import (
     load_s3_data,
     save_to_s3,
 )
-from ai_genomics.utils.patents import clean_ipc_codes
-from typing import List, Dict
+from ai_genomics.utils.patents import (
+    clean_ipc_codes,
+    clean_code_definition,
+    make_keywords_regex_pattern,
+    AI_KEYWORDS,
+    GENOMICS_KEYWORDS,
+    GOOD_GENOMICS_CPC_CODES,
+    GOOD_AI_CPC_CODES,
+    BAD_GENOMICS_CPC_CODES,
+    BAD_GENOMICS_IPC_CODES,
+)
+from typing import Mapping, List
 import re
-
-AI_KEYWORDS = ["machine learning", "artificial intelligence", "neural network"]
-
-GENOMICS_KEYWORDS = ["genome", "dna", "gene", "genetic"]
-
-GOOD_GENOMICS_CPC_CODES = ["C12Q1/6869", "G16B20/20", "G16B5/20"]
-
-GOOD_AI_CPC_CODES = [
-    "Y10S706/902",
-    "Y10S706/908",
-    "Y10S706/911",
-    "Y10S706/916",
-    "Y10S706/919",
-    "Y10S706/92",
-    "Y10S706/921",
-    "Y10S706/922",
-    "Y10S706/923",
-    "Y10S706/932",
-    "Y10S706/934",
-    "G16B40/20",
-    "G16B40/30",
-    "G06V10/762",
-    "G06V10/7635",
-    "G06V10/764",
-    "G06V10/77",
-    "G06V10/86",
-]
-
-BAD_GENOMICS_CPC_CODES = [
-    "H01J49/0409",
-    "H04L9/0866",
-    "C12P",
-    "G10H2220/386",
-    "C12C2200/01",
-    "A01H1/06",
-    "A01K11/003",
-    "A01K2217/15",
-    "A01K2267/0306",
-    "A23C19/0326",
-    "A23C2220/202",
-    "A23V2300/21",
-    "C40B10/00",
-    "C40B40/08",
-    "G05B23/0229",
-    "G05B2219/32091",
-    "G05B2219/32333",
-    "G05B2219/33041",
-    "G05B2219/35041",
-    "G05B2219/40384",
-    "G05B2219/40473",
-    "G05B2219/42145",
-    "G05B2219/42147",
-    "G06F2111/06",
-    "G06K7/1482",
-    "G06K9/6229",
-    "G06N3/086",
-    "G06N3/126",
-    "G10H2250/011",
-    "G10K2210/3029",
-    "G10L25/39",
-    "G01N23/20",
-    "G06N3/12",
-    "G06N3/123",
-    "G06N3/00",
-    "G06N3/002",
-]
-
-BAD_GENOMICS_IPC_CODES = [
-    "G06N0003120000",
-    "G10L0025390000",
-    "G10L0025390000",
-    "G06F0111060000",
-]
-
-
-def clean_class_code(code_text: str) -> str:
-    """Cleans definitions by:
-            - lowercasing;
-            - replacing values;
-            - removing punctuation;
-
-    Args:
-        code_text: Definition to clean
-
-    Returns:
-        Clean definition
-    """
-    return (
-        code_text.replace("\r", "")
-        .lower()
-        .translate(str.maketrans("", "", string.punctuation))
-    )
-
-
-def make_keywords_regex_pattern(keywords: List[str]) -> str:
-    """Makes regex pattern given a list of keywords or phrases
-
-    Example:
-        make_keywords_regex_pattern(['genome', 'dna']) -> '\\bgenome\\b|\\bdna\\b'
-    """
-    return "|".join(f"\\b{k}\\b" for k in keywords)
 
 
 def get_classification_codes(
-    class_codes: List[str], bad_codes: List[str],
-) -> Dict[str, list]:
+    class_codes: List[str],
+    bad_ai_codes: List[str] = [],
+    bad_genomics_codes: List[str] = [],
+    good_ai_codes: List[str] = [],
+    good_genomics_codes: List[str] = [],
+) -> Mapping[str, Mapping[str, str]]:
     """Get keyword-related classification codes per classification system.
 
     Args:
         class_codes: List of patent classification codes and
             descriptions of a given classification system.
-        bad_codes: List of 'bad' patent classification codes
+        bad_ai_codes: List of 'bad' ai patent classification codes
             of a given classification system
+        bad_genomics_codes: List of 'bad' genomics patent classification codes
+            of a given classification system
+        good_ai_codes: List of 'good' genomics patent classification codes
+            of a given classification system not found via keyword search
+        good_genomics_codes: List of 'good' genomics patent classification codes
+            of a given classification system not found via keyword search
 
     Returns:
-         Dictionary containing keys for genomics and ai with values
-            of a list of classification codes
+         classification_codes: A dictionary containing keys for genomics and ai with values
+            of a dictionary of classification codes and their respective definitions
     """
-    classification_codes = {label: [] for label in ("genomics", "ai")}
+    classification_codes = {}
     ai_pattern, genomics_pattern = (
         make_keywords_regex_pattern(AI_KEYWORDS),
         make_keywords_regex_pattern(GENOMICS_KEYWORDS),
     )
 
-    for i, code in enumerate(class_codes):
-        code_clean = clean_class_code(code[1])
-        if (
-            re.findall(genomics_pattern, code_clean)
-            and class_codes[i][0] not in bad_codes
-        ):
-            classification_codes["genomics"].append(class_codes[i][0])
-        if re.findall(ai_pattern, code_clean):
-            classification_codes["ai"].append(class_codes[i][0])
+    classification_codes = dict()
+
+    ai_codes = dict(
+        [x for x in class_codes if re.findall(ai_pattern, x[1])]
+        + [x for x in class_codes if x[0] in good_ai_codes]
+    )
+    genomics_codes = dict(
+        [x for x in class_codes if re.findall(genomics_pattern, x[1])]
+        + [x for x in class_codes if x[0] in good_genomics_codes]
+    )
+
+    clean_ai_codes = {
+        code: clean_code_definition(code_desc)
+        for code, code_desc in ai_codes.items()
+        if code not in bad_ai_codes
+    }
+    clean_genomics_codes = {
+        code: clean_code_definition(code_desc)
+        for code, code_desc in genomics_codes.items()
+        if code not in bad_genomics_codes
+    }
+
+    classification_codes["ai"] = clean_ai_codes
+    classification_codes["genomics"] = clean_genomics_codes
 
     return classification_codes
 
@@ -169,16 +103,36 @@ if __name__ == "__main__":
         [[i[0], i[1]] for i in ipc_codes if len(i) == 2],
     )
 
-    cpc_codes = get_classification_codes(cpc_codes_not_empty, BAD_GENOMICS_CPC_CODES)
-    # manually add a few more codes
-    cpc_codes["genomics"] = cpc_codes["genomics"] + GOOD_GENOMICS_CPC_CODES
-    cpc_codes["ai"] = cpc_codes["ai"] + GOOD_AI_CPC_CODES
+    cpc_codes = get_classification_codes(
+        cpc_codes_not_empty,
+        bad_genomics_codes=BAD_GENOMICS_CPC_CODES,
+        good_ai_codes=GOOD_AI_CPC_CODES,
+        good_genomics_codes=GOOD_GENOMICS_CPC_CODES,
+    )
+    ipc_codes = get_classification_codes(
+        ipc_codes_not_empty, bad_genomics_codes=BAD_GENOMICS_IPC_CODES
+    )
 
-    ipc_codes = get_classification_codes(ipc_codes_not_empty, BAD_GENOMICS_IPC_CODES)
+    formatted_ipc_codes = dict()
+    for topic in ("ai", "genomics"):
+        formatted_ipc_codes[topic] = dict(
+            zip(clean_ipc_codes(ipc_codes[topic].keys()), ipc_codes[topic].values())
+        )
 
-    save_to_s3(bucket_name, cpc_codes, "outputs/patent_data/class_codes/cpc.json")
+    # save with definitions and ipc clean codes with definitions
     save_to_s3(
         bucket_name,
-        {k: clean_ipc_codes(v) for k, v in ipc_codes.items()},
-        "outputs/patent_data/class_codes/ipc.json",
+        cpc_codes,
+        "outputs/patent_data/class_codes/cpc_with_definitions.json",
+    )
+    save_to_s3(
+        bucket_name,
+        ipc_codes,
+        "outputs/patent_data/class_codes/ipc_with_definitions.json",
+    )
+
+    save_to_s3(
+        bucket_name,
+        formatted_ipc_codes,
+        "outputs/patent_data/class_codes/ipc_formatted_with_definitions.json",
     )

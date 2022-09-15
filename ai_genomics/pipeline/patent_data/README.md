@@ -20,20 +20,20 @@ Before you run the `get_ai_genomics_patents.py` script, you will need to export 
 
 `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"`
 
-Alternatively, you could also set these credentials as an environmental variable in `.bashrc`.
+Alternatively, you could also set these credentials as an environmental variable in `.bashrc`. Your credentials will need specific permissions to pull data from BigQuery and you will get a permissions error should you not have access. If not, reach out to India Kerle to be granted table access.
 
 To identify and save AI and genomics related patents to s3, run:
 
 `python ai_genomics/pipeline/patent_data/get_ai_genomics_patents.py`
 
-You can pass a name of the table to query unique ai and genomics patents from. If the table does not exist in `golden-shine-355915.genomics`, it will first create the table then pull unique ai and genomics patents from it. Be careful of query limits when creating tables.
+This will get unique patents from: 1. ai_genomics: the AI and genomics table; 2. ai_sample: A sample of 10% of patents with AI codes; 3. genomics_sample: A sample of 3% of patents with genomics codes;
 
-The AI and genomics patents can be loaded using `ai_genomics.getters.patents.get_ai_genomics_patents`.
+in BigQuery and save them to s3.
 
-Finally, add the full list of CPC and IPC codes associated to a publication number, run:
+These tables were first created and verified for data download limitations in BigQuery's front end. Functions to generate the queries used to generate these tables are in the script.
+
+Finally, to add the full list of CPC and IPC codes associated to a publication number, run:
 
 `python ai_genomics/pipeline/patent_data/add_full_cpc_ipc_codes.py`
 
-### Quota limits
-
-If you have a free account, you will hit up against quota limits. Simply wait a few hours to re-run `get_ai_genomics_patents.py`
+This will add the full list of CPC and IPC codes associated to a patent document across AI genomics, a sample of AI and a sample of genomics related patents. These updated tables are also to s3.
