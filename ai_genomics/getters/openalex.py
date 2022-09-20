@@ -6,10 +6,12 @@ from functools import reduce
 from toolz import pipe
 
 from ai_genomics.utils.reading import read_json
+from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics import PROJECT_DIR, logger
-import pandas as pd
+
 
 OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
+OALEX_OUT_PATH = f"{PROJECT_DIR}/outputs/data/openalex"
 
 
 def get_openalex_works() -> List[Dict[Any, Any]]:
@@ -139,14 +141,46 @@ def work_abstracts(discipline: str, years: List) -> Dict:
     )
 
 
-def get_openalex_ai_genomics_works() -> pd.DataFrame:
+def ai_genom_getter(
+    filename: str, format: str = "csv", local: bool = True
+) -> pd.DataFrame:
     """Returns dataframe of AI in genomics OpenAlex works"""
-    try:
-        return pd.read_csv(
-            f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv",
-        )
-    except FileNotFoundError as e:
-        logger.error(
-            "FileNotFoundError: To create the missing file, run ai_genomics/analysis/openalex_definition.py"
-        )
-        raise e
+
+    if local:
+        if format == "csv":
+            return pd.read_csv(f"{OALEX_OUT_PATH}/{filename}.csv")
+        else:
+            with open(f"{OALEX_OUT_PATH}/{filename}.json") as infile:
+                return json.load(infile)
+    else:
+        return load_s3_data("ai-genomics", f"outputs/openalex/{filename}.{format}")
+
+
+def get_openalex_ai_genomics_works(local: bool = True) -> pd.DataFrame:
+    """Returns dataframe of AI in genomics OpenAlex works"""
+
+    return ai_genom_getter("openalex_works", "csv", local)
+
+
+def get_openalex_ai_genomics_concepts(local: bool = True) -> pd.DataFrame:
+    """Returns dataframe of AI in genomics OpenAlex concepts"""
+
+    return ai_genom_getter("openalex_concepts", "csv", local)
+
+
+def get_openalex_ai_genomics_mesh(local: bool = True) -> pd.DataFrame:
+    """Returns dataframe of AI in genomics OpenAlex MeSH terms"""
+
+    return ai_genom_getter("openalex_mesh", "csv", local)
+
+
+def get_openalex_ai_genomics_institutes(local: bool = True) -> pd.DataFrame:
+    """Returns dataframe of AI in genomics OpenAlex MeSH institutes/authorships"""
+
+    return ai_genom_getter("openalex_institutes", "csv", local)
+
+
+def get_openalex_ai_genomics_abstracts(local: bool = True) -> Dict:
+    """Returns dataframe of AI in genomics OpenAlex MeSH institutes/authorships"""
+
+    return ai_genom_getter("openalex_abstracts", "json", local)
