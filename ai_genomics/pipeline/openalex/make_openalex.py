@@ -315,6 +315,24 @@ def get_papers_with_concept(
     )
 
 
+def compile_oalex_dataset(
+    ai_dataset: pd.DataFrame,
+    genom_dataset: pd.DataFrame,
+    id_list: list,
+    id_var: str = "work_id",
+) -> pd.DataFrame:
+    """Compiles and tags different types of openalex datasets"""
+
+    compiled_df = pd.concat([ai_dataset, genom_dataset])
+    compiled_df["ai"], compiled_df["genomics"], compiled_df["ai_genomics"] = [
+        compiled_df[id_var].isin(_id_set) for _id_set in id_list
+    ]
+
+    return compiled_df.loc[
+        compiled_df[["ai", "genomics", "ai_genomics"]].values.sum(axis=1) > 0
+    ].reset_index(drop=True)
+
+
 OALEX_OUT_PATH = f"{PROJECT_DIR}/outputs/data/openalex"
 
 os.makedirs(OALEX_OUT_PATH, exist_ok=True)
@@ -607,28 +625,11 @@ if __name__ == "__main__":
     )
     genom_ids_combined = set(works_meta_genomics["work_id"]).union(all_genomics_ids)
 
-    def compile_oalex_dataset(
-        ai_dataset: pd.DataFrame,
-        genom_dataset: pd.DataFrame,
-        id_list: list,
-        id_var: str = "work_id",
-    ) -> pd.DataFrame:
-        """Compiles and tags different types of openalex datasets"""
-
-        compiled_df = pd.concat([ai_dataset, genom_dataset])
-        compiled_df["ai"], compiled_df["genomics"], compiled_df["ai_genomics"] = [
-            compiled_df[id_var].isin(_id_set) for _id_set in id_list
-        ]
-
-        return compiled_df.loc[
-            compiled_df[["ai", "genomics", "ai_genomics"]].values.sum(axis=1) > 0
-        ].reset_index(drop=True)
-
     logging.info("Save all the data in s3")
     id_list = [ai_ids_combined, genom_ids_combined, ai_gen_total_ids]
 
     for ai_dataset, genom_dataset, var_name, table_name in zip(
-        [all_works_provisional, all_concepts, all_ai_mesh, ai_authors],
+        [all_works, all_concepts, all_ai_mesh, ai_authors],
         [
             works_meta_genetics,
             works_concepts_genetics,
