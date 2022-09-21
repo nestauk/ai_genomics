@@ -137,3 +137,16 @@ def work_abstracts(discipline: str, years: List) -> Dict:
             for year in years
         ],
     )
+
+
+def get_openalex_ai_genomics_works() -> pd.DataFrame:
+    """Returns dataframe of AI in genomics OpenAlex works"""
+    try:
+        return pd.read_csv(
+            f"{PROJECT_DIR}/outputs/ai_genomics_provisional_dataset.csv",
+        )
+    except FileNotFoundError as e:
+        logger.error(
+            "FileNotFoundError: To create the missing file, run ai_genomics/analysis/openalex_definition.py"
+        )
+        raise e
