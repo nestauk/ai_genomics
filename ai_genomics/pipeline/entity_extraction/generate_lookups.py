@@ -3,7 +3,6 @@ where output is {id: abstract} for DBpedia tagging.
 
 python ai_genomics/pipeline/entity_extraction/generate_lookups.py
 """
-
 import pandas as pd
 import os
 from typing import Dict, List
@@ -16,9 +15,7 @@ from ai_genomics.getters.patents import (
     get_ai_genomics_patents,
 )
 
-CB_DATA = load_s3_data(
-    bucket_name, "outputs/crunchbase/crunchbase_ai_genom_comps.csv"
-).rename(columns={"genom": "genomics", "ai_genom": "ai_genomics"})
+CB_DATA = load_s3_data(bucket_name, "outputs/crunchbase/crunchbase_ai_genom_comps.csv")
 GTR_DATA = load_s3_data(bucket_name, "outputs/gtr/gtr_ai_genomics_projects.csv")
 
 OA_ABSTRACTS = load_s3_data(bucket_name, "outputs/openalex/openalex_abstracts.json")
@@ -33,11 +30,13 @@ LOOKUP_TABLE_PATH = "inputs/lookup_tables/"
 VALID_DF_TYPES = ["ai", "genomics", "ai_genomics"]
 
 
-def save_lookups(lookups: List[Dict], ds: str):
+def save_lookups(lookups: List[Dict]):
     """For a given list of lookups per data source (ai, genomics, ai_genomics), save lookups
     to s3."""
     for name, lookup in zip(VALID_DF_TYPES, lookups):
-        lookup_table_name = os.path.join(LOOKUP_TABLE_PATH, f"{name}_{ds}_lookup.json")
+        lookup_table_name = os.path.join(
+            LOOKUP_TABLE_PATH, f"{name}_patents_lookup.json"
+        )
         save_to_s3(bucket_name, lookup, lookup_table_name)
 
 
@@ -54,7 +53,7 @@ if __name__ == "__main__":
         ].to_dict()
         patent_lookups.append(patent_lookup)
 
-    save_lookups(patent_lookups, "patents")
+    save_lookups(patent_lookups)
 
     # generate and save cb look ups across ai + genomics, ai baseline and genomics baseline
     assert pd.Series(CB_DATA.id).is_unique == True, "not every id is unique"
