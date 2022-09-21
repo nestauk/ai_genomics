@@ -48,9 +48,11 @@ if __name__ == "__main__":
         assert (
             pd.Series(lookup.publication_number).is_unique == True
         ), "not every id is unique"
-        patent_lookup = lookup.set_index("publication_number")[
-            "abstract_text"
-        ].to_dict()
+        patent_lookup = (
+            lookup.query("abstract_language == 'en'")
+            .set_index("publication_number")["abstract_text"]
+            .to_dict()
+        )
         patent_lookups.append(patent_lookup)
 
     save_lookups(patent_lookups)
