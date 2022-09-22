@@ -5,6 +5,34 @@ import pandas as pd
 from toolz import pipe
 
 
+KEEP_CB_COLS = [
+    "id",
+    "name",
+    "type",
+    "created_at",
+    "updated_at",
+    "roles",
+    "homepage_url",
+    "country_code",
+    "state_code",
+    "region",
+    "city",
+    "address",
+    "num_funding_rounds",
+    "total_funding_usd",
+    "founded_on",
+    "employee_count",
+    "num_exits",
+    "location_id",
+    "short_description",
+    "long_description",
+    "description_combined",
+    "ai",
+    "genom",
+    "ai_genom",
+]
+
+
 def fetch_crunchbase(
     table_name: str,
 ) -> pd.DataFrame:
