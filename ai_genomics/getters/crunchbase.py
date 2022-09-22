@@ -1,5 +1,4 @@
 from ai_genomics import PROJECT_DIR, logger
-import os
 import pandas as pd
 
 from ai_genomics.pipeline.crunchbase_data.crunchbase_data import (
@@ -7,7 +6,7 @@ from ai_genomics.pipeline.crunchbase_data.crunchbase_data import (
     CB_COMP_NAME,
 )
 
-from ai_genomics.utils.reading import fetch_s3
+from ai_genomics.getters.data_getters import load_s3_data
 
 
 def get_ai_genomics_crunchbase_org_ids() -> pd.DataFrame:
@@ -34,4 +33,4 @@ def get_ai_genomics_crunchbase_orgs(local: bool = True) -> pd.DataFrame:
     if local:
         return pd.read_csv(CB_COMP_PATH)
     else:
-        return fetch_s3(f"outputs/crunchbase/{CB_COMP_NAME}")
+        return load_s3_data("ai-genomics", f"outputs/crunchbase/{CB_COMP_NAME}")
