@@ -34,13 +34,15 @@ BAD_ENTS = ["ORG", "GPE", "MONEY", "LOC", "PERSON"]
 class EntityCleaner:
     """
     Class that applies spaCy's pretrained NER model to predict entity types and
-    filter entities for a given entity list that are predicted
+    filter entities for a given entity list that are labelled as
     people, organisations, locations or money.
 
     Attributes
     --------
     entity_lookup_path: s3 location of labelled entities file
     bad_ents: list of spaCy entity types to remove
+    ner: Spacy's model
+    save_eval: Boolean to save evaluation results or not 
 
     Methods
     --------
@@ -87,7 +89,9 @@ class EntityCleaner:
         return [ent[0].replace("_", " ") for ent in entities]
 
     def format_labelled_data(self):
-        """FOR LABELLED DATA - formats labelled data to have binary labels"""
+        """FOR LABELLED DATA - formats labelled data to have binary labels
+        where 0 means entity is 'good' and 1 means entity is 'bad'
+        """
 
         self.labelled_entities = (
             load_s3_data(bucket_name, self.labelled_entity_path)
