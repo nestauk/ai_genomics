@@ -14,7 +14,7 @@ clean_entitites = {123324: ['genomics', 'RNA'],
                     14234: ['machine learning', 'personalised medicine'],
                     1666: ['deep neural networks', 'genetics']}
 
-If .py is run, evaluates labelled entities and applies clean_entities
+If script is run, evaluates labelled entities and applies clean_entities
 to toy extracted entity dictionary.
 """
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
@@ -181,13 +181,13 @@ class EntityCleaner:
 if __name__ == "__main__":
 
     ec = EntityCleaner(save_eval=False)
+    ec.evaluate()  # print evaluation metrics based on labelled dataset of 'bad' and 'good' entities
 
     entities = {
         123324: ["University of Michigan", "genomics", "RNA", "Harvard"],
         14234: ["machine learning", "MIT", "personalised medicine"],
         1666: ["Yale", "deep neural networks", "genetics"],
     }
-    ec.evaluate()  # print evaluation metrics based on labelled dataset of 'bad' and 'good' entities
 
     clean_entities = {
         text_id: ec.clean_entities(entity) for text_id, entity in entities.items()
