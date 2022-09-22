@@ -1,7 +1,6 @@
 from ai_genomics import PROJECT_DIR, bucket_name as BUCKET_NAME, logger
 from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.pipeline.gtr.make_gtr_projects import GTR_OUTPUTS_DIR, GTR_PROJ_NAME
-from ai_genomics.utils.reading import fetch_s3
 import pandas as pd
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
@@ -57,4 +56,4 @@ def get_ai_genomics_project_table(local: bool = True) -> pd.DataFrame:
         return pd.read_csv(GTR_OUTPUTS_DIR / GTR_PROJ_NAME)
 
     else:
-        return fetch_s3(f"outputs/gtr/{GTR_PROJ_NAME}")
+        return load_s3_data("ai-genomics", f"outputs/gtr/{GTR_PROJ_NAME}")
