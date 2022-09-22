@@ -9,8 +9,8 @@ import pandas as pd
 import numpy as np
 from toolz import pipe
 
-from ai_genomics.utils.crunchbase import fetch_crunchbase, parse_s3_table
-
+from ai_genomics.utils.crunchbase import fetch_crunchbase, parse_s3_table, KEEP_CB_COLS
+from ai_genomics.getters.data_getters import save_to_s3
 from ai_genomics import PROJECT_DIR, config
 
 CB_INPUTS_DATA_DIR = PROJECT_DIR / "inputs/data/crunchbase/"
@@ -22,33 +22,6 @@ CB_COMP_PATH = CB_OUTPUTS_DATA_DIR / CB_COMP_NAME
 
 os.makedirs(CB_INPUTS_DATA_DIR, exist_ok=True)
 os.makedirs(CB_OUTPUTS_DATA_DIR, exist_ok=True)
-
-KEEP_CB_COLS = [
-    "id",
-    "name",
-    "type",
-    "created_at",
-    "updated_at",
-    "roles",
-    "homepage_url",
-    "country_code",
-    "state_code",
-    "region",
-    "city",
-    "address",
-    "num_funding_rounds",
-    "total_funding_usd",
-    "founded_on",
-    "employee_count",
-    "num_exits",
-    "location_id",
-    "short_description",
-    "long_description",
-    "description_combined",
-    "ai",
-    "genom",
-    "ai_genom",
-]
 
 
 def search_terms(abstract: str, terms: Set) -> Union[bool, float]:
@@ -69,12 +42,6 @@ def search_terms(abstract: str, terms: Set) -> Union[bool, float]:
 
     else:
         return np.nan
-
-
-def send_output_to_s3(file_path: str, s3_destination: str):
-    """ """
-    s3 = boto3.resource("s3")
-    (s3.Bucket("ai-genomics").upload_file(file_path, f"outputs/{s3_destination}"))
 
 
 if __name__ == "__main__":
@@ -135,8 +102,10 @@ if __name__ == "__main__":
         cb_comps["id"].isin(x) for x in [ai_combined, gen_combined, ai_gen_combined]
     ]
 
-    cb_comps.loc[
+    cb_comps = cb_comps.loc[
         cb_comps[["ai", "genom", "ai_genom"]].values.sum(axis=1) > 0, :
-    ].reset_index(drop=True)[KEEP_CB_COLS].to_csv(CB_COMP_PATH, index=False)
+    ].reset_index(drop=True)[KEEP_CB_COLS]
 
-    send_output_to_s3(str(CB_COMP_PATH), f"crunchbase/{CB_COMP_NAME}")
+    cb_comps.to_csv(CB_COMP_PATH, index=False)
+
+    save_to_s3("ai-genomics", cb_comps, f"outputs/crunchbase/{CB_COMP_NAME}")
