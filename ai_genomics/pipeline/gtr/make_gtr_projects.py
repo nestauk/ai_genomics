@@ -8,6 +8,7 @@ import re
 from toolz import pipe
 
 from ai_genomics.pipeline.gtr.gtr_utils import fetch_gtr
+from ai_genomics.getters.data_getters import save_to_s3
 from ai_genomics import config, PROJECT_DIR
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     topics = fetch_gtr("gtr_projects-topic")
 
     # Topic distribution
-    topic_distr = pd.Series(Counter([topic["text"] for topic in topics]))
+    topic_distr = pd.Series(Counter(topics["text"].values()))
 
     relevant_concepts = topic_distr.loc[
         [
@@ -65,9 +66,11 @@ if __name__ == "__main__":
     ai_projs, genom_projs = [
         set(
             [
-                element["project_id"]
-                for element in topics
-                if any(t in element["text"] for t in terms)
+                pid
+                for pid, text in zip(
+                    topics["project_id"].values(), topics["text"].values()
+                )
+                if any(t in text for t in terms)
             ]
         )
         for terms in [ai_topics, genomics_topics]
@@ -147,17 +150,13 @@ if __name__ == "__main__":
         ]
     ]
 
-    filtered_projects = (
-        projects_df.loc[
-            projects_df[["ai", "genomics", "ai_genomics"]].values.sum(axis=1) > 0
-        ]
-        .reset_index(drop=True)
-        .to_csv(GTR_OUTPUTS_DIR / GTR_PROJ_NAME, index=False)
-    )
+    filtered_projects = projects_df.loc[
+        projects_df[["ai", "genomics", "ai_genomics"]].values.sum(axis=1) > 0
+    ].reset_index(drop=True)
 
-    send_output_to_s3(
-        str(GTR_OUTPUTS_DIR / GTR_PROJ_NAME), f"crunchbase/{GTR_PROJ_NAME}"
-    )
+    filtered_projects.to_csv(GTR_OUTPUTS_DIR / GTR_PROJ_NAME, index=False)
+
+    save_to_s3("ai-genomics", filtered_projects, f"outputs/gtr/{GTR_PROJ_NAME}")
 
     # Get publications from projects
     publications_from_projects = fetch_gtr("gtr_projects-outcomes_publications")
