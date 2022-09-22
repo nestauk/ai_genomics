@@ -50,6 +50,7 @@ if __name__ == "__main__":
         ), "not every id is unique"
         patent_lookup = (
             lookup.query("abstract_language == 'en'")
+            .dropna(subset=["abstract_text"])
             .set_index("publication_number")["abstract_text"]
             .to_dict()
         )
@@ -75,6 +76,36 @@ if __name__ == "__main__":
     assert len(OA_ABSTRACTS.keys()) == len(
         set(OA_ABSTRACTS.keys())
     ), "not every id is unique"
+    bad_abstracts = [
+        "No abstract.",
+        "X",
+        "en",
+        "None",
+        "N/A",
+        "nema",
+        "ABSTRACT",
+        ".",
+        "■■■",
+        "x",
+        "Abstract",
+        "n/a",
+        "Removed.",
+        ":",
+        "-- / --",
+        "--/--",
+        "-",
+        "N/a",
+        "<p />",
+        "/",
+    ]
+    oa_abstracts_clean = {
+        oa_key: oa_abstract
+        for oa_key, oa_abstract in OA_ABSTRACTS.items()
+        if oa_abstract not in bad_abstracts
+    }
+
     save_to_s3(
-        bucket_name, OA_ABSTRACTS, os.path.join(LOOKUP_TABLE_PATH, "oa_lookup.json")
+        bucket_name,
+        oa_abstracts_clean,
+        os.path.join(LOOKUP_TABLE_PATH, "oa_lookup.json"),
     )
