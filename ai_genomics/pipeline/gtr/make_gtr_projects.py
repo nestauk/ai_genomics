@@ -1,20 +1,44 @@
 # Script to explore AI definition
 
+import boto3
 import logging
 import pandas as pd
 from collections import Counter
 import re
+from toolz import pipe
 
 from ai_genomics.pipeline.gtr.gtr_utils import fetch_gtr
+from ai_genomics.getters.data_getters import save_to_s3
 from ai_genomics import config, PROJECT_DIR
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
 GTR_INPUTS_DIR.mkdir(exist_ok=True)
 
+GTR_OUTPUTS_DIR = PROJECT_DIR / "outputs/data/gtr"
+GTR_OUTPUTS_DIR.mkdir(exist_ok=True)
+
+GTR_PROJ_NAME = "gtr_ai_genomics_projects.csv"
+
+KEEP_GTR_VARS = [
+    "id",
+    "project_id",
+    "title",
+    "start",
+    "grant_category",
+    "abstract_text",
+    "potential_impact",
+]
+
 
 def camel_case_to_snake_case_col_names(df: pd.DataFrame) -> pd.DataFrame:
     """Turn column names from camelCase to snake_case"""
     return df.rename(columns=lambda x: re.sub(r"(?<!^)(?=[A-Z])", "_", x).lower())
+
+
+def send_output_to_s3(file_path: str, s3_destination: str):
+    """TODO: PUT THIS IN UTILS"""
+    s3 = boto3.resource("s3")
+    (s3.Bucket("ai-genomics").upload_file(file_path, f"outputs/{s3_destination}"))
 
 
 if __name__ == "__main__":
@@ -23,7 +47,7 @@ if __name__ == "__main__":
     topics = fetch_gtr("gtr_projects-topic")
 
     # Topic distribution
-    topic_distr = pd.Series(Counter([topic["text"] for topic in topics]))
+    topic_distr = pd.Series(Counter(topics["text"].values()))
 
     relevant_concepts = topic_distr.loc[
         [
@@ -42,9 +66,11 @@ if __name__ == "__main__":
     ai_projs, genom_projs = [
         set(
             [
-                element["project_id"]
-                for element in topics
-                if any(t in element["text"] for t in terms)
+                pid
+                for pid, text in zip(
+                    topics["project_id"].values(), topics["text"].values()
+                )
+                if any(t in text for t in terms)
             ]
         )
         for terms in [ai_topics, genomics_topics]
@@ -106,10 +132,31 @@ if __name__ == "__main__":
 
     logging.info(project_examples)
 
-    # Save project ids
+    # Save relevant (AI and genomics, AI, genomics) projects locally and to s3
     ai_genomics_combined.pipe(camel_case_to_snake_case_col_names).to_json(
         GTR_INPUTS_DIR / "gtr_ai_genomics_projects.json"
     )
+
+    projects_df = pipe(pd.DataFrame(projects), camel_case_to_snake_case_col_names)[
+        KEEP_GTR_VARS
+    ]
+
+    projects_df["ai"], projects_df["genomics"], projects_df["ai_genomics"] = [
+        projects_df["id"].isin(list_ids)
+        for list_ids in [
+            ai_projs_abstr,
+            genom_projs_abstr,
+            ai_projs_abstr & genom_projs_abstr,
+        ]
+    ]
+
+    filtered_projects = projects_df.loc[
+        projects_df[["ai", "genomics", "ai_genomics"]].values.sum(axis=1) > 0
+    ].reset_index(drop=True)
+
+    filtered_projects.to_csv(GTR_OUTPUTS_DIR / GTR_PROJ_NAME, index=False)
+
+    save_to_s3("ai-genomics", filtered_projects, f"outputs/gtr/{GTR_PROJ_NAME}")
 
     # Get publications from projects
     publications_from_projects = fetch_gtr("gtr_projects-outcomes_publications")

@@ -43,4 +43,6 @@ The AI and genomics Crunchbase organisation ids can be loaded using `ai_genomics
 
 Run `python ai_genomics/analysis/gtr_definitions.py` to print a summary of AI / genomics projects in the GtR data. This also saves a list of project in the intersection of AI and genomics in `inputs/data/gtr/gtr_ai_genomics_projects.json`.
 
-The AI and genomics GtR projects and publications can be loaded using `ai_genomics.getters.gtr.get_ai_genomics_gtr_data`.
+Run `python ai_genomics/pipeline/gtr/make_gtr_projects.py` to identify AI and genomics projects and create a table of projects in AI and genomics or belong to a baseline category (AI or genomics). This also saves a json with articles from AI and genomics projects.
+
+Load the AI genomics and baseline projects table with `ai_genomics.getters.gtr.get_ai_genomics_project_table`.
