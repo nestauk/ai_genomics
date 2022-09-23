@@ -26,3 +26,4 @@ boto3==1.24.7
 fsspec==2022.5.0
 s3fs==2022.5.0
 pandas
+selenium
