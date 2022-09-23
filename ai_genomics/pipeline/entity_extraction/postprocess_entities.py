@@ -1,18 +1,48 @@
 """Class to post process extracted entities using
 spacy's pretrained NER model where expected input of extracted
-entities is {id: [entities]} and expected output is {id: [clean_entities]}
+entities includes both the DBpedia URI and confidence score.
 
 Filter out entities that are: people, organisations, locations
 
 For example,
 
-entities = {123324: ['University of Michigan', 'genomics', 'RNA'],
-                14234: ['machine learning', 'MIT', 'personalised medicine'],
-                1666: ['Yale', 'deep neural networks', 'genetics']}
+entities = {'EP-3810804-A1': [{'URI': 'http://dbpedia.org/resource/Alternative_splicing',
+   'confidence': 80},
+  {'URI': 'http://dbpedia.org/resource/Genomics', 'confidence': 70},
+  {'URI': 'http://dbpedia.org/resource/Transcriptome', 'confidence': 100},
+  {'URI': 'http://dbpedia.org/resource/Protein', 'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/RNA', 'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/Machine_learning', 'confidence': 90}],
+ 'EP-1967857-A3': [],
+ 'US-2007134705-A1': [{'URI': 'http://dbpedia.org/resource/Transcription_factor',
+   'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/Gene', 'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/Interval_graph', 'confidence': 100}],
+ 'US-8921074-B2': [{'URI': 'http://dbpedia.org/resource/Colorectal_cancer',
+   'confidence': 100},
+  {'URI': 'http://dbpedia.org/resource/Gene', 'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/IL2RB', 'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/TSG-6', 'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/RNA', 'confidence': 90}],
+ 'WO-2020092591-A1': [{'URI': 'http://dbpedia.org/resource/Germline',
+   'confidence': 70},
+  {'URI': 'http://dbpedia.org/resource/Genome', 'confidence': 90},
+  {'URI': 'http://dbpedia.org/resource/Allele', 'confidence': 90}]}
 
-clean_entitites = {123324: ['genomics', 'RNA'],
-                    14234: ['machine learning', 'personalised medicine'],
-                    1666: ['deep neural networks', 'genetics']}
+clean_entities = {'EP-3810804-A1': [['Alternative splicing', 80],
+  ['Genomics', 70],
+  ['Protein', 90],
+  ['RNA', 90],
+  ['Machine learning', 90]],
+ 'EP-1967857-A3': [],
+ 'US-2007134705-A1': [['Transcription factor', 90],
+  ['Gene', 90],
+  ['Interval graph', 100]],
+ 'US-8921074-B2': [['Colorectal cancer', 100],
+  ['Gene', 90],
+  ['TSG-6', 90],
+  ['RNA', 90]],
+ 'WO-2020092591-A1': [['Germline', 70], ['Genome', 90]]}
 
 If script is run, evaluates labelled entities and applies clean_entities
 to toy extracted entity dictionary.
@@ -42,7 +72,7 @@ class EntityCleaner:
     entity_lookup_path: s3 location of labelled entities file
     bad_ents: list of spaCy entity types to remove
     ner: Spacy's model
-    save_eval: Boolean to save evaluation results or not 
+    save_eval: Boolean to save evaluation results or not
 
     Methods
     --------
@@ -57,7 +87,7 @@ class EntityCleaner:
                             based on spaCy's pretrained NER model.
                             entity is 'bad' if its entity type is in
                             bad_ents.
-    clean_entities(entity_list): given the entity prediction, return
+    filter_entities(entity_list): given the entity prediction, return
                                     entity list with only 'good' predictions.
     evaluate(y_pred, y_true): calculates f1, recall, accuracy and precision
                                 of two lists of binaries. If no y_pred and
@@ -123,7 +153,7 @@ class EntityCleaner:
             doc = self.ner(ent)
             if doc.ents:
                 for tok in doc.ents:
-                    if tok.label_ in BAD_ENTS:
+                    if tok.label_ in self.bad_entities:
                         bad_ents.append(entities_list[i])
             bad_ents_deduped = list(set(bad_ents))
             if bad_ents_deduped != []:
@@ -133,12 +163,15 @@ class EntityCleaner:
 
         return labels
 
-    def clean_entities(self, entities_list: List[str]) -> List[str]:
+    def filter_entities(self, entities_list: List[Dict]) -> List[str]:
         """filters entities list based on predicted 'bad' entities"""
+        ents = [
+            [ent["URI"].split("/")[-1].replace("_", " "), ent["confidence"]]
+            for ent in entities_list
+        ]
+        ent_preds = self.predict([ent[0] for ent in ents])
 
-        ent_preds = self.predict(entities_list)
-
-        return [entities_list[i] for i, pred in enumerate(ent_preds) if pred != 1]
+        return [ents[i] for i, pred in enumerate(ent_preds) if pred != 1]
 
     def evaluate(
         self, y_true: List[int] = None, y_pred: List[int] = None
@@ -183,13 +216,36 @@ if __name__ == "__main__":
     ec = EntityCleaner(save_eval=False)
     ec.evaluate()  # print evaluation metrics based on labelled dataset of 'bad' and 'good' entities
 
-    entities = {
-        123324: ["University of Michigan", "genomics", "RNA", "Harvard"],
-        14234: ["machine learning", "MIT", "personalised medicine"],
-        1666: ["Yale", "deep neural networks", "genetics"],
+    test_entities = {
+        "AU-2019293244-A1": [
+            {"URI": "http://dbpedia.org/resource/Cancer_vaccine", "confidence": 90},
+            {"URI": "http://dbpedia.org/resource/Cancer", "confidence": 70},
+            {
+                "URI": "http://dbpedia.org/resource/Biodiversity_hotspot",
+                "confidence": 70,
+            },
+        ],
+        "CA-2578634-A1": [
+            {"URI": "http://dbpedia.org/resource/Breed", "confidence": 70}
+        ],
+        "CA-2577741-A1": [],
+        "US-6920397-B2": [
+            {"URI": "http://dbpedia.org/resource/Signal_processing", "confidence": 100},
+            {"URI": "http://dbpedia.org/resource/Tessellation", "confidence": 90},
+            {"URI": "http://dbpedia.org/resource/Interferometry", "confidence": 90},
+            {"URI": "http://dbpedia.org/resource/Resonance", "confidence": 90},
+            {
+                "URI": "http://dbpedia.org/resource/Stochastic_resonance",
+                "confidence": 70,
+            },
+            {"URI": "http://dbpedia.org/resource/Stochastic", "confidence": 80},
+        ],
+        "WO-2019046347-A9": [
+            {"URI": "http://dbpedia.org/resource/Microorganism", "confidence": 90}
+        ],
     }
 
     clean_entities = {
-        text_id: ec.clean_entities(entity) for text_id, entity in entities.items()
+        text_id: ec.filter_entities(entity) for text_id, entity in test_entities.items()
     }  # apply clean entities to list and print results
     print(clean_entities)
