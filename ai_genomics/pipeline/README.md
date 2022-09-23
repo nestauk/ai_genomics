@@ -39,6 +39,10 @@ Run `python ai_genomics/analysis/crunchbase_definitions.py` to test the impact o
 
 The AI and genomics Crunchbase organisation ids can be loaded using `ai_genomics.getters.crunchbase.get_ai_genomics_crunchbase_org_ids`.
 
+Run `python ai_genomics/pipeline/crunchbase_data/make_crunchbase_data.py` to produce a table with CrunchBase AI + genomics companies and AI / genomics baselines.
+
+You can get the data locally or from S3 (if e.g. you haven't run the script above) using `ai_genomics.getters.crunchbase.get_ai_genomics_orgs`
+
 ## Gateway to Research
 
 Run `python ai_genomics/analysis/gtr_definitions.py` to print a summary of AI / genomics projects in the GtR data. This also saves a list of project in the intersection of AI and genomics in `inputs/data/gtr/gtr_ai_genomics_projects.json`.
