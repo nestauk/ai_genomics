@@ -10,7 +10,7 @@ To postprocess extracted entities in the anticipated format `{id: [entities]}`:
 from ai_genomics.pipeline.entity_extraction.postprocess_entities import EntityCleaner
 
 ec = EntityCleaner()
-clean_entities = {text_id: ec.clean_entities(entity) for text_id, entity in entities.items()}
+clean_entities = {text_id: ec.filter_entities(entity) for text_id, entity in entities.items()}
 ```
 
 where `entities = {id: [entities]}`
