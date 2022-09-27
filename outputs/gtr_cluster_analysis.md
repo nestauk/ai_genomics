@@ -12,11 +12,11 @@ We have created vector representations of these projects' abstracts using SPECTE
 
 We reduce the dimensionality of these data using UMAP (Uniform Manifold Approximation and Projection), an algorithm that projects high-dimensional data into fewer (2 in this case) dimensions while retaining the local structure of the larger and more complex dataset. @gtr_umap presents the results, using color to distinguish between AI and genomics projects and projects in the broader "AI" and "genomics" categories.
 
-![UMAP projection of AI genomics and baseline abstracts. Each point is a GtR project and its colour represents its category (AI and genomics, AI, genomics).](/figures/png/umap_projection.png){#fig:gtr_umap}
+![UMAP projection of AI genomics and baseline abstracts. Each point is a GtR project and its colour represents its category (AI and genomics, AI, genomics).](https://raw.githubusercontent.com/nestauk/ai_genomics/113_gtr_topics/outputs/figures/png/umap_projection.png){#fig:gtr_umap}
 
 We note that AI and genomics projects (orange) tend to appear close to clusters of genomics papers (red), suggesting that they mostly comprise applications of AI techniques to existing areas of genomics. We also find a small number of AI projects clustering with genomics projects. When we inspect their titles, we find that they are in areas adjacent to genomics such as drug development and biophysics. This suggests that our semantic clustering is capturing the content of abstracts, and that it could be used to identify false negatives in the data i.e. bona fide AI and genomics projects that were not captured by our category and keyword-based search strategy. @fig:gtr_cluster_distr presents the number of documents in each cluster and their distribution over different categories. It shows a number of clusters with dominance by AI (e.g. 42, 27, 18, 12), clusteers with a predominance of genomics projects and mixed ones, potentially suggesting the scope for deploying AI in different domains of genomics.
 
-![Number of documents and distribution over AI and genomics, AI, Genomics categories in every cluster](/figures/png/cluster_distribution.png) {#fig:gtr_cluster_distr}
+![Number of documents and distribution over AI and genomics, AI, Genomics categories in every cluster](https://raw.githubusercontent.com/nestauk/ai_genomics/113_gtr_topics/outputs/figures/png/cluster_distribution.png) {#fig:gtr_cluster_distr}
 
 ## Results
 
@@ -24,7 +24,7 @@ We cluster papers on a smaller number of categories using the K-Means algorith, 
 
 The boxplot in @fig:gtr_sil shows the distribution of silhouette scores (a measure of clustering goodness-of-fit i.e. the extent to which entities in a cluster are similar to each other and different fromn those outside ranging between -1 and 1, which higher values indicating better clustering) as K grows. We see an initial plateau in performance increases at around 50 and chose that value as a pragmatic compromise between cluster homogeneity and tractability (avoiding an excessive number of categories) when reporting.
 
-![Distribution of silhouette scores for different values of K](/figures/png/silh_boxplot.png){#fig:gtr_sil}
+![Distribution of silhouette scores for different values of K](https://raw.githubusercontent.com/nestauk/ai_genomics/113_gtr_topics/outputs/figures/png/silh_boxplot.png){#fig:gtr_sil}
 
 ## Cluster content
 
@@ -64,11 +64,11 @@ In @fig:gtr_cluster_trends, every row is a cluster of documents (focusing on tho
 
 This chart helps us to distinguish between well established research themes such as 36 (genetic analysis) and 47 (proteomics) and research themes where most of the activity has been happening recently such as 0 (predictive analyses for precision medicine), 17 (use of AI and genomics data in biotechnology and the automation of drug discovery) and 20 (which seems related to avian influenza). We also note a number of clusters with no activity in the last couple of years, such as 31 (focused on the analysis of neurological disorders and mental health issues) or 29 (cancer applications).
 
-![Evolution of activity by cluster; size of the cluster indicates number of projects that year (including AI and genomics and other projects); the colour indicates the share of AI and genomics projects in the cluster in that year - red indicates a stronger presence of AI and genomics projects.](/figures/png/cluster_evolution.png) {#fig:gtr_cluster_trends)
+![Evolution of activity by cluster; size of the cluster indicates number of projects that year (including AI and genomics and other projects); the colour indicates the share of AI and genomics projects in the cluster in that year - red indicates a stronger presence of AI and genomics projects.](https://raw.githubusercontent.com/nestauk/ai_genomics/113_gtr_topics/outputs/figures/png/cluster_evolution.png) {#fig:gtr_cluster_trends)
 
 In @fig:gtr_cluster_trends we adapt the methodology used by Nesta in previous analyses of technological emergence to our data. For each of the clusters with more than 5 AI and genomics projects, we calculate measures of significance (% of all projects since 2020 accounted for by the cluster) and recency (% of all projects in a cluster initiated in the last three years). This seeks to help us distinguish between emerging (high recency and low significance), hot (high recency and high significance), stabilising (high significance and low recency) clusters. We present the results in @fig:gtr_emergence_scatter and @tbl:gtr_cluster_class.
 
-![Scatterplot of cluster emergence: the Y-axis represents the percentage of all projects since 2020 accounted for by projects in a cluster ("significance"); the X-axis represents the percentage of all projects in the cluster initiated since 2020 ("recency")](/figures/png/emergence_scatter.png){#fig:gtr_emergence_scatter}
+![Scatterplot of cluster emergence: the Y-axis represents the percentage of all projects since 2020 accounted for by projects in a cluster ("significance"); the X-axis represents the percentage of all projects in the cluster initiated since 2020 ("recency")](https://raw.githubusercontent.com/nestauk/ai_genomics/113_gtr_topics/outputs/figures/png/emergence_scatter.png){#fig:gtr_emergence_scatter}
 
 | **Recency / Significance** |                                         **Low**                                         |                                                                **High**                                                                |
 | :------------------------- | :-------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------: |
