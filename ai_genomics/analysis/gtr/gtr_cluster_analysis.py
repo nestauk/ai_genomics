@@ -9,16 +9,10 @@ from sklearn.metrics import silhouette_score
 from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.getters.gtr import get_ai_genomics_project_table
 from ai_genomics import PROJECT_DIR
-from ai_genomics.utils.altair_save_utils import (
-    google_chrome_driver_setup,
-    save_altair,
-    altair_text_resize,
-)
+from ai_genomics.utils.save_plotting import AltairSaver
+from ai_genomics.utils.plotting import configure_plots
 
 OUT_PATH = f"{PROJECT_DIR}/outputs/figures"
-
-
-wd = google_chrome_driver_setup()
 
 
 def get_gtr_sampled():
@@ -119,7 +113,9 @@ def gtr_cluster_analysis(reproduce: bool = True):
         )
     )
 
-    save_altair(altair_text_resize(proj_chart), "umap_projection", driver=wd)
+    AltairSaver().save(
+        configure_plots(proj_chart).properties(width=500, height=400), "umap_projection"
+    )
 
     logging.info("Finding provisionally optimal number of clusters")
     results = []
@@ -139,7 +135,8 @@ def gtr_cluster_analysis(reproduce: bool = True):
         .mark_boxplot()
         .encode(x="clust_n", y=alt.Y("score", scale=alt.Scale(zero=False)))
     )
-    save_altair(altair_text_resize(sil_box), "silh_boxplot", driver=wd)
+
+    AltairSaver().save(configure_plots(sil_box).properties(width=500), "silh_boxplot")
 
     logging.info("Run clustering to continue analysis")
     cluster_assign = {
@@ -169,7 +166,9 @@ def gtr_cluster_analysis(reproduce: bool = True):
     ).properties(width=550, height=200)
     cluster_distr
 
-    save_altair(altair_text_resize(cluster_distr), "cluster_distribution", driver=wd)
+    AltairSaver().save(
+        configure_plots(cluster_distr).properties(width=500), "cluster_distribution"
+    )
 
     # Cluster content
     cluster_summary = []
@@ -255,7 +254,9 @@ def gtr_cluster_analysis(reproduce: bool = True):
         )
     ).properties(width=600, height=400)
 
-    save_altair(altair_text_resize(evol_bubble), "cluster_evolution", driver=wd)
+    AltairSaver().save(
+        configure_plots(evol_bubble).properties(width=500), "cluster_evolution"
+    )
 
     # Analysis of "emergence"
     clust_year_table = (
@@ -323,7 +324,9 @@ def gtr_cluster_analysis(reproduce: bool = True):
 
     em_chart_joined = emergence_chart + hor + vert + labels
 
-    save_altair(altair_text_resize(em_chart_joined), "emergence_scatter", driver=wd)
+    AltairSaver().save(
+        configure_plots(em_chart_joined).properties(width=500), "emergence_scatter"
+    )
 
 
 if __name__ == "__main__":
