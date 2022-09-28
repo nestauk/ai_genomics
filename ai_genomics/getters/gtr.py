@@ -1,6 +1,7 @@
 from ai_genomics import PROJECT_DIR, bucket_name as BUCKET_NAME, logger
 from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.pipeline.gtr.make_gtr_projects import GTR_OUTPUTS_DIR, GTR_PROJ_NAME
+from typing import Mapping, Union
 import pandas as pd
 
 GTR_INPUTS_DIR = PROJECT_DIR / "inputs/data/gtr"
@@ -57,3 +58,11 @@ def get_ai_genomics_project_table(local: bool = True) -> pd.DataFrame:
 
     else:
         return load_s3_data("ai-genomics", f"outputs/gtr/{GTR_PROJ_NAME}")
+
+
+def get_gtr_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads ai genomics gtr entities"""
+    return load_s3_data(
+        BUCKET_NAME,
+        "outputs/entity_extraction/gtr_lookup_clean.json",
+    )

@@ -4,9 +4,11 @@ import pandas as pd
 from typing import List, Dict, Any
 from functools import reduce
 from toolz import pipe
+from typing import Mapping, Union
 
+from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.utils.reading import read_json
-from ai_genomics import PROJECT_DIR, logger
+from ai_genomics import PROJECT_DIR, logger, bucket_name
 import pandas as pd
 
 OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
@@ -150,3 +152,11 @@ def get_openalex_ai_genomics_works() -> pd.DataFrame:
             "FileNotFoundError: To create the missing file, run ai_genomics/analysis/openalex_definition.py"
         )
         raise e
+
+
+def get_openalex_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads ai genomics oa entities"""
+    return load_s3_data(
+        bucket_name,
+        "outputs/entity_extraction/oa_lookup_clean.json",
+    )
