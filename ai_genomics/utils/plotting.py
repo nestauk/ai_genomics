@@ -9,11 +9,8 @@ import pandas as pd
 ChartType = alt.vegalite.v4.api.Chart
 
 # Fonts and colours
-FONT = "Averta Demo"  # should be changed depending on what your font is called in your system's font book
-TITLE_FONT = "Averta Demo"  # should be changed depending on what your font is called in your system's font book
-FONTSIZE_TITLE = 16
-FONTSIZE_SUBTITLE = 13
-FONTSIZE_NORMAL = 13
+FONT = "Averta"  # should be changed depending on what your font is called in your system's font book
+TITLE_FONT = "Averta"  # should be changed depending on what your font is called in your system's font book
 
 NESTA_COLOURS = [
     "#0000FF",
@@ -55,25 +52,35 @@ alt.themes.register("nestafont", nestafont)
 alt.themes.enable("nestafont")
 
 
-def configure_plots(fig, chart_title: str = "", chart_subtitle: str = ""):
+def configure_plots(
+    fig,
+    chart_title: str = "",
+    chart_subtitle: str = "",
+    fontsize_title: int = 16,
+    fontsize_subtitle: int = 13,
+    fontsize_normal: int = 13,
+):
     """Adds titles, subtitles; configures font sizes; adjusts gridlines"""
     return (
         fig.properties(
             title={
                 "anchor": "start",
                 "text": chart_title,
-                "fontSize": FONTSIZE_TITLE,
+                "fontSize": fontsize_title,
                 "subtitle": chart_subtitle,
                 "subtitleFont": FONT,
-                "subtitleFontSize": FONTSIZE_SUBTITLE,
+                "subtitleFontSize": fontsize_subtitle,
             },
         )
         .configure_axis(
             gridDash=[1, 7],
             gridColor="grey",
-            labelFontSize=FONTSIZE_NORMAL,
-            titleFontSize=FONTSIZE_NORMAL,
+            labelFontSize=fontsize_normal,
+            titleFontSize=fontsize_normal,
         )
-        .configure_legend(titleFontSize=FONTSIZE_NORMAL, labelFontSize=FONTSIZE_NORMAL,)
+        .configure_legend(
+            titleFontSize=FONTSIZE_NORMAL,
+            labelFontSize=FONTSIZE_NORMAL,
+        )
         .configure_view(strokeWidth=0)
     )

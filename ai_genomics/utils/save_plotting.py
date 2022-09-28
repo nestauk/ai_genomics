@@ -2,6 +2,8 @@
 utils.save_plotting
 Utils for easier exporting of altair charts
 """
+from ai_genomics import PROJECT_DIR
+
 from altair_saver import save
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -9,7 +11,8 @@ import os
 from typing import Iterator
 from pathlib import Path
 
-FIGURE_PATH = Path("outputs/")
+
+FIGURE_PATH = Path(f"{PROJECT_DIR}/outputs/figures")
 DEFAULT_FILETYPES = ["png", "svg", "html"]
 
 
