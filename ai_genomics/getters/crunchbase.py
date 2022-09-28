@@ -3,7 +3,7 @@ from ai_genomics import PROJECT_DIR, logger, bucket_name
 import pandas as pd
 from typing import Mapping, Union
 
-from ai_genomics.pipeline.crunchbase_data.crunchbase_data import (
+from ai_genomics.pipeline.crunchbase_data.make_crunchbase_data import (
     CB_COMP_PATH,
     CB_COMP_NAME,
 )
