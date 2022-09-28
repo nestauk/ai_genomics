@@ -1,5 +1,5 @@
 from ai_genomics.pipeline.entity_extraction.postprocess_entities import EntityCleaner
-from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
+from ai_genomics.getters.data_getters import save_to_s3
 
 from metaflow import FlowSpec, step, retry
 
