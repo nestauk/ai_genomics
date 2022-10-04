@@ -1,0 +1,7 @@
+n_contributors: 4
+abstracts:
+  overlap: 20
+  max_sample_size: 200
+definitions:
+  overlap: 20
+  min_frequency: 10
