@@ -79,8 +79,8 @@ def configure_plots(
             titleFontSize=fontsize_normal,
         )
         .configure_legend(
-            titleFontSize=FONTSIZE_NORMAL,
-            labelFontSize=FONTSIZE_NORMAL,
+            titleFontSize=fontsize_title,
+            labelFontSize=fontsize_normal,
         )
         .configure_view(strokeWidth=0)
     )
