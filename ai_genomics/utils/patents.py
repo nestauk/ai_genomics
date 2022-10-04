@@ -202,7 +202,8 @@ def clean_ipc_codes(genomics_codes: List[str]) -> List[str]:
 
 class PatentsWrangler:
     """
-    Class to wrangle patents data
+    Class to wrangle and clean patents data across
+    ai genomics, ai and genomics patent datasets
     Attributes
     ----------
     cpc_files_path (str): the path for XML cpc data
