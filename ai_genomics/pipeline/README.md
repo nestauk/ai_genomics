@@ -47,6 +47,12 @@ You can get the data locally or from S3 (if e.g. you haven't run the script abov
 
 Run `python ai_genomics/analysis/gtr_definitions.py` to print a summary of AI / genomics projects in the GtR data. This also saves a list of project in the intersection of AI and genomics in `inputs/data/gtr/gtr_ai_genomics_projects.json`.
 
-Run `python ai_genomics/pipeline/gtr/make_gtr_projects.py` to identify AI and genomics projects and create a table of projects in AI and genomics or belong to a baseline category (AI or genomics). This also saves a json with articles from AI and genomics projects.
+The AI and genomics GtR projects and publications can be loaded using `ai_genomics.getters.gtr.get_ai_genomics_gtr_data`.
 
-Load the AI genomics and baseline projects table with `ai_genomics.getters.gtr.get_ai_genomics_project_table`.
+## Validation
+
+This pipeline produces samples of data for expert validation. Specifically, it produces samples of patent and publication abstracts and the OpenAlex concepts and CPC patent codes used to generate those datasets. The output samples vary in format. The samples for patent and publication abstracts are partially overlapping, such that each validation contributor assesses a small sample of identical abstracts and a larger number of different ones. This is designed to maximise the breadth of coverage, while gathering information to calculate inter-contributor agreement. The CPC patent code samples are also overlapping samples but the OpenAlex concepts are provided in full as there are so few.
+
+First, run `python ai_genomics/pipeline/patent_data/cpc_lookup.py` to create a lookup of CPC codes, including information about their parent codes.
+
+Next, run `python ai_genomics/pipeline/validation/abstracts.py` and `python ai_genomics/pipeline/validation/definitions.py` to produce the validation outputs. These must then be formatted in a spreadsheet for subject matter expert contributions.
