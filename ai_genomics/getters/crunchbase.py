@@ -1,7 +1,9 @@
-from ai_genomics import PROJECT_DIR, logger
-import pandas as pd
+from ai_genomics import PROJECT_DIR, logger, bucket_name
 
-from ai_genomics.pipeline.crunchbase_data.crunchbase_data import (
+import pandas as pd
+from typing import Mapping, Union
+
+from ai_genomics.pipeline.crunchbase_data.make_crunchbase_data import (
     CB_COMP_PATH,
     CB_COMP_NAME,
 )
@@ -34,3 +36,11 @@ def get_ai_genomics_crunchbase_orgs(local: bool = True) -> pd.DataFrame:
         return pd.read_csv(CB_COMP_PATH)
     else:
         return load_s3_data("ai-genomics", f"outputs/crunchbase/{CB_COMP_NAME}")
+
+
+def get_crunchbase_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads ai genomics cb entities"""
+    return load_s3_data(
+        bucket_name,
+        "outputs/entity_extraction/cb_lookup_clean.json",
+    )

@@ -80,3 +80,27 @@ def get_ai_genomics_ipc_codes_formatted() -> Mapping[
         bucket_name,
         "outputs/patent_data/class_codes/ipc_formatted_with_definitions.json",
     )
+
+
+def get_ai_genomics_patents_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads AI in genomics patents entities"""
+    return load_s3_data(
+        bucket_name,
+        "outputs/entity_extraction/ai_genomics_patents_lookup_clean.json",
+    )
+
+
+def get_ai_patents_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads AI patents entities"""
+    return load_s3_data(
+        bucket_name,
+        "outputs/entity_extraction/ai_patents_lookup_clean.json",
+    )
+
+
+def get_genomics_patents_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads genomics patents entities"""
+    return load_s3_data(
+        bucket_name,
+        "outputs/entity_extraction/genomics_patents_lookup_clean.json",
+    )
