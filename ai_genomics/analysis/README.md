@@ -31,3 +31,12 @@ Run `python ai_genomics/analysis/ai_genomics_experts/gtr_people.py` to generate 
 Run `python ai_genomics/analysis/gtr/gtr_cluster_analysis.py` to reproduce the prototype cluster analysis of GtR clusters. Note that this analysis uses the same sampled dataset as reported by JMG.
 
 You can run change the `reproduce` parameter to re-run the analysis from scratch. This includes creating vector representations of all sampled projects (which takes around 1hr locally).
+
+## OpenAlex -- analysis of influence
+
+Run `python ai_genomics/analysis/influence/openalex_influence_analysis.py` to perform a semantic analysis of discipline influence in our corpus of AI genomics research. This works as follows:
+
+1. Train topic model on corpus including AI genomics, AI, and Genomics research
+2. Calculate a discipline weight that captures the share of activity in a topic accounted by AI or Genomics e.g. if 80% of the top documents in a topic are in genomics, then it's weight is 0.8 (and the AI weight is 0.2)
+3. Calculate overall influence of a discipline (AI or Genomics) in a document by weighting each topic weight in a document by its discipline weight and aggregating them over disciplines
+4. The script validates findings by checking publication venues for documents in different positions of the "influenced by AI" distribution.
