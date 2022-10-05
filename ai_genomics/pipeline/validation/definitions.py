@@ -5,8 +5,9 @@ from ai_genomics import bucket_name, get_yaml_config, PROJECT_DIR
 from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.getters.patents import get_cpc_lookup, get_ai_genomics_patents
 from ai_genomics.pipeline.validation.utils import generate_overlapping_samples
-from ai_genomics.pipeline.patent_data.cpc_utils import find_context
+from ai_genomics.pipeline.patent_data.cpc_utils import find_context, filter_cpc_lookup
 from ai_genomics.utils.reading import make_path_if_not_exist
+
 import ast
 import json
 import pandas as pd
@@ -29,19 +30,42 @@ if __name__ == "__main__":
         code_freqs < config["definitions"]["min_frequency"]
     ].index.values
 
-    cpc_lookup = load_s3_data(
-        bucket_name,
-        "outputs/patent_data/class_codes/cpc_with_definitions.json",
-    )
+    cpc_code_lookup = get_cpc_lookup()
+
+    include = config["definitions"]["patent_include"]
+    fragments = config["definitions"]["patent_fragment"]
+    exclude = config["definitions"]["patent_exclude"]
+    cpc_code_lookup = filter_cpc_lookup(cpc_code_lookup, include, fragments, exclude)
+
+    # cpc_lookup = load_s3_data(
+    #     bucket_name,
+    #     "outputs/patent_data/class_codes/cpc_with_definitions.json",
+    # )
 
     cpc_code_df = pd.DataFrame(
         {
-            "code": cpc_lookup["genomics"].keys(),
-            "description": cpc_lookup["genomics"].values(),
+            "code": cpc_code_lookup.keys(),
+            "description": [v["description"] for v in cpc_code_lookup.values()],
             "classification_system": "cpc",
         }
     )
     cpc_code_df = cpc_code_df[~cpc_code_df["code"].isin(drop_codes)]
+
+    downsample = []
+    for d in cpc_code_df["description"]:
+        downsample.append(
+            any(
+                [
+                    True if i in d.lower() else False
+                    for i in config["definitions"]["patent_downsample"]
+                ]
+            )
+        )
+    cpc_code_df["downsample"] = downsample
+
+    cpc_downsample = cpc_code_df[cpc_code_df["downsample"]].sample(frac=0.1)
+    cpc_code_df = cpc_code_df[~cpc_code_df["downsample"]]
+    cpc_code_df = pd.concat([cpc_code_df, cpc_downsample])
 
     code_lookup = get_cpc_lookup()
     contexts = [find_context(c, code_lookup) for c in cpc_code_df["code"]]
@@ -79,4 +103,4 @@ if __name__ == "__main__":
         }
     )
 
-    oa_concepts_df.to_csv(out_dir / "oa_definitions.csv")
+    oa_concepts_df.to_csv(out_dir / "oa_definitions_v2.csv")
