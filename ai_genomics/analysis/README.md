@@ -40,3 +40,5 @@ Run `python ai_genomics/analysis/influence/openalex_influence_analysis.py` to pe
 2. Calculate a discipline weight that captures the share of activity in a topic accounted by AI or Genomics e.g. if 80% of the top documents in a topic are in genomics, then it's weight is 0.8 (and the AI weight is 0.2)
 3. Calculate overall influence of a discipline (AI or Genomics) in a document by weighting each topic weight in a document by its discipline weight and aggregating them over disciplines
 4. The script validates findings by checking publication venues for documents in different positions of the "influenced by AI" distribution.
+
+You can fetch a lookup between `work_id` and the discipline influence values using `ai_genomics.getters.openalex.get_openalex_disc_influence`
