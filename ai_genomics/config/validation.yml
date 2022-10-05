@@ -1,7 +1,38 @@
-n_contributors: 4
+n_contributors: 2
 abstracts:
   overlap: 20
   max_sample_size: 200
 definitions:
   overlap: 20
-  min_frequency: 10
+  min_frequency: 0
+  patent_include:
+    - genome
+    - genomes
+    - genomic
+    - genomics
+    - dna
+    - rna
+    - gene
+    - genes
+    - genetic
+    - genetics
+    - nucleotide
+    - nucleotides
+    - polymorphism
+    - polymorphisms
+    - transcriptome
+    - transcriptomes
+    - transcriptomic
+    - transcriptomics
+    - radiogenomic
+    - radiogenomics
+  patent_exclude:
+    - algorithm
+  patent_fragment:
+    - geneti
+    - genom
+    - nucleotide
+  patent_downsample:
+    - virus
+    - viral
+    - engineer

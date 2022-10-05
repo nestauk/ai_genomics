@@ -1,8 +1,10 @@
 from bs4 import BeautifulSoup
 import json
 import os
-from typing import Dict, Union
+from typing import Dict, Union, Sequence
 from pathlib import Path
+
+from ai_genomics.utils.text import strip_punct
 
 
 def make_cpc_lookup(scheme_dir: Union[Path, str], out_path: Union[Path, str]):
@@ -86,3 +88,31 @@ def find_context(
             break
     context = "; ".join(contexts[min_level::-1])
     return context
+
+
+def filter_cpc_lookup(
+    cpc_lookup: Dict,
+    includes: Sequence[str],
+    fragments: Sequence[str],
+    excludes: Sequence[str],
+) -> Dict:
+
+    filtered = {}
+    for k, v in cpc_lookup.items():
+        contains_f = any(
+            [True if f in v["description"].lower() else False for f in fragments]
+        )
+        if contains_f:
+            filtered[k] = v
+        else:
+            desc = strip_punct(v["description"])
+            desc = set([t.lower() for t in desc.split(" ")])
+
+            contains_i = any([True if i in desc else False for i in includes])
+            contains_e = any([True if e in desc else False for e in excludes])
+
+            if contains_i and not contains_e:
+                # print(desc, "\n")
+                filtered[k] = v
+
+    return filtered
