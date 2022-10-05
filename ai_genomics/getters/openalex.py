@@ -184,3 +184,18 @@ def get_openalex_ai_genomics_abstracts(local: bool = True) -> Dict:
     """Returns dataframe of AI in genomics OpenAlex MeSH institutes/authorships"""
 
     return ai_genom_getter("openalex_abstracts", "json", local)
+
+
+def get_openalex_disc_influence() -> pd.DataFrame:
+    """Returns dict with discipline influence scores for each paper"""
+
+    return (
+        pd.DataFrame(
+            load_s3_data(
+                "ai-genomics", "outputs/analysis/openalex_influence_score.json"
+            )
+        )
+        .T.stack()
+        .reset_index(name="disc_influence")
+        .rename(columns={"level_0": "work_id", "level_1": "category"})
+    )
