@@ -8,7 +8,6 @@ from ai_genomics import logger
 from typing import List
 import pandas as pd
 import numpy as np
-import string
 
 GENOMICS_AI_FIELDS = (
     "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
