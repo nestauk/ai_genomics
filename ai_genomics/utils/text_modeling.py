@@ -8,9 +8,22 @@ from pandas import DataFrame
 import tomotopy as tp
 
 
-from string import punctuation
+from string import punctuation, digits
 
 PUNCT = "|\\".join([x for x in punctuation])
+DIGITS = "|".join([x for x in digits])
+
+
+def remove_digits(doc: str):
+    """Remove digits from a document"""
+
+    return re.sub(DIGITS, "", doc)
+
+
+def remove_short_tokens(doc: str):
+    """Remove short tokens"""
+
+    return [d for d in doc if len(d) > 2]
 
 
 def remove_symbols(doc: str):
@@ -61,20 +74,23 @@ def build_ngrams(
 
 
 def train_lda(docs: List[str], k: int = 50, top_remove: int = 500, verbose=False):
-    """Train an LDA model on a list of tokenised documents"""
+    """Train an LDA model on a list of tokenised documents
+    Args:
+        docs: List of tokenised documents.
+        k: Number of topics.
+        top_remove: Number of top words to remove.
+        verbose: Print progress (NB we always print output topics)
+
+    """
     mdl = tp.LDAModel(tw=tp.TermWeight.ONE, min_cf=3, rm_top=top_remove, k=k)
     for n, doc in enumerate(docs):
         idx = mdl.add_doc(doc)
         if n != idx:
             print(n)
-        # mdl.add_doc(doc)
-        # if idx < 0:
-        #     print(n)
-        #     print("Document not added")
     mdl.burn_in = 100
     mdl.train(0)
 
-    if verbose is True:
+    if verbose:
         print(
             "Num docs:",
             len(mdl.docs),
@@ -87,21 +103,21 @@ def train_lda(docs: List[str], k: int = 50, top_remove: int = 500, verbose=False
     print("Training...", flush=True)
     for i in range(0, 1000, 10):
         mdl.train(10)
-        # print("Iteration: {}\tLog-likelihood: {}".format(i, mdl.ll_per_word))
+        if verbose:
+            print("Iteration: {}\tLog-likelihood: {}".format(i, mdl.ll_per_word))
 
-    # mdl.summary()
+    mdl.summary()
 
-    if verbose is True:
-        for k in range(mdl.k):
-            print("Topic #{}".format(k))
-            for word, prob in mdl.get_topic_words(k):
-                print("\t", word, prob, sep="\t")
+    for k in range(mdl.k):
+        print("Topic #{}".format(k))
+        for word, prob in mdl.get_topic_words(k):
+            print("\t", word, prob, sep="\t")
 
     return mdl
 
 
 def create_topic_names(mdl: tp.LDAModel, k: int, n_words=10) -> list:
-    """Create a list of topic names"""
+    """Create a list of topic names based on their weights on a topic"""
 
     return [
         "_".join([el[0] for n, el in enumerate(mdl.get_topic_words(n)) if n < n_words])
@@ -110,7 +126,7 @@ def create_topic_names(mdl: tp.LDAModel, k: int, n_words=10) -> list:
 
 
 def create_doc_topics(mdl: tp.LDAModel, topic_names: list, doc_ids: list) -> DataFrame:
-    """Make a list of topic probabilities for each document"""
+    """Create a dataframe with topic distributions per document"""
 
     return DataFrame(
         [mdl.docs[n].get_topic_dist() for n in range(len(mdl.docs))],
