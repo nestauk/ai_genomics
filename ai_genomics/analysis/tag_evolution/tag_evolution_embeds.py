@@ -144,7 +144,7 @@ if __name__ == "__main__":
     gtr = load_s3_data(bucket_name, 'outputs/gtr/gtr_ai_genomics_projects.csv')
     gtr_filtered = filter_data(data=gtr, query='ai_genomics == True', date_col='start', id_col='id')
     logger.info('loaded and filtered gtr data')
-    
+
     #timeslice entities
     ents_per_date = timestamp_entities(list_of_dfs=[patents_filtered, crunchbase_filtered, gtr_filtered, oa_filtered], list_of_ents=[patent_ents, crunchbase_ents, gtr_ents, oa_ents])
     logger.info('timesliced entities on a yearly basis from 2015 onwards.')
@@ -184,6 +184,3 @@ if __name__ == "__main__":
     save_to_s3(bucket_name, ent_embeds_lookup, 'outputs/analysis/tag_evolution/dbpedia_reduced_embeds.json')
     save_to_s3(bucket_name, propagated_labels, 'outputs/analysis/tag_evolution/dbpedia_clusters_timeslice.json')
     logger.info('saved dbpedia entities and propagated entity clusters.')
-
-    
-
