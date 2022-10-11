@@ -12,7 +12,6 @@ fasttext
 tomotopy
 scikit-learn
 gensim
-spacy
 umap-learn
 ratelim
 python-dotenv

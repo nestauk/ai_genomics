@@ -199,3 +199,11 @@ def get_openalex_disc_influence() -> pd.DataFrame:
         .reset_index(name="disc_influence")
         .rename(columns={"level_0": "work_id", "level_1": "category"})
     )
+
+
+def get_openalex_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads ai genomics oa entities"""
+    return load_s3_data(
+        bucket_name,
+        "outputs/entity_extraction/oa_lookup_clean.json",
+    )
