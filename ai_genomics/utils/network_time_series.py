@@ -14,8 +14,6 @@ from collections import Counter
 import itertools
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-####
-
 
 def get_tfidf_top_features(documents: list, n_top: int):
     """get top n features using tfidf."""
@@ -74,22 +72,19 @@ def add_cluster_names(subgraph_communities: dict, n_top: int) -> Dict:
                 for x, y in subgraph.nodes(data=True)
                 if y["timeslice cluster number"] == community
             ]
-            community_names[community] = "-".join(
-                get_tfidf_top_features(node_names, 3))
+            community_names[community] = "-".join(get_tfidf_top_features(node_names, 3))
 
     for subgraph in subgraph_communities.values():
         node_cluster_names = dict(
             zip(
                 list(subgraph.nodes()),
                 [
-                    community_names[subgraph.nodes[n]
-                                    ["timeslice cluster number"]]
+                    community_names[subgraph.nodes[n]["timeslice cluster number"]]
                     for n in subgraph.nodes
                 ],
             )
         )
-        nx.set_node_attributes(
-            subgraph, node_cluster_names, "timeslice cluster name")
+        nx.set_node_attributes(subgraph, node_cluster_names, "timeslice cluster name")
 
     return subgraph_communities
 
@@ -128,22 +123,18 @@ def add_cluster_colors(subgraph_communities: dict) -> Dict:
             zip(
                 list(subgraph.nodes()),
                 [
-                    cluster_colors[subgraph.nodes[n]
-                                   ["timeslice cluster number"]]
+                    cluster_colors[subgraph.nodes[n]["timeslice cluster number"]]
                     for n in subgraph.nodes
                 ],
             )
         )
 
-        nx.set_node_attributes(
-            subgraph, node_cluster_colors, "timeslice cluster color")
+        nx.set_node_attributes(subgraph, node_cluster_colors, "timeslice cluster color")
 
     return subgraph_communities
 
 
-def timeslice_pair_coo_graph(
-    G, timeslice_interval: int, min_timeslice: int
-) -> Dict:
+def timeslice_pair_coo_graph(G, timeslice_interval: int, min_timeslice: int) -> Dict:
     """
     Creates timesliced ent-pair co-occurance subgraphs every X year interval.
     Args:
@@ -153,8 +144,7 @@ def timeslice_pair_coo_graph(
         G_timeslices (Dict): A dictionary where keys refer to timeslices and
         the values refer to ent pair cooccurance subgraphs.
     """
-    pairs_first_published = [e["first_introduced"]
-                             for u, v, e in G.edges(data=True)]
+    pairs_first_published = [e["first_introduced"] for u, v, e in G.edges(data=True)]
 
     G_timeslices = dict()
     for i, timeslice in enumerate(
@@ -194,8 +184,7 @@ def cluster_timeslice_pair_coo_graph(G_timeslices: dict):
 
     for timeslice, subgraph in G_timeslices.items():
         subgraph_igraph = ig.Graph.from_networkx(subgraph)
-        partitions = la.find_partition(
-            subgraph_igraph, la.ModularityVertexPartition)
+        partitions = la.find_partition(subgraph_igraph, la.ModularityVertexPartition)
 
         for node in range(len(subgraph_igraph.vs)):
             subgraph_igraph.vs["cluster number"] = partitions.membership
@@ -222,8 +211,7 @@ def sanitise_clusters(timeslice_x, timeslice_y, min_jaccard_score):
     subgraph_clusters = [
         get_subgraph_clusters(subgraph) for subgraph in (timeslice_x, timeslice_y)
     ]
-    cluster_perms = list(itertools.product(
-        subgraph_clusters[0], subgraph_clusters[1]))
+    cluster_perms = list(itertools.product(subgraph_clusters[0], subgraph_clusters[1]))
 
     perm_dists = []
     for cluster_perm in cluster_perms:

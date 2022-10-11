@@ -3,6 +3,7 @@ import time
 from ai_genomics import logger
 import logging
 
+
 class BertVectorizer:
     """
     Use a pretrained transformers model to embed sentences.
