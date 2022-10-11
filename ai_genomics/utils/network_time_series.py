@@ -203,7 +203,7 @@ def cluster_timeslice_pair_coo_graph(G_timeslices: dict):
 def sanitise_clusters(timeslice_x, timeslice_y, min_jaccard_score):
     """
     Enforces cluster label consistency across timeslices greedily
-    based on jaccard similarity.
+    based on maximum jaccard similarity above threshold.
     Args:
         timeslice_x (Graph): ent pair cooccurance subgraph at timeslice x
         timeslice_y (Graph): ent pair cooccurance subgraphs at timeslice y (x + 1)
