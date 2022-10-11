@@ -37,11 +37,6 @@ if __name__ == "__main__":
     exclude = config["definitions"]["patent_exclude"]
     cpc_code_lookup = filter_cpc_lookup(cpc_code_lookup, include, fragments, exclude)
 
-    # cpc_lookup = load_s3_data(
-    #     bucket_name,
-    #     "outputs/patent_data/class_codes/cpc_with_definitions.json",
-    # )
-
     cpc_code_df = pd.DataFrame(
         {
             "code": cpc_code_lookup.keys(),
@@ -91,16 +86,30 @@ if __name__ == "__main__":
             index=False,
         )
 
-    oa_concepts_dir = PROJECT_DIR / "inputs/openalex/genetics_concepts_definitions.json"
-    with open(oa_concepts_dir, "r") as f:
-        oa_concepts = json.load(f)
+    # oa_concepts_dir = PROJECT_DIR / "inputs/openalex/genetics_concepts_definitions.json"
+    # with open(oa_concepts_dir, "r") as f:
+    #     oa_concepts = json.load(f)
 
-    oa_concepts_df = pd.DataFrame(
-        {
-            "classification_system": "oa",
-            "code": [c[0] for c in oa_concepts],
-            "description": [c[1] for c in oa_concepts],
-        }
+    # oa_concepts_df = pd.DataFrame(
+    #     {
+    #         "classification_system": "oa",
+    #         "code": [c[0] for c in oa_concepts],
+    #         "description": [c[1] for c in oa_concepts],
+    #     }
+    # )
+
+    # oa_concepts_df.to_csv(out_dir / "oa_definitions_v2.csv")
+
+    oa_concepts = pd.read_csv(PROJECT_DIR / "inputs/openalex/oa_genomics_concepts.csv")
+
+    overlapping_samples = generate_overlapping_samples(
+        oa_concepts,
+        n_splits=config["n_contributors"],
+        overlap=overlap,
     )
 
-    oa_concepts_df.to_csv(out_dir / "oa_definitions_v2.csv")
+    for i, sample in enumerate(overlapping_samples):
+        sample.to_csv(
+            out_dir / f"publication_definitions_{i}.csv",
+            index=False,
+        )
