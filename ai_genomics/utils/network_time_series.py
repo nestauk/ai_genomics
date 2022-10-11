@@ -32,7 +32,6 @@ def get_subgraph_cluster_nodes(G_timeslice, cluster: str) -> List:
         if node_info["timeslice cluster number"] == cluster
     ]
 
-
 def get_subgraph_clusters(G_timeslice) -> List:
     """helper function to get ordered list of all subgraph
     clusters from largest to smallest."""

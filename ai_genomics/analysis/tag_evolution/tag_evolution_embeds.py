@@ -20,7 +20,6 @@ from ai_genomics.getters.patents import (
 )
 from ai_genomics.getters.crunchbase import get_crunchbase_entities
 from ai_genomics.getters.gtr import get_gtr_entities
-from ai_genomics.getters.openalex import get_openalex_entities
 from ai_genomics.utils.bert_vectorizer import BertVectorizer
 from ai_genomics.utils.network_time_series import jaccard_similarity
 
@@ -29,13 +28,11 @@ bert_model = BertVectorizer(multi_process=False).fit()
 reducer = umap.UMAP()
 
 # load entities
-patent_ents, crunchbase_ents, gtr_ents, oa_ents = (
+patent_ents, crunchbase_ents, gtr_ents = (
     get_ai_genomics_patents_entities(),
     get_crunchbase_entities(),
     get_gtr_entities(),
-    get_openalex_entities(),
 )
-
 
 def filter_data(
     data: pd.DataFrame, query: str, date_col: str, id_col: str
@@ -191,8 +188,8 @@ if __name__ == "__main__":
 
     # timeslice entities
     ents_per_date = timestamp_entities(
-        list_of_dfs=[patents_filtered, crunchbase_filtered, gtr_filtered, oa_filtered],
-        list_of_ents=[patent_ents, crunchbase_ents, gtr_ents, oa_ents],
+        list_of_dfs=[patents_filtered, crunchbase_filtered, gtr_filtered],
+        list_of_ents=[patent_ents, crunchbase_ents, gtr_ents],
     )
     logger.info("timesliced entities on a yearly basis from 2015 onwards.")
 
