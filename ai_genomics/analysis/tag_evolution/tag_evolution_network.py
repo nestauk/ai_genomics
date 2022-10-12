@@ -4,6 +4,7 @@ Used PEC-style approach
 It also saves out the propagated cluster labels to s3. 
 """
 import sys
+
 sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
 
 from collections import Counter
@@ -25,6 +26,7 @@ from ai_genomics.analysis.tag_evolution.tag_evolution_embeds import filter_data
 import ai_genomics.utils.network_time_series as nts
 
 min_weight = 10
+
 
 def clean_entities(ents):
     """helper function remove entity scores from entity lists"""

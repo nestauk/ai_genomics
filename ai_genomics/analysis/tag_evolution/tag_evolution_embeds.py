@@ -34,6 +34,7 @@ patent_ents, crunchbase_ents, gtr_ents = (
     get_gtr_entities(),
 )
 
+
 def filter_data(
     data: pd.DataFrame, query: str, date_col: str, id_col: str
 ) -> pd.DataFrame:

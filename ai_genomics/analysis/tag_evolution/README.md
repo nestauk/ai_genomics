@@ -2,7 +2,7 @@
 
 The scripts in this directory focus on clustering AI Genomics tags across all datasets over time in two approaches: 1) a semantic approach and 2) a tag co-occurance network based approach.
 
-In both instances, DBpedia entities are cumulatively 'timesliced' for the last 5 years based on founded, publication or granted dates across the data sources. Cluster names are propagated based on a minimum jaccard similarity score of at least 0.5 for given clusters t and t+1.
+In both instances, DBpedia entities are cumulatively 'timesliced' based on founded, publication or granted dates across the data sources. Cluster names are propagated based on a minimum jaccard similarity score of at least 0.5 for given clusters t and t+1.
 
 ## Semantic Approach
 
