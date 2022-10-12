@@ -239,6 +239,6 @@ if __name__ == "__main__":
     save_to_s3(
         bucket_name,
         propagated_labels,
-        "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice.json",
+        "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_embed.json",
     )
     logger.info("saved dbpedia entities and propagated entity clusters.")

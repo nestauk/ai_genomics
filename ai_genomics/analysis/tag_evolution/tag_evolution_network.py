@@ -3,6 +3,9 @@ timestamps and propagates the cluster labels across timestamps.
 Used PEC-style approach
 It also saves out the propagated cluster labels to s3. 
 """
+import sys
+sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
+
 from collections import Counter
 import networkx as nx
 import itertools
@@ -17,12 +20,11 @@ from ai_genomics.getters.patents import (
 from ai_genomics.getters.crunchbase import get_crunchbase_entities
 from ai_genomics.getters.gtr import get_gtr_entities
 
-# depending on what method might make sense, move this to a utils
+# move this to a utils eventually
 from ai_genomics.analysis.tag_evolution.tag_evolution_embeds import filter_data
 import ai_genomics.utils.network_time_series as nts
 
 min_weight = 10
-
 
 def clean_entities(ents):
     """helper function remove entity scores from entity lists"""
@@ -139,5 +141,5 @@ if __name__ == "__main__":
     save_to_s3(
         bucket_name,
         subgraph_communities,
-        "outputs/analysis/tag_evolution/dbpedia_clusters_timeseries.pkl",
+        "outputs/analysis/tag_evolution/dbpedia_clusters_timeseries_network.pkl",
     )
