@@ -55,7 +55,7 @@ if __name__ == "__main__":
     )
 
     logger.info("saving ai ents...")
-    ai_ents = filter_entities(ids=ai_genomics_ids)
+    ai_ents = filter_entities(ids=ai_ids)
     save_to_s3(
         bucket_name, ai_ents, "outputs/entity_extraction/oa_ai_lookup_clean.json"
     )
