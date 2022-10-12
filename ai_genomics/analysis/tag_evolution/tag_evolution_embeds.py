@@ -195,7 +195,7 @@ if __name__ == "__main__":
     logger.info("timesliced entities on a yearly basis from 2015 onwards.")
 
     # embed and reduce ents and generate lookup
-    all_ents = list(set(itertools.chain(*list(ents_per_date.values()))))
+    all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
     ent_embeds_lookup = generate_entities_embedding_lookup(entities=all_ents)
     logger.info("generated reduced entity embedding lookup.")
 
