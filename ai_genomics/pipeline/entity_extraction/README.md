@@ -19,9 +19,7 @@ where `entities = {id: [[entities, confidence_score]]}`
 
 You can also run the script (`python ai_genomics/pipeline/entity_extraction/postprocess_entities.py`) to print accuracy, f1, recall and precision from a labelled dataset with labelled 'good' or 'bad' entities.
 
-## Filter OpenAlex extracted entities 
-
-While loading the OpenAlex extracted entities from s3 doesn't take a long time, linking the lookup table to other OpenAlex datasets based on the work_id key does.
+## Filter OpenAlex extracted entities
 
 This script splits the lookup based on the ids into ai, ai_genomics, genomics (and samples of each area type) entity lookups and saves the output to s3:
 
