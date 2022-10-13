@@ -86,6 +86,8 @@ def calculate_topic_shares(
     Args:
         topic_df: Topic distribution for the corpus.
         disc_names_ids: Dictionary of disc names and ids.
+        baseline_discs: List of baseline disciplines.
+        binarise_thres: quantile threshold for binarising topic distribution.
 
     Returns:
         Df of discipline shares in each topic
@@ -135,7 +137,7 @@ if __name__ == "__main__":
 
     import ai_genomics.getters.gtr as gtr
 
-    gtr_meta = gtr.get_ai_genomics_project_table()
+    gtr_meta = gtr.get_ai_genomics_project_table(local=False)
 
     # We need to sample baselines of similar sizes. Otherwise the shares
     # (and perhaps the topics?) will be unbalanced
