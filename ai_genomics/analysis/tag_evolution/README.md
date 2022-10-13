@@ -28,9 +28,7 @@ to run this pipeline:
 
 - Via a network based approach, we identified ~61 clusters total throughout the timeslices and 13 clusters at the final timestamp. One cluster persists from the first timeslice: data-open-science and pfizer-novartis. Clusters from 1, 2, 5 and 6 also persist.
 
-TO DO:
-
-- Via an embedding approach, we identify ~65 clusters total throughout the timeslices and 48 at the final timestamp. Four clusters persist throughout and they include cluster numbers 38, 34, 27 and 16: 38 appears to be related to personalised medicine and water; 34 appears related to lipids and blood; 27 has clustered animals and fish and 16 appears related to neuroscience.
+- Via an embedding approach, we identify ~60 clusters total throughout the timeslices and 47 at the final timestamp. Many clusters persist throughout: examples include 2, 5, and 28. 2 appears to be about computer programming; 5 appears to be about algorithms and 28 appears to be about immunity and antigens.
 
 ## Notes
 
