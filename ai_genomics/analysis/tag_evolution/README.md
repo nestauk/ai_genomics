@@ -26,12 +26,12 @@ to run this pipeline:
 
 ## A few high observations across both approaches
 
-- Via a network based approach, we identified ~38 clusters total throughout the timeslices and 14 clusters at the final timestamp. Two clusters from the first timeslice (2015) persist: data-algorithm-learning and urine-salvia.
+- Via a network based approach, we identified ~61 clusters total throughout the timeslices and 13 clusters at the final timestamp. One cluster persists from the first timeslice: data-open-science and pfizer-novartis. Clusters from 1, 2, 5 and 6 also persist.
 
-- Via an embedding approach, we identify ~64 clusters total throughout the timeslices and 46 at the final timestamp. Four clusters persist throughout and they include cluster numbers 38, 34, 27 and 16: 38 appears to be related to personalised medicine and water; 34 appears related to lipids and blood; 27 has clustered animals and fish and 16 appears related to neuroscience.
+TO DO:
 
-## etc.
+- Via an embedding approach, we identify ~65 clusters total throughout the timeslices and 48 at the final timestamp. Four clusters persist throughout and they include cluster numbers 38, 34, 27 and 16: 38 appears to be related to personalised medicine and water; 34 appears related to lipids and blood; 27 has clustered animals and fish and 16 appears related to neuroscience.
 
-- how to filter open alex entities so its not so slow and can be included
-- from the network analysis, the clusters in the network are pretty large - have a stricter merging threshold or cluster into subclusters?
+## Notes
+
 - from the embedding approach, how to deal with topic combinations

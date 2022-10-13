@@ -6,22 +6,8 @@ import pandas as pd
 from ai_genomics import logger
 from typing import Union, List
 from decimal import Decimal
-import numpy
 
 S3 = boto3.resource("s3")
-
-
-class CustomJsonEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Decimal):
-            return float(obj)
-        elif isinstance(obj, numpy.integer):
-            return int(obj)
-        elif isinstance(obj, numpy.floating):
-            return float(obj)
-        elif isinstance(obj, numpy.ndarray):
-            return obj.tolist()
-        return super(CustomJsonEncoder, self).default(obj)
 
 
 def get_s3_dir_files(bucket_name: str, dir_name: str) -> List[str]:
@@ -59,9 +45,7 @@ def load_s3_data(bucket_name: str, file_name: str) -> Union[pd.DataFrame, str, d
         return pd.read_csv(f"s3://{bucket_name}/{file_name}")
     elif fnmatch(file_name, "*.tsv.zip"):
         return pd.read_csv(
-            f"s3://{bucket_name}/{file_name}",
-            compression="zip",
-            sep="\t",
+            f"s3://{bucket_name}/{file_name}", compression="zip", sep="\t",
         )
     elif fnmatch(file_name, "*.pickle") or fnmatch(file_name, "*.pkl"):
         file = obj.get()["Body"].read()
@@ -98,7 +82,7 @@ def save_to_s3(bucket_name: str, output_var, output_file_dir: str):
     elif fnmatch(output_file_dir, "*.csv"):
         output_var.to_csv("s3://" + bucket_name + "/" + output_file_dir, index=False)
     elif fnmatch(output_file_dir, "*.json"):
-        obj.put(Body=json.dumps(output_var, cls=CustomJsonEncoder))
+        obj.put(Body=json.dumps(output_var))
     else:
         logger.exception(
             'Function not supported for file type other than "*.json", *.txt", "*.pickle", "*.tsv" and "*.csv"'

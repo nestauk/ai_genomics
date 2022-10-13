@@ -3,6 +3,12 @@ timestamps and propagates the cluster labels across timestamps.
 
 It also saves out reduced entity embeddings and the propagated cluster labels to s3. 
 """
+import sys
+
+sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
+
+from ai_genomics.getters.data_getters import load_s3_data
+import pandas as pd
 from typing import Dict, List
 import itertools
 import numpy as np
@@ -20,6 +26,7 @@ from ai_genomics.getters.patents import (
 )
 from ai_genomics.getters.crunchbase import get_crunchbase_entities
 from ai_genomics.getters.gtr import get_gtr_entities
+from ai_genomics.getters.openalex import get_openalex_ai_genomics_works
 from ai_genomics.utils.bert_vectorizer import BertVectorizer
 from ai_genomics.utils.network_time_series import jaccard_similarity
 
@@ -28,10 +35,14 @@ bert_model = BertVectorizer(multi_process=False).fit()
 reducer = umap.UMAP()
 
 # load entities
-patent_ents, crunchbase_ents, gtr_ents = (
+patent_ents, crunchbase_ents, gtr_ents, oa_ents = (
     get_ai_genomics_patents_entities(),
     get_crunchbase_entities(),
     get_gtr_entities(),
+    # temporarily as I wait for another PR to be merged
+    load_s3_data(
+        bucket_name, "outputs/entity_extraction/oa_ai_genomics_lookup_clean.json"
+    ),
 )
 
 
@@ -64,9 +75,11 @@ def timestamp_entities(
         all_ents = []
         for df, ents in zip(list_of_dfs, list_of_ents):
             df_ids = list(df[df.date < min_date].id)
-            ents_subset = {k: [i[0] for i in v] for k, v in ents.items() if k in df_ids}
-            all_ents.extend(list(set(list(itertools.chain(*ents_subset.values())))))
-        ents_per_date[min_date.year] = all_ents
+            ents_subset = {
+                id_: [i[0] for i in ents.get(id_)] for id_ in df_ids if ents.get(id_)
+            }
+            all_ents.extend(list(itertools.chain(*ents_subset.values())))
+        ents_per_date[min_date.year] = list(set(all_ents))
 
     return ents_per_date
 
@@ -82,6 +95,8 @@ def generate_entities_embedding_lookup(entities: List[str]) -> Dict[str, np.arra
     return ent_reduced_embeds_dict
 
 
+# if this is the method we want to end up using, manually define k based on graphs
+# rather than max
 def get_best_k(
     reduced_entities: Dict[str, np.array], ents_per_date: Dict[str, List[str]]
 ) -> List[int]:
@@ -105,62 +120,42 @@ def get_best_k(
     return best_ks
 
 
-def update_labels(
-    new_labels_dict: Dict[int, int], timeslice_dict: Dict[int, List[str]]
-) -> Dict[int, List[str]]:
-    """Helper function to update cluster labels based on new labels dict."""
-    new_labels = []
-    for clust in list(timeslice_dict.keys()):
-        new_clust = new_labels_dict.get(str(clust))
-        if new_clust:
-            new_labels.append(str(new_clust))
-        else:
-            new_labels.append(str(clust))
-
-    return dict(zip(new_labels, timeslice_dict.values()))
-
-
 def propagate_labels(
-    timeslice_x: Dict[int, List[str]],
-    timeslice_y: Dict[int, List[str]],
-    min_jaccard_score: float = 0.5,
+    timeslice_x, timeslice_y, min_jaccard_score: float = 0.7,
 ) -> Dict[int, List[str]]:
     """Propogates cluster labels from t-1 to t based on minimum jaccard similarity
-    between entity lists.
-    
-    Returns updated cluster labels at time t
+    between entity lists.    
     """
-    perm_dists = [
-        [
-            (clust_x, clust_y, jaccard_similarity(ent_x, ent_y))
-            for clust_y, ent_y in timeslice_y.items()
-        ]
-        for clust_x, ent_x in timeslice_x.items()
-    ]
-    perm_dists = [[x for x in perm_dist if x[2] != 0] for perm_dist in perm_dists]
+    cluster_perms = list(itertools.product(timeslice_x, timeslice_y))
 
-    perm_dists_df = pd.DataFrame(
-        itertools.chain(*perm_dists),
-        columns=["timeslice_x_cluster", "timeslice_y_cluster", "jaccard_score"],
+    perm_dists = []
+    for cluster_x, cluster_y in cluster_perms:
+        timeslice_x_ents, timeslice_y_ents = (
+            timeslice_x.get(cluster_x),
+            timeslice_y.get(cluster_y),
+        )
+        dists = jaccard_similarity(timeslice_x_ents, timeslice_y_ents)
+        if (dists != 0) & (dists > min_jaccard_score):
+            perm_dists.append((cluster_x, cluster_y, dists))
+
+    sorted_perm_dists = sorted(perm_dists, key=lambda x: (x[0], x[2]), reverse=True)
+    sorted_perm_dists_clusts = list(
+        dict([(i[0], i[1]) for i in sorted_perm_dists]).items()
     )
-    new_y_clusters = dict()
-    for timeslice, timeslice_info in perm_dists_df.groupby("timeslice_x_cluster"):
-        max_score = max(timeslice_info["jaccard_score"])
-        y_cluster = timeslice_info[
-            timeslice_info.jaccard_score == max_score
-        ].timeslice_y_cluster.values[0]
-        # jaccard similarity score needs to be at least 0.5 to merge clusters
-        if max_score > min_jaccard_score:
-            new_y_clusters[str(y_cluster)] = timeslice
-            logger.info(
-                f"replace {y_cluster} with {timeslice} at t + 1 based on jaccard similarity."
-            )
 
-    # update timeslice_y labels
-    return update_labels(new_y_clusters, timeslice_y)
+    while len(sorted_perm_dists_clusts) > 0:
+        most_similar_clusts = sorted_perm_dists_clusts[0]
+        # update timeslice y
+        timeslice_y[sorted_perm_dists_clusts[0][0]] = timeslice_y.get(
+            sorted_perm_dists_clusts[0][1]
+        )
+        sorted_perm_dists_clusts.remove(most_similar_clusts)
 
 
 if __name__ == "__main__":
+    logger.info(
+        "loading AI genomics DBpedia entities and datasets across all data sources...."
+    )
     logger.info(
         "loading AI genomics DBpedia entities and datasets across all data sources...."
     )
@@ -186,6 +181,15 @@ if __name__ == "__main__":
         data=gtr, query="ai_genomics == True", date_col="start", id_col="id"
     )
     logger.info("loaded and filtered gtr data")
+
+    oa = get_openalex_ai_genomics_works()
+    oa_filtered = filter_data(
+        data=oa,
+        query="ai_genomics == True",
+        date_col="publication_date",
+        id_col="work_id",
+    )
+    logger.info("loaded and filtered oa data")
 
     # timeslice entities
     ents_per_date = timestamp_entities(
@@ -217,18 +221,13 @@ if __name__ == "__main__":
         ents_per_date_clusts[year] = clust_dict
     logger.info("clustered entities at each timestamp using best ks.")
 
-    # propogate cluster names across timeslices
-    new_timeslice_y = propagate_labels(
-        ents_per_date_clusts[2015], ents_per_date_clusts[2016]
-    )
-    propagated_labels = dict()
-    for _ in range(5):
-        timeslice_x = list(ents_per_date_clusts.keys())[_ + 1]
-        timeslice_y = list(ents_per_date_clusts.keys())[_ + 2]
-        new_timeslice_y = propagate_labels(
-            new_timeslice_y, ents_per_date_clusts[timeslice_y]
-        )
-        propagated_labels[timeslice_y] = new_timeslice_y
+    #### propogate cluster names across timeslices
+    years = list(ents_per_date_clusts.keys())
+    for year in range(len(years) - 1):
+        timeslice_x = ents_per_date_clusts[years[year]]
+        timeslice_y = ents_per_date_clusts[years[year + 1]]
+        propagate_labels(timeslice_x, timeslice_y)
+
     logger.info("propagated labels across timeslices.")
 
     # save dbpedia entity look up and timesliced clusters from 2015 onwards
@@ -237,9 +236,13 @@ if __name__ == "__main__":
         ent_embeds_lookup,
         "outputs/analysis/tag_evolution/dbpedia_reduced_embeds.json",
     )
+    # change keys to string to be able to save dict
     save_to_s3(
         bucket_name,
-        propagated_labels,
+        {
+            year: {str(k): v for k, v in ent_info.items()}
+            for year, ent_info in ents_per_date_clusts.items()
+        },
         "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_embed.json",
     )
     logger.info("saved dbpedia entities and propagated entity clusters.")

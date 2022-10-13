@@ -3,6 +3,10 @@ timestamps and propagates the cluster labels across timestamps.
 Used PEC-style approach
 It also saves out the propagated cluster labels to s3. 
 """
+import sys
+
+sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
+
 from collections import Counter
 import networkx as nx
 import itertools
@@ -16,6 +20,7 @@ from ai_genomics.getters.patents import (
 )
 from ai_genomics.getters.crunchbase import get_crunchbase_entities
 from ai_genomics.getters.gtr import get_gtr_entities
+from ai_genomics.getters.openalex import get_openalex_ai_genomics_works
 
 # move this to a utils eventually
 from ai_genomics.analysis.tag_evolution.tag_evolution_embeds import filter_data
@@ -34,10 +39,17 @@ if __name__ == "__main__":
         "loading AI genomics DBpedia entities and datasets across all data sources...."
     )
     logger.info("loading and cleaning entity lookups...")
-    patent_ents, crunchbase_ents, gtr_ents = (
+    patent_ents, crunchbase_ents, gtr_ents, oa_ents = (
         clean_entities(get_ai_genomics_patents_entities()),
         clean_entities(get_crunchbase_entities()),
         clean_entities(get_gtr_entities()),
+        # temporarily as I wait for another PR to be merged
+        clean_entities(
+            load_s3_data(
+                bucket_name,
+                "outputs/entity_extraction/oa_ai_genomics_lookup_clean.json",
+            )
+        ),
     )
 
     logger.info("loading dfs...")
@@ -63,9 +75,21 @@ if __name__ == "__main__":
         data=gtr, query="ai_genomics == True", date_col="start", id_col="id"
     )
     logger.info("loaded and filtered gtr data")
+
+    oa = get_openalex_ai_genomics_works()
+    oa_filtered = filter_data(
+        data=oa,
+        query="ai_genomics == True",
+        date_col="publication_date",
+        id_col="work_id",
+    )
+    logger.info("loaded and filtered oa data")
+
     # prepare data
     all_ents = dict(
-        pair for d in [patent_ents, crunchbase_ents, gtr_ents] for pair in d.items()
+        pair
+        for d in [patent_ents, crunchbase_ents, gtr_ents, oa_ents]
+        for pair in d.items()
     )
     all_dfs = pd.concat(
         [
@@ -126,7 +150,7 @@ if __name__ == "__main__":
         nts.sanitise_clusters(
             subgraph_communities[timeslice_x],
             subgraph_communities[timeslice_y],
-            min_jaccard_score=0.5,
+            min_jaccard_score=0.7,
         )
     logger.info("sanitised clusters")
 

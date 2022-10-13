@@ -1,13 +1,13 @@
 import json
 
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Mapping, Union
 from functools import reduce
 from toolz import pipe
 
 from ai_genomics.utils.reading import read_json
 from ai_genomics.getters.data_getters import load_s3_data
-from ai_genomics import PROJECT_DIR, logger
+from ai_genomics import PROJECT_DIR, logger, bucket_name
 
 
 OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
@@ -203,7 +203,4 @@ def get_openalex_disc_influence() -> pd.DataFrame:
 
 def get_openalex_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
     """From S3 loads ai genomics oa entities"""
-    return load_s3_data(
-        bucket_name,
-        "outputs/entity_extraction/oa_lookup_clean.json",
-    )
+    return load_s3_data(bucket_name, "outputs/entity_extraction/oa_lookup_clean.json",)
