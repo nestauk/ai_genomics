@@ -27,11 +27,6 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
 
     logging.info("Processing and saving")
     # Works
-    # (
-    #     openalex.make_work_corpus_metadata(oalex_works).to_csv(
-    #         f"{OALEX_PATH}/works_{concept_name}_{year}.csv", index=False
-    #     )
-    # )
     works_corpus_metadata = openalex.make_work_corpus_metadata(oalex_works)
     save_to_s3(
         "ai-genomics",
@@ -40,14 +35,7 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
     )
 
     # Concepts
-
     if make_df:
-
-        # (
-        #     openalex.make_work_concepts(oalex_works)
-        #     .assign(year=year)
-        #     .to_csv(f"{OALEX_PATH}/concepts_{concept_name}_{year}.csv", index=False)
-        # )
         work_concepts = openalex.make_work_concepts(oalex_works).assign(year=year)
         save_to_s3(
             "ai-genomics",
@@ -56,8 +44,6 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
         )
 
     else:
-        # with open(f"{OALEX_PATH}/concepts_{concept_name}_{year}.json", "w") as outfile:
-        #     json.dump(openalex.make_work_concepts(oalex_works, make_df), outfile)
         work_concepts = openalex.make_work_concepts(oalex_works, make_df)
         save_to_s3(
             "ai-genomics",
@@ -66,13 +52,6 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
         )
 
     # Mesh
-    # (
-    #     openalex.make_work_concepts(
-    #         oalex_works, variable="mesh", keys_to_keep=openalex.MESH_VARS
-    #     )
-    #     .assign(year=year)
-    #     .to_csv(f"{OALEX_PATH}/mesh_{concept_name}_{year}.csv", index=False)
-    # )
     openalex_concepts = openalex.make_work_concepts(
         oalex_works, variable="mesh", keys_to_keep=openalex.MESH_VARS
     ).assign(year=year)
@@ -83,11 +62,6 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
     )
 
     # Authorships
-    # (
-    #     openalex.make_work_authorships(oalex_works)
-    #     .assign(year=year)
-    #     .to_csv(f"{OALEX_PATH}/authorships_{concept_name}_{year}.csv", index=False)
-    # )
     work_authorships = openalex.make_work_authorships(oalex_works)
     work_authorships.assign(year=year)
     save_to_s3(
@@ -97,8 +71,6 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
     )
 
     # Citations
-    # with open(f"{OALEX_PATH}/citations_{concept_name}_{year}.json", "w") as outfile:
-    #     json.dump(openalex.make_citations(oalex_works), outfile)
     citations_json = openalex.make_citations(oalex_works)
     save_to_s3(
         "ai-genomics",
@@ -107,8 +79,6 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
     )
 
     # Deinverted abstracts
-    # with open(f"{OALEX_PATH}/abstracts_{concept_name}_{year}.json", "w") as outfile:
-    #     json.dump(openalex.make_deinverted_abstracts(oalex_works), outfile)
     deinverted_abstracts_json = openalex.make_deinverted_abstracts(oalex_works)
     save_to_s3(
         "ai-genomics",
