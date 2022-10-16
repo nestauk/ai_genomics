@@ -105,7 +105,6 @@ class MakeYearSummaryFlow(FlowSpec):
         self.years = list(range(2007, 2023))
         self.next(self.fetch_save_year, foreach="years")
 
-    @batch(cpu=4, memory=32000)
     @step
     def fetch_save_year(self):
         print("Task started")
