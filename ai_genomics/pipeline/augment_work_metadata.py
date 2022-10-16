@@ -35,7 +35,7 @@ def predict_language(text: str, model: fasttext.FastText._FastText) -> Dict:
 
 if __name__ == "__main__":
 
-    for year in range(2007, 2022):
+    for year in range(2007, 2023):
 
         logging.info(year)
 
