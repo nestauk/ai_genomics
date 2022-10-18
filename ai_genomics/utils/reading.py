@@ -21,3 +21,15 @@ def fetch_s3(s3_path) -> Union[pd.DataFrame, Dict]:
     bucket = s3.Bucket("ai-genomics")
     obj = bucket.Object(s3_path)
     return pd.read_csv(obj.get()["Body"])
+
+
+def _convert_str_to_pathlib_path(path: Union[pathlib.Path, str]) -> pathlib.Path:
+    """Converts a path written as a string to pathlib format"""
+    return pathlib.Path(path) if type(path) is str else path
+
+
+def make_path_if_not_exist(path: Union[pathlib.Path, str]):
+    """Check if path exists, if it does not exist then create it"""
+    path = _convert_str_to_pathlib_path(path)
+    if not path.exists():
+        path.mkdir(parents=True)
