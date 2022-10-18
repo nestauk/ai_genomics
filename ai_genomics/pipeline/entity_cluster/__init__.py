@@ -57,7 +57,10 @@ def create_doc_vectors(
     """Create document vectors that represent the presence of an entity cluster
     within a document.
 
-
+    This works like a count vectorisation. The number of entities in each
+    document belonging to an entity cluster is summed. The result is a sparse
+    matrix where rows are documents and columns represent the number of times
+    an entity cluster was identified in a document.
 
     Args:
         entities (Mapping[str, Sequence[str]]): Entities (without scores) for
@@ -69,7 +72,7 @@ def create_doc_vectors(
         pd.DataFrame: The document vectors.
     """
 
-    d = max(entity_to_clusters_lookup.values())
+    d = max(entity_to_clusters_lookup.values()) + 1
 
     doc_vectors = []
     for ents in entities.values():
@@ -78,6 +81,8 @@ def create_doc_vectors(
             for e in ents
             if entity_to_clusters_lookup.get(e) is not None
         ]
-        doc_vectors.append(np.np.bincount(entity_groups, minlength=d))
+        doc_vectors.append(np.bincount(entity_groups, minlength=d))
 
-    return pd.DataFrame(np.array(doc_vectors), index=entities.keys())
+    doc_vectors = pd.DataFrame(np.array(doc_vectors), index=entities.keys())
+    doc_vectors.index.name = "id"
+    return doc_vectors
