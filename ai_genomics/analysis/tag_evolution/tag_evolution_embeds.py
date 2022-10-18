@@ -3,10 +3,6 @@ timestamps and propagates the cluster labels across timestamps.
 
 It also saves out reduced entity embeddings and the propagated cluster labels to s3. 
 """
-import sys
-
-sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
-
 from ai_genomics.getters.data_getters import load_s3_data
 import pandas as pd
 from typing import Dict, List
@@ -230,10 +226,10 @@ if __name__ == "__main__":
 
     logger.info("propagated labels across timeslices.")
 
-    # save dbpedia entity look up and timesliced clusters from 2015 onwards
+    # save look up in json serializable way 
     save_to_s3(
         bucket_name,
-        ent_embeds_lookup,
+        {k:v.tolist() for k, v in ent_embeds_lookup.items()},
         "outputs/analysis/tag_evolution/dbpedia_reduced_embeds.json",
     )
     # change keys to string to be able to save dict

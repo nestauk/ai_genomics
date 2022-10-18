@@ -3,10 +3,6 @@ timestamps and propagates the cluster labels across timestamps.
 Used PEC-style approach
 It also saves out the propagated cluster labels to s3. 
 """
-import sys
-
-sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
-
 from collections import Counter
 import networkx as nx
 import itertools
