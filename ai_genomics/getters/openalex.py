@@ -1,14 +1,13 @@
 import json
 
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Mapping, Union
 from functools import reduce
 from toolz import pipe
 
 from ai_genomics.utils.reading import read_json
 from ai_genomics.getters.data_getters import load_s3_data
-from ai_genomics import PROJECT_DIR, logger
-
+from ai_genomics import PROJECT_DIR, logger, bucket_name
 
 OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
 OALEX_OUT_PATH = f"{PROJECT_DIR}/outputs/data/openalex"
