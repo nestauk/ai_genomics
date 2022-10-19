@@ -7,6 +7,8 @@ from typing import Mapping, Optional, Union
 
 
 def strip_scores(entities):
+    """Strips the scores from DBpedia entities to leave only a lookup between
+    documents and entity tags."""
     return {k: [e[0] for e in v] for k, v in entities.items()}
 
 
