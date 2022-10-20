@@ -207,7 +207,7 @@ if __name__ == "__main__":
         list_of_dfs=[patents_filtered, crunchbase_filtered, gtr_filtered],
         list_of_ents=[patent_ents, crunchbase_ents, gtr_ents],
     )
-    logger.info("timesliced entities on a yearly basis from 2015 onwards.")
+    logger.info("timesliced entities on a yearly basis from 2010 onwards.")
 
     # embed and reduce ents and generate lookup
     all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
