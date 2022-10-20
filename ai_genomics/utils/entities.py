@@ -3,7 +3,7 @@ from collections import Counter
 from itertools import chain
 import numpy as np
 
-from typing import Mapping, Optional, Union, List
+from typing import Mapping, Optional, Union, List, Dict
 from ai_genomics.utils.text_embedding import embed, reduce
 
 

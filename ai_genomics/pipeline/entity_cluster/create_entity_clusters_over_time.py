@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/Users/india.kerlenesta/Projects/ai_genomics')
+
 """This script clusters AI genomics entity embeddings using k-means at successive 
 timestamps and propagates the cluster labels across timestamps.
 
@@ -212,7 +215,7 @@ if __name__ == "__main__":
     # embed and reduce ents and generate lookup
     all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
     ent_embeds_lookup = generate_embed_lookup(
-        entities=all_ents, model=CONFIG["embed"], reduce_embedding=True
+        entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=True
     )
     logger.info("generated reduced entity embedding lookup.")
 
