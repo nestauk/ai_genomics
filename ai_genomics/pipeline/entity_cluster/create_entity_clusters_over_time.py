@@ -1,6 +1,3 @@
-import sys
-sys.path.append('/Users/india.kerlenesta/Projects/ai_genomics')
-
 """This script clusters AI genomics entity embeddings using k-means at successive 
 timestamps and propagates the cluster labels across timestamps.
 
