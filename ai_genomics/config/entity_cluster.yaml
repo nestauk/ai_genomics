@@ -1,0 +1,14 @@
+filter_entities:
+  min_entity_freq: 10
+  max_entity_freq: null
+embed:
+  model: all-MiniLM-L6-v2
+cluster:
+  k_100:
+    n_clusters: 100
+  k_200:
+    n_clusters: 200
+  k_500:
+    n_clusters: 500
+  k_1000:
+    n_clusters: 1000

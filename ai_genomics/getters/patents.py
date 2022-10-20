@@ -104,3 +104,18 @@ def get_genomics_patents_entities() -> Mapping[str, Mapping[str, Union[str, str]
         bucket_name,
         "outputs/entity_extraction/genomics_patents_lookup_clean.json",
     )
+
+
+def get_patent_ai_genomics_entity_groups(k: int = 500) -> pd.DataFrame:
+    """Gets a dataframe of vectors representing the presence of DBpedia entity
+    clusters in each document.
+
+    Args:
+        k (int, optional): The number of clusters. Defaults to 500.
+
+    Returns:
+        pd.DataFrame: A sparse dataframe where the index is patent IDs and
+            the columns are vector dimensions (entity cluster IDs).
+    """
+    fname = f"inputs/entities/gtr_entity_group_vectors_k_{k}.csv"
+    return load_s3_data(bucket_name, fname)

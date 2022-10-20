@@ -44,3 +44,18 @@ def get_crunchbase_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
         bucket_name,
         "outputs/entity_extraction/cb_lookup_clean.json",
     )
+
+
+def get_crunchbase_ai_genomics_entity_groups(k: int = 500) -> pd.DataFrame:
+    """Gets a dataframe of vectors representing the presence of DBpedia entity
+    clusters in each document.
+
+    Args:
+        k (int, optional): The number of clusters. Defaults to 500.
+
+    Returns:
+        pd.DataFrame: A sparse dataframe where the index is company IDs and
+            the columns are vector dimensions (entity cluster IDs).
+    """
+    fname = f"inputs/entities/crunchbase_entity_group_vectors_k_{k}.csv"
+    return load_s3_data(bucket_name, fname)
