@@ -3,13 +3,26 @@ from collections import Counter
 from itertools import chain
 import numpy as np
 
-from typing import Mapping, Optional, Union
+from typing import Mapping, Optional, Union, List
+from ai_genomics.utils.text_embedding import embed, reduce
 
 
 def strip_scores(entities):
     """Strips the scores from DBpedia entities to leave only a lookup between
     documents and entity tags."""
     return {k: [e[0] for e in v] for k, v in entities.items()}
+
+
+def generate_embed_lookup(
+    entities: List[str], model: str, reduce_embedding=False
+) -> Dict[str, np.array]:
+    """Generates an embedding lookup where the key is the entity
+    and the value is the reduced embedding.
+    """
+    embeds = embed(entities, model=model)
+    if reduce_embedding:
+        embeds = reduce(embeds)
+    return dict(zip(entities, embeds))
 
 
 def filter_entities(
