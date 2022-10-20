@@ -39,7 +39,7 @@ def reduce(embeds: NDArray) -> NDArray:
             transformer used.
     
     Returns:
-        NDArray: 
+        NDArray: Reduced embeddings of texts to 2-dimensions
     """
     reducer = umap.UMAP()
     return reducer.fit_transform(embeds)
