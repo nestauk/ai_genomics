@@ -21,12 +21,16 @@ from ai_genomics.getters.patents import (
 
 from ai_genomics.getters.crunchbase import get_crunchbase_entities
 from ai_genomics.getters.gtr import get_gtr_entities
-from ai_genomics.getters.openalex import get_openalex_ai_genomics_works, get_openalex_ai_genomics_entities 
+from ai_genomics.getters.openalex import (
+    get_openalex_ai_genomics_works,
+    get_openalex_ai_genomics_entities,
+)
 from ai_genomics.utils.text import jaccard_similarity
 from ai_genomics.utils.entities import generate_embed_lookup
 from ai_genomics.utils.filtering import filter_data
 
 CONFIG = get_yaml_config(PROJECT_DIR / "ai_genomics/config/entity_cluster.yaml")
+
 
 def timestamp_entities(
     list_of_dfs: List[pd.DataFrame],
@@ -65,6 +69,7 @@ def timestamp_entities(
 
     return ents_per_date
 
+
 def get_best_k(
     reduced_entities: Dict[str, np.array], ents_per_date: Dict[str, List[str]]
 ) -> List[int]:
@@ -96,9 +101,10 @@ def get_best_k(
 
     return best_ks
 
+
 def propagate_labels(
-    timeslice_x:Dict[str, List[str]], 
-    timeslice_y:Dict[str, List[str]], 
+    timeslice_x: Dict[str, List[str]],
+    timeslice_y: Dict[str, List[str]],
     min_jaccard_score: float = 0.7,
 ) -> Dict[int, List[str]]:
     """Propogates cluster labels from t-1 to t based on maximum 
@@ -117,32 +123,32 @@ def propagate_labels(
     timeslice_y cluster numbers are changed in place based on similarty
         score thresholds. 
     """
-    #generate cartesian product of cluster lists at t-1 and t
+    # generate cartesian product of cluster lists at t-1 and t
     cluster_perms = list(itertools.product(timeslice_x, timeslice_y))
-    
-    #calculate the jaccard simiarity between entity lists at t-1 and t
+
+    # calculate the jaccard simiarity between entity lists at t-1 and t
     perm_dists = []
     for cluster_x, cluster_y in cluster_perms:
-        #get entity lists at each timeslice oer cluster number 
+        # get entity lists at each timeslice oer cluster number
         timeslice_x_ents, timeslice_y_ents = (
             timeslice_x.get(cluster_x),
             timeslice_y.get(cluster_y),
         )
         dists = jaccard_similarity(timeslice_x_ents, timeslice_y_ents)
-        #if the similarity is not 0 AND above the minimum threshold
+        # if the similarity is not 0 AND above the minimum threshold
         if (dists != 0) & (dists > min_jaccard_score):
             perm_dists.append((cluster_x, cluster_y, dists))
-    #sort the list of cluster numbers at t-1, cluster numbers at t and their 
-    #jaccard similarty scores 
+    # sort the list of cluster numbers at t-1, cluster numbers at t and their
+    # jaccard similarty scores
     sorted_perm_dists = sorted(perm_dists, key=lambda x: (x[0], x[2]), reverse=True)
-    #remove clusters that are close the multiple clusters by picking the 
-    #combination with the highest jaccard similarty score 
+    # remove clusters that are close the multiple clusters by picking the
+    # combination with the highest jaccard similarty score
     sorted_perm_dists_clusts = list(
         dict([(i[0], i[1]) for i in sorted_perm_dists]).items()
     )
-    
-    #recursively update cluster labels at t with cluster labels
-    #from t-1 based on the sorted list 
+
+    # recursively update cluster labels at t with cluster labels
+    # from t-1 based on the sorted list
     while len(sorted_perm_dists_clusts) > 0:
         most_similar_clusts = sorted_perm_dists_clusts[0]
         timeslice_y[sorted_perm_dists_clusts[0][0]] = timeslice_y.get(
@@ -151,18 +157,19 @@ def propagate_labels(
         sorted_perm_dists_clusts.remove(most_similar_clusts)
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     logger.info(
         "loading AI genomics DBpedia entities and datasets across all data sources...."
     )
     # load entities
     patent_ents, crunchbase_ents, gtr_ents, oa_ents = (
-    get_ai_genomics_patents_entities(),
-    get_crunchbase_entities(),
-    get_gtr_entities(),
-    get_openalex_ai_genomics_entities())
-    logger.info('loaded AI genomics DBpedia entities')
-    
+        get_ai_genomics_patents_entities(),
+        get_crunchbase_entities(),
+        get_gtr_entities(),
+        get_openalex_ai_genomics_entities(),
+    )
+    logger.info("loaded AI genomics DBpedia entities")
+
     patents = get_ai_genomics_patents()
     patents_filtered = filter_data(
         data=patents,
@@ -204,7 +211,9 @@ if __name__ == "__main__":
 
     # embed and reduce ents and generate lookup
     all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
-    ent_embeds_lookup = generate_embed_lookup(entities=all_ents, model=CONFIG["embed"], reduce_embedding=True)
+    ent_embeds_lookup = generate_embed_lookup(
+        entities=all_ents, model=CONFIG["embed"], reduce_embedding=True
+    )
     logger.info("generated reduced entity embedding lookup.")
 
     # identify optimal k at every timeslice
@@ -232,7 +241,7 @@ if __name__ == "__main__":
         timeslice_y = ents_per_date_clusts[years[year + 1]]
         propagate_labels(timeslice_x, timeslice_y)
     logger.info("propagated labels across timeslices.")
-        
+
     # change keys to string to be able to save dict
     save_to_s3(
         bucket_name,

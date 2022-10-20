@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def filter_data(
     data: pd.DataFrame, query: str, date_col: str, id_col: str
 ) -> pd.DataFrame:
