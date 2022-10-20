@@ -17,11 +17,11 @@ def generate_embed_lookup(
     entities: List[str], model: str, reduce_embedding=False
 ) -> Dict[str, np.array]:
     """Generates an embedding lookup where the key is the entity
-    and the value is the reduced embedding.
+    and the value is the embedding. 
     """
     embeds = embed(entities, model=model)
     if reduce_embedding:
-        embeds = reduce(embeds)
+        return dict(zip(entities, reduce(embeds)))
     return dict(zip(entities, embeds))
 
 
