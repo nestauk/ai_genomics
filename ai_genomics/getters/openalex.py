@@ -201,30 +201,37 @@ def get_openalex_disc_influence() -> pd.DataFrame:
 
 
 def get_openalex_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
-    """From S3 loads ai genomics oa entities"""
+    """From S3 loads all oa entities"""
     return load_s3_data(bucket_name, "outputs/entity_extraction/oa_lookup_clean.json",)
 
+
+def get_openalex_genomics_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
+    """From S3 loads genomics oa entities"""
+    return load_s3_data(
+        bucket_name,
+        "outputs/entity_extraction/oa_genomics_lookup_clean.json",
+    )
 
 def get_openalex_ai_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
     """From S3 loads ai oa entities"""
     return load_s3_data(
-        bucket_name, "outputs/entity_extraction/oa_ai_lookup_clean.json",
+        bucket_name,
+        "outputs/entity_extraction/oa_ai_lookup_clean.json",
     )
-
 
 def get_openalex_ai_genomics_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
     """From S3 loads ai genomics oa entities"""
     return load_s3_data(
-        bucket_name, "outputs/entity_extraction/oa_ai_genomics_lookup_clean.json",
+        bucket_name,
+        "outputs/entity_extraction/oa_ai_genomics_lookup_clean.json",
     )
-
 
 def get_openalex_entities_sample() -> Mapping[str, Mapping[str, Union[str, str]]]:
     """From S3 loads oa entities sample"""
     return load_s3_data(
-        bucket_name, "outputs/entity_extraction/oa_lookup_clean_sample.json",
+        bucket_name,
+        "outputs/entity_extraction/oa_lookup_clean_sample.json",
     )
-
 
 def get_openalex_ai_genomics_works_entity_groups(k: int = 500) -> pd.DataFrame:
     """Gets a dataframe of vectors representing the presence of DBpedia entity
