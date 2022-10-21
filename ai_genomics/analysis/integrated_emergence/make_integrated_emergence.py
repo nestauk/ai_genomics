@@ -1,3 +1,5 @@
+# Generate integrated analysis of evolution of genomics activity
+
 from ai_genomics.getters.openalex import (
     get_openalex_ai_genomics_works,
     get_openalex_entities,
@@ -5,7 +7,6 @@ from ai_genomics.getters.openalex import (
 )
 from ai_genomics.getters.patents import (
     get_ai_genomics_patents,
-    get_ai_genomics_patents_entities,
     get_patent_ai_genomics_entity_groups,
 )
 from ai_genomics.getters.gtr import (
@@ -19,16 +20,16 @@ import logging
 from toolz import pipe
 from itertools import chain
 from collections import Counter
+from typing import List, Dict
 import pandas as pd
 import numpy as np
 from ai_genomics.utils.save_plotting import AltairSaver
 from ai_genomics.utils.plotting import configure_plots
-from typing import List, Dict, Callable
 
 
-# %%
+# Functions
 def make_entity_cluster_names(level: int = 100, top_names: int = 3) -> Dict:
-    """Makes the names for entity clusters using openalex
+    """Makes the names for entity clusters using openalex entity frequencies
     Args:
         level: the clustering level to use
         top_names: top number of entities to use in the cluster name
@@ -59,7 +60,12 @@ def make_entity_cluster_names(level: int = 100, top_names: int = 3) -> Dict:
 
 
 def make_doc_meta_dict(data_source: str) -> Dict:
-    """Makes a lookup between doc ids and years"""
+    """Makes a lookup between doc ids and relevant metadata
+    (years in the case of openalex and gtr, family id and pub year in the case of patents)
+
+    Args:
+        data_source: the data source to use
+    """
 
     if data_source == "openalex":
         return (
@@ -99,13 +105,16 @@ def make_cluster_year_table(
     level: int = 100,
 ) -> pd.DataFrame:
     """
-    Creates a df with cluster name x year frequencies:
+    Creates a df with cluster name per year frequencies:
 
     Args:
         level: clustering level
         entity_getter: an entity getter for a dataset
         metadata_lookup: a lookup between doc ids and years / patent id in the case of patents
         cluster_names; lookup between cluster numbers and names
+
+    Returns:
+        A table with cluster names and frequencies per year
     """
 
     if source != "patents":
@@ -162,7 +171,8 @@ def make_cluster_year_table(
 def make_emergence_indices(
     table: pd.DataFrame, recency_threshold: int = 3
 ) -> pd.DataFrame:
-    """Calculates recency / signficance indices for a table with evolution of activity by topic
+    """Calculates recency / signficance indices for a table with
+        evolution of activity by topic
 
     Args:
         table: cluster x year activity
@@ -257,53 +267,25 @@ def make_emergence_chart(
     return scatter + y_line + x_line
 
 
-# %%
-# Name values
-
-cluster_names = make_entity_cluster_names()
-
-
-# %%
-oalex_meta_dict, patent_meta_dict, gtr_meta_dict = [
-    make_doc_meta_dict(source) for source in ["openalex", "patents", "gtr"]
-]
-
-
-# %%
-saver = AltairSaver()
-
-# %%
-data_sources = ["openalex", "patents", "gtr"]
-
-emergence_tables_container = []
-
-for source in data_sources:
-    logging.info(f"Analysing emergence in {source}")
-
-    emergence_table = pipe(
-        make_cluster_year_table(source, make_doc_meta_dict(source), cluster_names),
-        make_emergence_indices,
-    )
-
-    emergence_tables_container.append(emergence_table)
-
-    emergence_chart = pipe(
-        make_emergence_chart(emergence_table, top_terms=10), configure_plots
-    ).properties(width=500, height=400, title=f"{source.capitalize()} Emergence Table")
-
-    saver.save(emergence_chart, f"emergence_{source}")
-
-
-# %%
 def combined_emergence_chart(
     emergence_tables: List, data_names: List, top_clusters: int = 20
 ):
-    """Creates combined emergence analysis"""
+    """Creates combined emergence analysis
+
+    Args:
+        emergence_tables: list of emergence tables
+        data_names: list of data names
+        top_clusters: number of clusters to include in the analysis by frequency
+
+    Returns:
+        A chart comparing emergence indicators for different data sources
+    """
 
     emergence_combined = pd.concat(
         [t.assign(source=name) for name, t in zip(data_names, emergence_tables)]
     )
 
+    # This gives us the set of top top_cluster clusters by data source
     selected_clusters = set(
         emergence_combined.groupby("source")
         .apply(
@@ -333,14 +315,45 @@ def combined_emergence_chart(
                     "significance", op="mean", order="descending"
                 ),
             ),
-            x="recency",
-            size="significance",
-            color="source",
+            x=alt.X("recency", axis=alt.Axis(format="%"), title="Emergence"),
+            size=alt.Y(
+                "significance", legend=alt.Legend(format="%"), title="Significance"
+            ),
+            color=alt.Color("source", title="Data source"),
         )
     ).configure_axis()
 
 
-# %%
-emergence_combined = combined_emergence_chart(emergence_tables_container, data_sources)
+if __name__ == "__main__":
 
-emergence_combined
+    saver = AltairSaver()
+
+    cluster_names = make_entity_cluster_names()
+
+    data_sources = ["openalex", "patents", "gtr"]
+
+    emergence_tables_container = []
+
+    for source in data_sources:
+        logging.info(f"Analysing emergence in {source}")
+
+        emergence_table = pipe(
+            make_cluster_year_table(source, make_doc_meta_dict(source), cluster_names),
+            make_emergence_indices,
+        )
+
+        emergence_tables_container.append(emergence_table)
+
+        emergence_chart = pipe(
+            make_emergence_chart(emergence_table, top_terms=10), configure_plots
+        ).properties(
+            width=500, height=400, title=f"{source.capitalize()} Emergence Table"
+        )
+
+        saver.save(emergence_chart, f"emergence_{source}")
+
+    emergence_combined = combined_emergence_chart(
+        emergence_tables_container, data_sources
+    )
+
+    saver.save(emergence_combined, "emergence_combined")
