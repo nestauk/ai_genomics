@@ -6,5 +6,7 @@ dependencies:
   - pip
   - python=3.9
   - spacy
+  - boto3
+  - s3fs=2022.5.0
   # Only put dependencies that are NOT available with pip here (e.g. graph-tool)
   # or that enable extra functionality such as GPU/MKL support
