@@ -202,10 +202,8 @@ def get_openalex_disc_influence() -> pd.DataFrame:
 
 def get_openalex_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
     """From S3 loads all oa entities"""
-    return load_s3_data(
-        bucket_name,
-        "outputs/entity_extraction/oa_lookup_clean.json",
-    )
+    return load_s3_data(bucket_name, "outputs/entity_extraction/oa_lookup_clean.json",)
+
 
 def get_openalex_genomics_entities() -> Mapping[str, Mapping[str, Union[str, str]]]:
     """From S3 loads genomics oa entities"""
