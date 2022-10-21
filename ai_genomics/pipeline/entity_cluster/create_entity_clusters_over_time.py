@@ -1,3 +1,6 @@
+import sys
+sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
+
 """This script clusters AI genomics entity embeddings using k-means at successive 
 timestamps and propagates the cluster labels across timestamps.
 
@@ -101,7 +104,6 @@ def get_best_k(
 
     return best_ks
 
-
 def propagate_labels(
     timeslice_x: Dict[str, List[str]],
     timeslice_y: Dict[str, List[str]],
@@ -155,7 +157,6 @@ def propagate_labels(
             sorted_perm_dists_clusts[0][1]
         )
         sorted_perm_dists_clusts.remove(most_similar_clusts)
-
 
 if __name__ == "__main__":
     logger.info(
@@ -228,9 +229,9 @@ if __name__ == "__main__":
         ent_embeds = [ent_embeds_lookup.get(ent) for ent in ents]
         km = KMeans(n_clusters=best_k).fit(ent_embeds)
         clust = km.predict(ent_embeds)
-        clust_dict = {c: [] for c in clust}
+        clust_dict = {f"{c}_{year}" : [] for c in clust}
         for i, c in enumerate(clust):
-            clust_dict[c].append(ents[i])
+            clust_dict[f"{c}_{year}"].append(ents[i])
         ents_per_date_clusts[year] = clust_dict
     logger.info("clustered entities at each timestamp using best ks.")
 
