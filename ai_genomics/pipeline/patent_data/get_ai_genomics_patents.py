@@ -1,6 +1,8 @@
 """Script to query BigQuery based on genomics related and AI related cpc codes."""
 from ai_genomics import bucket_name, logger
-from ai_genomics.getters.patents import get_ai_genomics_cpc_codes
+from ai_genomics.getters.patents import (
+    get_ai_genomics_cpc_codes,
+)
 from ai_genomics.utils.patents import (
     est_conn,
     replace_missing_values_with_nans,
@@ -12,7 +14,7 @@ from typing import Dict
 import pandas as pd
 
 GENOMICS_AI_FIELDS = (
-    "publication_number, application_number, family_id, cpc.code as cpc_code, "
+    "publication_number, application_number, cpc.code as cpc_code, "
     "title_localized.text as title_text, title_localized.language as title_language, "
     "abstract_localized.text as abstract_text, abstract_localized.language as abstract_language, "
     "publication_date, filing_date, grant_date, priority_date, inventor_harmonized.name "
@@ -23,9 +25,10 @@ GENOMICS_AI_FIELDS = (
 
 CPC_CODES = get_ai_genomics_cpc_codes()
 
-
 def code_query(
-    cpc_codes: Dict[str, list] = CPC_CODES, topic: str = "ai", sample: int = 10
+    cpc_codes: Dict[str, list] = CPC_CODES,
+    topic: str = "ai",
+    sample: int = 10,
 ) -> str:
     """Generates query to get sample of patents based on cpc codes.
 
@@ -35,21 +38,22 @@ def code_query(
     Returns:
         BigQuery query to select related patents.
     """
-    cpc_ids = convert_list_of_codes_to_string(list(cpc_codes[topic].keys()))
+    cpc_ids = convert_list_of_codes_to_string(list(cpc_codes[topic].keys())),
 
     topic_q = (
         f"SELECT {GENOMICS_AI_FIELDS} "
         f"FROM `patents-public-data.patents.publications` TABLESAMPLE SYSTEM ({sample} PERCENT), "
-        "UNNEST(cpc) AS cpc, "
+        " UNNEST(cpc) AS cpc, "
         "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized, "
         "UNNEST(inventor_harmonized) inventor_harmonized, UNNEST(assignee_harmonized) assignee_harmonized "
-        f"WHERE cpc.code IN ({cpc_ids})"
-    )
+        f"WHERE cpc.code IN ({cpc_ids})")
 
     return topic_q
 
 
-def genomics_ai_query(cpc_codes: Dict[str, list] = CPC_CODES) -> str:
+def genomics_ai_query(
+    cpc_codes: Dict[str, list] = CPC_CODES,
+) -> str:
     """Generates query to identify genomics ai patents
             based on cpc codes.
 
@@ -61,15 +65,12 @@ def genomics_ai_query(cpc_codes: Dict[str, list] = CPC_CODES) -> str:
     """
 
     cpc_ai_ids = convert_list_of_codes_to_string(list(cpc_codes["ai"].keys()))
-    cpc_genomics_ids = convert_list_of_codes_to_string(
-        list(cpc_codes["genomics"].keys())
-    )
+    cpc_genomics_ids = convert_list_of_codes_to_string(list(cpc_codes["genomics"].keys())),
 
     genomics_q = (
         f"SELECT DISTINCT publication_number "
-        "FROM `patents-public-data.patents.publications`, UNNEST(cpc) AS cpc__u "
-        f"WHERE cpc__u.code IN ({cpc_genomics_ids})"
-    )
+        "FROM `patents-public-data.patents.publications`, UNNEST(cpc) AS cpc__u, "
+        f"WHERE cpc__u.code IN ({cpc_genomics_ids})")
 
     genomics_ai_q = (
         f"WITH "
