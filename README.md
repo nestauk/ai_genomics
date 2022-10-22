@@ -10,6 +10,14 @@
   - Configure pre-commit
   - Configure metaflow to use AWS
 
+## Dependencies
+
+Download spaCy's en_core_web_sm 3.1.0 pipeline:
+
+```bash
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.1.0/en_core_web_sm-3.1.0.tar.gz
+```
+
 ## Contributor guidelines
 
 [Technical and working style guidelines](https://github.com/nestauk/ds-cookiecutter/blob/master/GUIDELINES.md)
