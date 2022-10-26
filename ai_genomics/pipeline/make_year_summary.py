@@ -26,10 +26,7 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
         logging.info(f"{concept_name}_{year} already exists")
         return
 
-    with open(
-        f"/Users/jackvines/Downloads/openalex-works_production-True_year-{year}.json"
-    ) as json_file:
-        oalex_works = json.load(json_file)
+    oalex_works = openalex.fetch_openalex(concept_name, year)
 
     logging.info("Processing and saving")
     # Works
