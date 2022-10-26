@@ -1,4 +1,5 @@
 # Scripts to augment the work metadata with abstract information and predicted language
+import json
 import logging
 import os
 from toolz import pipe
@@ -47,6 +48,10 @@ if __name__ == "__main__":
                 logging.info("Already exists")
 
             else:
+                with open(
+                    f"{OALEX_PATH}/abstracts_{discipline}_{year}.json", "r"
+                ) as infile:
+                    abstract_lookup = json.load(infile)
                 (
                     pipe(
                         f"{OALEX_PATH}/works_{discipline}_{year}.csv",
@@ -55,9 +60,15 @@ if __name__ == "__main__":
                             [
                                 df,
                                 pd.DataFrame(
-                                    df["display_name"]
-                                    .str.replace("\n", "")
-                                    .apply(lambda title: predict_language(title, model))
+                                    df["work_id"]
+                                    .apply(
+                                        lambda work_id: predict_language(
+                                            str(abstract_lookup[work_id]).replace(
+                                                "\n", ""
+                                            ),
+                                            model,
+                                        )
+                                    )
                                     .tolist()
                                 ),
                             ],

@@ -11,7 +11,6 @@ from metaflow import FlowSpec, step, batch
 from ai_genomics.utils import openalex
 from ai_genomics import PROJECT_DIR
 from ai_genomics.getters.openalex import get_openalex_instits
-from ai_genomics.getters.data_getters import save_to_s3
 
 
 OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex/"
@@ -23,92 +22,80 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
         concept_name: The name of the concept
         year: the year
     """
-    oalex_works = openalex.fetch_openalex(concept_name, year)
+    if os.path.exists(f"{OALEX_PATH}/works_{concept_name}_{year}.csv"):
+        logging.info(f"{concept_name}_{year} already exists")
+        return
+
+    with open(
+        f"/Users/jackvines/Downloads/openalex-works_production-True_year-{year}.json"
+    ) as json_file:
+        oalex_works = json.load(json_file)
 
     logging.info("Processing and saving")
     # Works
-    works_corpus_metadata = openalex.make_work_corpus_metadata(oalex_works)
-    save_to_s3(
-        "ai-genomics",
-        works_corpus_metadata,
-        f"inputs/data/openalex/works_{concept_name}_{year}.csv",
+    (
+        openalex.make_work_corpus_metadata(oalex_works).to_csv(
+            f"{OALEX_PATH}/works_{concept_name}_{year}.csv", index=False
+        )
     )
 
     # Concepts
+
     if make_df:
-        work_concepts = openalex.make_work_concepts(oalex_works).assign(year=year)
-        save_to_s3(
-            "ai-genomics",
-            work_concepts,
-            f"inputs/data/openalex/concepts_{concept_name}_{year}.csv",
+
+        (
+            openalex.make_work_concepts(oalex_works)
+            .assign(year=year)
+            .to_csv(f"{OALEX_PATH}/concepts_{concept_name}_{year}.csv", index=False)
         )
 
     else:
-        work_concepts = openalex.make_work_concepts(oalex_works, make_df)
-        save_to_s3(
-            "ai-genomics",
-            work_concepts,
-            f"inputs/data/openalex/concepts_{concept_name}_{year}.json",
-        )
+        with open(f"{OALEX_PATH}/concepts_{concept_name}_{year}.json", "w") as outfile:
+            json.dump(openalex.make_work_concepts(oalex_works, make_df), outfile)
 
     # Mesh
-    openalex_concepts = openalex.make_work_concepts(
-        oalex_works, variable="mesh", keys_to_keep=openalex.MESH_VARS
-    ).assign(year=year)
-    save_to_s3(
-        "ai-genomics",
-        openalex_concepts,
-        f"inputs/data/openalex/mesh_{concept_name}_{year}.csv",
+    (
+        openalex.make_work_concepts(
+            oalex_works, variable="mesh", keys_to_keep=openalex.MESH_VARS
+        )
+        .assign(year=year)
+        .to_csv(f"{OALEX_PATH}/mesh_{concept_name}_{year}.csv", index=False)
     )
 
     # Authorships
-    work_authorships = openalex.make_work_authorships(oalex_works)
-    work_authorships.assign(year=year)
-    save_to_s3(
-        "ai-genomics",
-        work_authorships,
-        f"inputs/data/openalex/authorships_{concept_name}_{year}.csv",
+    (
+        openalex.make_work_authorships(oalex_works)
+        .assign(year=year)
+        .to_csv(f"{OALEX_PATH}/authorships_{concept_name}_{year}.csv", index=False)
     )
 
     # Citations
-    citations_json = openalex.make_citations(oalex_works)
-    save_to_s3(
-        "ai-genomics",
-        citations_json,
-        f"inputs/data/openalex/citations_{concept_name}_{year}.json",
-    )
+    with open(f"{OALEX_PATH}/citations_{concept_name}_{year}.json", "w") as outfile:
+        json.dump(openalex.make_citations(oalex_works), outfile)
 
     # Deinverted abstracts
-    deinverted_abstracts_json = openalex.make_deinverted_abstracts(oalex_works)
-    save_to_s3(
-        "ai-genomics",
-        deinverted_abstracts_json,
-        f"inputs/data/openalex/abstracts_{concept_name}_{year}.json",
-    )
+    with open(f"{OALEX_PATH}/abstracts_{concept_name}_{year}.json", "w") as outfile:
+        json.dump(openalex.make_deinverted_abstracts(oalex_works), outfile)
 
 
 class MakeYearSummaryFlow(FlowSpec):
     @step
     def start(self):
-        self.next(self.save_institutions_meta)
+        self.next(self.make_directories)
 
     @step
-    def save_institutions_meta(self):
-        save_to_s3(
-            "ai-genomics",
-            pipe(
-                get_openalex_instits(),
-                partial(openalex.make_inst_metadata, meta_vars=openalex.INST_META_VARS),
-            ),
-            "inputs/data/openalex/oalex_institutions_meta.csv",
-        )
-        self.years = list(range(2007, 2023))
+    def make_directories(self):
+        os.makedirs(OALEX_PATH, exist_ok=True)
+        pipe(
+            get_openalex_instits(),
+            partial(openalex.make_inst_metadata, meta_vars=openalex.INST_META_VARS),
+        ).to_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv", index=False)
+        self.years = list(range(2015, 2017))
         self.next(self.fetch_save_year, foreach="years")
 
     @step
     def fetch_save_year(self):
-        print("Task started")
-        for concept_name in ["artificial_intelligence", "genetics"]:
+        for concept_name in ["genetics", "artificial_intelligence"]:
             fetch_save_year(concept_name, self.input, make_df=True)
         self.next(self.join)
 
