@@ -44,7 +44,7 @@ Finally, to add a column for whether a patent is "in scope" or not according to 
 
 If at least one CPC code is in scope according to a validator, the patent is considered 'in scope'.
 
-A small analysis of patent scope tags suggests that:
+An analysis of patent scope tags suggests that:
 
 - 87% of patents have at least 1 "in scope" CPC code associated to them
 - 97% of patents have at least 1 "in scope" OR "tangential" CPC code associated to them

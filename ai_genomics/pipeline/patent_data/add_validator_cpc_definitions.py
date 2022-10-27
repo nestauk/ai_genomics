@@ -1,6 +1,7 @@
 """
 Script to add validator cpc definitions to generated AI genomics and
-genomics sample patents data. 
+genomics sample patents data. A patent is considered 'in scope'
+if it has at least 1 "in scope" CPC code associated to it.
 
 python ai_genomics/pipeline/patent_data/add_validator_cpc_definitions.py
 """
