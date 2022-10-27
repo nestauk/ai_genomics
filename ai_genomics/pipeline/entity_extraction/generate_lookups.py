@@ -1,5 +1,5 @@
 """Script to generate look up tables across datasets (ai and genomics, ai baseline, genomics baseline)
-where output is {id: abstract} for DBpedia tagging.
+where output is [{id: X, abstract: Y}] for DBpedia tagging.
 
 python ai_genomics/pipeline/entity_extraction/generate_lookups.py
 """
