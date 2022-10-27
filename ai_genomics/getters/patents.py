@@ -119,3 +119,13 @@ def get_patent_ai_genomics_entity_groups(k: int = 500) -> pd.DataFrame:
     """
     fname = f"inputs/entities/patent_entity_group_vectors_k_{k}.csv"
     return load_s3_data(bucket_name, fname)
+
+
+def get_patent_ai_genomics_abstract_embeddings() -> pd.DataFrame:
+    """Gets an array of abstract embeddings and the associated publication IDs.
+
+    Returns:
+       pd.DataFrame: Abstract embeddings and the associated publication IDs.
+    """
+    fname = "inputs/embedding/pat_embeddings.csv"
+    return load_s3_data(bucket_name, fname)
