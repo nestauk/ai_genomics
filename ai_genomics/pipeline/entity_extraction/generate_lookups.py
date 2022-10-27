@@ -14,20 +14,11 @@ from ai_genomics.getters.patents import (
     get_genomics_sample_patents,
     get_ai_genomics_patents,
 )
-
+import json
 import boto3
 from boto3.s3.transfer import TransferConfig
-import json
 
-# to deal with OA size now
-S3 = boto3.client("s3")
-# add config to allow for larger multi_part threshold
-config = TransferConfig(
-    multipart_threshold=1024 * 25,
-    max_concurrency=10,
-    multipart_chunksize=1024 * 25,
-    use_threads=True,
-)
+s3_client = boto3.client("s3")
 
 CB_DATA = load_s3_data(bucket_name, "outputs/crunchbase/crunchbase_ai_genom_comps.csv")
 GTR_DATA = load_s3_data(bucket_name, "outputs/gtr/gtr_ai_genomics_projects.csv")
@@ -40,9 +31,16 @@ AI_PATENTS, GENOMICS_PATENTS, AI_GENOMICS_PATENTS = (
     get_ai_genomics_patents(),
 )
 
-OA_LOOKUP_LOCAL_PATH = str(PROJECT_DIR) + "/outputs/data/openalex/oa_lookup.json"
+OA_LOOKUP_LOCAL_PATH = str(PROJECT_DIR) + "/outputs/data/openalex/"
 LOOKUP_TABLE_PATH = "inputs/lookup_tables/"
 VALID_DF_TYPES = ["ai", "genomics", "ai_genomics"]
+
+config = TransferConfig(
+    multipart_threshold=1024 * 25,
+    max_concurrency=10,
+    multipart_chunksize=1024 * 25,
+    use_threads=True,
+)
 
 
 def save_lookups(lookups: List[Dict]):
@@ -70,10 +68,14 @@ if __name__ == "__main__":
             .T.to_dict()
         )
         patent_lookups.append(list(patent_lookup.values()))
-    
-    for patent_name, patent_lookup in zip(('ai', 'genomics', 'ai_genomics'), patent_lookups):
+
+    for patent_name, patent_lookup in zip(
+        ("ai", "genomics", "ai_genomics"), patent_lookups
+    ):
         save_to_s3(
-            bucket_name, patent_lookup, os.path.join(LOOKUP_TABLE_PATH, f"{patent_name}_patents_lookup.json")
+            bucket_name,
+            patent_lookup,
+            os.path.join(LOOKUP_TABLE_PATH, f"{patent_name}_patents_lookup.json"),
         )
 
     # generate and save cb look ups across ai + genomics, ai baseline and genomics baseline
@@ -135,14 +137,19 @@ if __name__ == "__main__":
             oa_abstracts_clean["abstract"] = abstract
         oa_abstracts_clean_list.append(oa_abstracts_clean)
 
-    with open(OA_LOOKUP_LOCAL_PATH, "w") as f:
-        json.dump(oa_abstracts_clean_list, f)
+    # file is greater than 5GB so will need to download locally
+    # then push to s3 with different config
 
+    if not os.path.isdir(OA_LOOKUP_LOCAL_PATH):
+        os.mkdir(OA_LOOKUP_LOCAL_PATH)
+
+    with open(OA_LOOKUP_LOCAL_PATH + "oa_lookup.json", "w") as f:
+        json.dump(oa_abstracts_clean_list, f)
     logger.info("loaded oa_lookup to file.")
 
     # Upload to bucket-name at key-name with config
-    S3.upload_file(
-        OA_LOOKUP_LOCAL_PATH,
+    s3_client.upload_file(
+        OA_LOOKUP_LOCAL_PATH + "oa_lookup.json",
         bucket_name,
         LOOKUP_TABLE_PATH + "oa_lookup.json",
         Config=config,
