@@ -20,6 +20,20 @@ from boto3.s3.transfer import TransferConfig
 
 s3_client = boto3.client("s3")
 
+import boto3
+from boto3.s3.transfer import TransferConfig
+import json
+
+# to deal with OA size now
+S3 = boto3.client("s3")
+# add config to allow for larger multi_part threshold
+config = TransferConfig(
+    multipart_threshold=1024 * 25,
+    max_concurrency=10,
+    multipart_chunksize=1024 * 25,
+    use_threads=True,
+)
+
 CB_DATA = load_s3_data(bucket_name, "outputs/crunchbase/crunchbase_ai_genom_comps.csv")
 GTR_DATA = load_s3_data(bucket_name, "outputs/gtr/gtr_ai_genomics_projects.csv")
 
@@ -33,7 +47,7 @@ AI_PATENTS, GENOMICS_PATENTS, AI_GENOMICS_PATENTS = (
     get_ai_genomics_patents(),
 )
 
-OA_LOOKUP_LOCAL_PATH = str(PROJECT_DIR) + "/outputs/data/openalex/"
+OA_LOOKUP_LOCAL_PATH = str(PROJECT_DIR) + "/outputs/data/openalex/oa_lookup.json"
 LOOKUP_TABLE_PATH = "inputs/lookup_tables/"
 VALID_DF_TYPES = ["ai", "genomics", "ai_genomics"]
 
@@ -65,9 +79,8 @@ if __name__ == "__main__":
         ), "not every id is unique"
         patent_lookup = (
             lookup.query("abstract_language == 'en'")
-            .dropna(subset=["abstract_text"])
-            [['publication_number', 'abstract_text']]
-            .rename(columns={'publication_number': 'id', 'abstract_text': 'abstract'})
+            .dropna(subset=["abstract_text"])[["publication_number", "abstract_text"]]
+            .rename(columns={"publication_number": "id", "abstract_text": "abstract"})
             .T.to_dict()
         )
         patent_lookups.extend(list(patent_lookup.values()))
@@ -75,14 +88,24 @@ if __name__ == "__main__":
 
     # generate and save cb look ups across ai + genomics, ai baseline and genomics baseline
     assert pd.Series(CB_DATA.id).is_unique == True, "not every id is unique"
-    cb_lookup = list(CB_DATA[['id', 'description_combined']].rename(columns={'description_combined': 'abstract'}).T.to_dict().values())
+    cb_lookup = list(
+        CB_DATA[["id", "description_combined"]]
+        .rename(columns={"description_combined": "abstract"})
+        .T.to_dict()
+        .values()
+    )
     save_to_s3(
         bucket_name, cb_lookup, os.path.join(LOOKUP_TABLE_PATH, "cb_lookup.json")
     )
 
     # generate and save gtr look ups across ai + genomics, ai baseline and genomics baseline gtr
     assert pd.Series(GTR_DATA.id).is_unique == True, "not every id is unique"
-    gtr_lookup = list(GTR_DATA[['id', 'abstract_text']].rename(columns={'abstract_text': 'abstract'}).T.to_dict().values())
+    gtr_lookup = list(
+        GTR_DATA[["id", "abstract_text"]]
+        .rename(columns={"abstract_text": "abstract"})
+        .T.to_dict()
+        .values()
+    )
     save_to_s3(
         bucket_name, gtr_lookup, os.path.join(LOOKUP_TABLE_PATH, "gtr_lookup.json")
     )
