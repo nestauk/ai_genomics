@@ -8,7 +8,6 @@ from ai_genomics import logger
 from typing import List
 import pandas as pd
 import numpy as np
-import string
 
 GENOMICS_AI_FIELDS = (
     "publication_number, application_number, cpc.code as cpc_code, ipc.code as ipc_code, "
@@ -151,8 +150,7 @@ def replace_missing_values_with_nans(ai_genomics_patents: pd.DataFrame) -> pd.Da
     """Replace missing values in the AI in
     genomics patents dataset with NaNs"""
     return ai_genomics_patents.replace(
-        {date_col: 0 for date_col in DATE_COLS},
-        np.nan,
+        {date_col: 0 for date_col in DATE_COLS}, np.nan,
     ).mask(ai_genomics_patents.applymap(str).eq("[]"))
 
 
