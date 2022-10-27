@@ -25,7 +25,7 @@ CPC_CODES = get_ai_genomics_cpc_codes()
 
 
 def code_query(
-    cpc_codes: Dict[str, list] = CPC_CODES, topic: str = "ai", sample: int = 10,
+    cpc_codes: Dict[str, list] = CPC_CODES, topic: str = "ai", sample: int = 10
 ) -> str:
     """Generates query to get sample of patents based on cpc codes.
 
@@ -40,7 +40,7 @@ def code_query(
     topic_q = (
         f"SELECT {GENOMICS_AI_FIELDS} "
         f"FROM `patents-public-data.patents.publications` TABLESAMPLE SYSTEM ({sample} PERCENT), "
-        " UNNEST(cpc) AS cpc, "
+        "UNNEST(cpc) AS cpc, "
         "UNNEST(title_localized) AS title_localized, UNNEST(abstract_localized) AS abstract_localized, "
         "UNNEST(inventor_harmonized) inventor_harmonized, UNNEST(assignee_harmonized) assignee_harmonized "
         f"WHERE cpc.code IN ({cpc_ids})"
@@ -49,7 +49,7 @@ def code_query(
     return topic_q
 
 
-def genomics_ai_query(cpc_codes: Dict[str, list] = CPC_CODES,) -> str:
+def genomics_ai_query(cpc_codes: Dict[str, list] = CPC_CODES) -> str:
     """Generates query to identify genomics ai patents
             based on cpc codes.
 
@@ -86,7 +86,7 @@ def genomics_ai_query(cpc_codes: Dict[str, list] = CPC_CODES,) -> str:
     return genomics_ai_q
 
 
-def get_patents(conn, table_name: str = "ai_genomics",) -> pd.DataFrame:
+def get_patents(conn, table_name: str = "ai_genomics") -> pd.DataFrame:
     """
     Gets unique patent documents from a specified
     table name in BigQuery.
