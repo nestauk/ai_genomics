@@ -96,5 +96,5 @@ def get_patent_ai_genomics_entity_groups(k: int = 500) -> pd.DataFrame:
         pd.DataFrame: A sparse dataframe where the index is patent IDs and
             the columns are vector dimensions (entity cluster IDs).
     """
-    fname = f"inputs/entities/gtr_entity_group_vectors_k_{k}.csv"
+    fname = f"inputs/entities/patent_entity_group_vectors_k_{k}.csv"
     return load_s3_data(bucket_name, fname)
