@@ -32,8 +32,18 @@ in BigQuery and save them to s3.
 
 These tables were first created and verified for data download limitations in BigQuery's front end. Functions to generate the queries used to generate these tables are in the script.
 
-Finally, to add the full list of CPC codes associated to a publication number, run:
+To add the full list of CPC codes associated to a publication number, run:
 
 `python ai_genomics/pipeline/patent_data/add_full_cpc_codes.py`
 
 This will add the full list of CPC codes associated to a patent document across AI genomics, a sample of AI and a sample of genomics related patents. These updated tables are also to s3.
+
+Finally, to add a column for whether a patent is "in scope" or not according to validator's definitions, run:
+
+`python ai_genomics/pipeline/patent_data/add_validator_cpc_definitions.py`
+
+If at least one CPC code is in scope according to a validator, the patent is considered 'in scope'. 
+
+A small analysis of patent scope tags suggests that:
+- 87% of patents have at least 1 "in scope" CPC code associated to them 
+- 97% of patents have at least 1 "in scope" OR "tangential" CPC code associated to them

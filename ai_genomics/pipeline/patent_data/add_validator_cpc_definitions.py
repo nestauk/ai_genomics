@@ -14,6 +14,7 @@ import ast
 import pandas as pd
 from typing import List
 
+
 def scope_tag(cpc_codes: List[str]) -> List[str]:
     """tag each code with scope definition"""
     tags = []
