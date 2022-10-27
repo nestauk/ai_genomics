@@ -42,8 +42,10 @@ Finally, to add a column for whether a patent is "in scope" or not according to 
 
 `python ai_genomics/pipeline/patent_data/add_validator_cpc_definitions.py`
 
-If at least one CPC code is in scope according to a validator, the patent is considered 'in scope'. 
+If at least one CPC code is in scope according to a validator, the patent is considered 'in scope'.
 
 A small analysis of patent scope tags suggests that:
-- 87% of patents have at least 1 "in scope" CPC code associated to them 
+
+- 87% of patents have at least 1 "in scope" CPC code associated to them
 - 97% of patents have at least 1 "in scope" OR "tangential" CPC code associated to them
+- 2.4% of patents (or 337 patents) have both an "in scope" AND "out of scope" CPC code associated to them 
