@@ -51,25 +51,25 @@ if __name__ == "__main__":
         patent_lookup = (
             lookup.query("abstract_language == 'en'")
             .dropna(subset=["abstract_text"])
-            .set_index("publication_number")["abstract_text"]
-            .to_dict()
+            [['publication_number', 'abstract_text']]
+            .rename(columns={'publication_number': 'id', 'abstract_text': 'abstract'})
+            .T.to_dict()
         )
-        patent_lookups.append(patent_lookup)
-
+        patent_lookups.extend(list(patent_lookup.values()))
     save_lookups(patent_lookups)
 
     # generate and save cb look ups across ai + genomics, ai baseline and genomics baseline
     assert pd.Series(CB_DATA.id).is_unique == True, "not every id is unique"
-    cb_lookup = CB_DATA.set_index("id")["description_combined"].to_dict()
+    cb_lookup = list(CB_DATA[['id', 'description_combined']].rename(columns={'description_combined': 'abstract'}).T.to_dict().values())
     save_to_s3(
         bucket_name, cb_lookup, os.path.join(LOOKUP_TABLE_PATH, "cb_lookup.json")
     )
 
     # generate and save gtr look ups across ai + genomics, ai baseline and genomics baseline gtr
     assert pd.Series(GTR_DATA.id).is_unique == True, "not every id is unique"
-    cb_lookup = GTR_DATA.set_index("id")["abstract_text"].to_dict()
+    gtr_lookup = list(GTR_DATA[['id', 'abstract_text']].rename(columns={'abstract_text': 'abstract'}).T.to_dict().values())
     save_to_s3(
-        bucket_name, cb_lookup, os.path.join(LOOKUP_TABLE_PATH, "gtr_lookup.json")
+        bucket_name, gtr_lookup, os.path.join(LOOKUP_TABLE_PATH, "gtr_lookup.json")
     )
 
     # generate openalex look ups across ai + genomics, ai baseline and genomics baseline openalex
@@ -98,14 +98,17 @@ if __name__ == "__main__":
         "<p />",
         "/",
     ]
-    oa_abstracts_clean = {
-        oa_key: oa_abstract
-        for oa_key, oa_abstract in OA_ABSTRACTS.items()
-        if oa_abstract not in bad_abstracts
-    }
+
+    oa_abstracts_clean_list = []
+    oa_abstracts_clean = {}
+    for id_, abstract in OA_ABSTRACTS.items():
+        if abstract not in bad_abstracts:
+            oa_abstracts_clean['id'] = id_
+            oa_abstracts_clean['abstract'] = abstract
+        oa_abstracts_clean_list.append(oa_abstracts_clean)
 
     save_to_s3(
         bucket_name,
-        oa_abstracts_clean,
+        oa_abstracts_clean_list,
         os.path.join(LOOKUP_TABLE_PATH, "oa_lookup.json"),
     )
