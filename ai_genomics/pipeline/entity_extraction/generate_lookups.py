@@ -144,21 +144,12 @@ if __name__ == "__main__":
             oa_abstracts_clean["abstract"] = abstract
         oa_abstracts_clean_list.append(oa_abstracts_clean)
 
-<<<<<<< HEAD
     # when I try to run the script, I'm getting an error message that file is greater than 5GB so will need to download locally
     # then push to s3 with different config
 
     if not os.path.isdir(OA_LOOKUP_LOCAL_PATH):
         os.mkdir(OA_LOOKUP_LOCAL_PATH)
 
-=======
-    # file is greater than 5GB so will need to download locally
-    # then push to s3 with different config
-
-    if not os.path.isdir(OA_LOOKUP_LOCAL_PATH):
-        os.mkdir(OA_LOOKUP_LOCAL_PATH)
-
->>>>>>> 93844ce (deal with large oa file)
     with open(OA_LOOKUP_LOCAL_PATH + "oa_lookup.json", "w") as f:
         json.dump(oa_abstracts_clean_list, f)
     logger.info("loaded oa_lookup to file.")
@@ -167,6 +158,7 @@ if __name__ == "__main__":
     s3_client.upload_file(
         OA_LOOKUP_LOCAL_PATH + "oa_lookup.json",
         bucket_name,
-        oa_abstracts_clean_list,
-        os.path.join(LOOKUP_TABLE_PATH, "oa_lookup.json"),
+        oa_abstracts_clean,
+        os.path.join(LOOKUP_TABLE_PATH, "ai_genomics_oa_lookup.json"),
     )
+    logger.info("uploaded oa_lookup to s3")
