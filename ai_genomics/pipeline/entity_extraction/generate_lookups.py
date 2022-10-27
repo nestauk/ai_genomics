@@ -137,7 +137,7 @@ if __name__ == "__main__":
             oa_abstracts_clean["abstract"] = abstract
         oa_abstracts_clean_list.append(oa_abstracts_clean)
 
-    # file is greater than 5GB so will need to download locally
+    # when I try to run the script, I'm getting an error message that file is greater than 5GB so will need to download locally
     # then push to s3 with different config
 
     if not os.path.isdir(OA_LOOKUP_LOCAL_PATH):
