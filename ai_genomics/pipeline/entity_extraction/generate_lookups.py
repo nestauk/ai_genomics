@@ -69,8 +69,12 @@ if __name__ == "__main__":
             .rename(columns={"publication_number": "id", "abstract_text": "abstract"})
             .T.to_dict()
         )
-        patent_lookups.extend(list(patent_lookup.values()))
-    save_lookups(patent_lookups)
+        patent_lookups.append(list(patent_lookup.values()))
+    
+    for patent_name, patent_lookup in zip(('ai', 'genomics', 'ai_genomics'), patent_lookups):
+        save_to_s3(
+            bucket_name, patent_lookup, os.path.join(LOOKUP_TABLE_PATH, f"{patent_name}_patents_lookup.json")
+        )
 
     # generate and save cb look ups across ai + genomics, ai baseline and genomics baseline
     assert pd.Series(CB_DATA.id).is_unique == True, "not every id is unique"
