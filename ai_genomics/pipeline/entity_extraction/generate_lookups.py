@@ -65,41 +65,24 @@ if __name__ == "__main__":
         ), "not every id is unique"
         patent_lookup = (
             lookup.query("abstract_language == 'en'")
-            .dropna(subset=["abstract_text"])[["publication_number", "abstract_text"]]
-            .rename(columns={"publication_number": "id", "abstract_text": "abstract"})
+            .dropna(subset=["abstract_text"])
+            [['publication_number', 'abstract_text']]
+            .rename(columns={'publication_number': 'id', 'abstract_text': 'abstract'})
             .T.to_dict()
         )
-        patent_lookups.append(list(patent_lookup.values()))
-
-    for patent_name, patent_lookup in zip(
-        ("ai", "genomics", "ai_genomics"), patent_lookups
-    ):
-        save_to_s3(
-            bucket_name,
-            patent_lookup,
-            os.path.join(LOOKUP_TABLE_PATH, f"{patent_name}_patents_lookup.json"),
-        )
+        patent_lookups.extend(list(patent_lookup.values()))
+    save_lookups(patent_lookups)
 
     # generate and save cb look ups across ai + genomics, ai baseline and genomics baseline
     assert pd.Series(CB_DATA.id).is_unique == True, "not every id is unique"
-    cb_lookup = list(
-        CB_DATA[["id", "description_combined"]]
-        .rename(columns={"description_combined": "abstract"})
-        .T.to_dict()
-        .values()
-    )
+    cb_lookup = list(CB_DATA[['id', 'description_combined']].rename(columns={'description_combined': 'abstract'}).T.to_dict().values())
     save_to_s3(
         bucket_name, cb_lookup, os.path.join(LOOKUP_TABLE_PATH, "cb_lookup.json")
     )
 
     # generate and save gtr look ups across ai + genomics, ai baseline and genomics baseline gtr
     assert pd.Series(GTR_DATA.id).is_unique == True, "not every id is unique"
-    gtr_lookup = list(
-        GTR_DATA[["id", "abstract_text"]]
-        .rename(columns={"abstract_text": "abstract"})
-        .T.to_dict()
-        .values()
-    )
+    gtr_lookup = list(GTR_DATA[['id', 'abstract_text']].rename(columns={'abstract_text': 'abstract'}).T.to_dict().values())
     save_to_s3(
         bucket_name, gtr_lookup, os.path.join(LOOKUP_TABLE_PATH, "gtr_lookup.json")
     )
@@ -153,7 +136,6 @@ if __name__ == "__main__":
     s3_client.upload_file(
         OA_LOOKUP_LOCAL_PATH + "oa_lookup.json",
         bucket_name,
-        oa_abstracts_clean,
-        os.path.join(LOOKUP_TABLE_PATH, "ai_genomics_oa_lookup.json"),
+        oa_abstracts_clean_list,
+        os.path.join(LOOKUP_TABLE_PATH, "oa_lookup.json"),
     )
-    logger.info("uploaded oa_lookup to s3")
