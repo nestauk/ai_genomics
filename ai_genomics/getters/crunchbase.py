@@ -67,5 +67,5 @@ def get_crunchbase_ai_genomics_description_embeddings() -> pd.DataFrame:
     Returns:
        pd.DataFrame: Description embeddings and the associated company IDs.
     """
-    fname = "inputs/embedding/pat_embeddings.csv"
+    fname = "inputs/embedding/cb_ai_genomics_embeddings.csv"
     return load_s3_data(bucket_name, fname)

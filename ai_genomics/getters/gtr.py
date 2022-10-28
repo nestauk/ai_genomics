@@ -89,5 +89,5 @@ def get_gtr_ai_genomics_project_embeddings() -> pd.DataFrame:
     Returns:
        pd.DataFrame: Project description embeddings and the associated project IDs.
     """
-    fname = "inputs/embedding/gtr_embeddings.csv"
+    fname = "inputs/embedding/gtr_ai_genomics_embeddings.csv"
     return load_s3_data(BUCKET_NAME, fname)

@@ -253,5 +253,5 @@ def get_openalex_ai_genomics_works_embeddings() -> pd.DataFrame:
     Returns:
         pd.DataFrame: Abstract embeddings and the associated work IDs.
     """
-    fname = "inputs/embedding/oa_embeddings.csv"
+    fname = "inputs/embedding/oa_ai_genomics_embeddings.csv"
     return load_s3_data(bucket_name, fname)

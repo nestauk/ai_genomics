@@ -127,5 +127,5 @@ def get_patent_ai_genomics_abstract_embeddings() -> pd.DataFrame:
     Returns:
        pd.DataFrame: Abstract embeddings and the associated publication IDs.
     """
-    fname = "inputs/embedding/pat_embeddings.csv"
+    fname = "inputs/embedding/pat_ai_genomics_embeddings.csv"
     return load_s3_data(bucket_name, fname)
