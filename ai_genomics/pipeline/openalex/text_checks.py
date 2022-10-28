@@ -42,7 +42,7 @@ if __name__ == "__main__":
         for discipline in ["artificial_intelligence", "genetics"]:
 
             logging.info(f"processing works for {discipline} and {year}")
-
+            oalex_abstracts = work_abstracts(discipline, [year])
             if os.path.exists(f"{OALEX_PATH}/works_{discipline}_{year}_augmented.csv"):
                 logging.info("Already exists")
 
@@ -55,9 +55,15 @@ if __name__ == "__main__":
                             [
                                 df,
                                 pd.DataFrame(
-                                    df["display_name"]
-                                    .str.replace("\n", "")
-                                    .apply(lambda title: predict_language(title, model))
+                                    df["work_id"]
+                                    .apply(
+                                        lambda work_id: predict_language(
+                                            str(oalex_abstracts[work_id]).replace(
+                                                "\n", ""
+                                            ),
+                                            model,
+                                        )
+                                    )
                                     .tolist()
                                 ),
                             ],

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from ai_genomics import config, PROJECT_DIR
+from ai_genomics import config, PROJECT_DIR, BUCKET_NAME
 from ai_genomics.getters.openalex import (
     work_metadata,
     work_concepts,
@@ -20,7 +20,7 @@ from ai_genomics.getters.openalex import (
     get_concepts_df,
 )
 from ai_genomics.getters.papers_w_code import read_pwc_papers
-from ai_genomics.getters.data_getters import save_to_s3
+from ai_genomics.getters.data_getters import save_to_s3, load_s3_data
 
 
 def get_arxiv_id(ven: str) -> str:
@@ -472,24 +472,14 @@ if __name__ == "__main__":
 
     concept_df = get_concepts_df()
 
-    # Genomics concepts table
-    genom_concs_df = concept_df.loc[
-        ["genom" in conc.lower() for conc in concept_df["display_name"].values]
-    ].sort_values("works_count", ascending=True)
-
     # Genomics concepts set
-    genomics_concepts = set(genom_concs_df["display_name"])
-
-    # Plot (in matplotlib!!!)
-    fig, ax = plt.subplots(figsize=(9, 10))
-
-    genom_concs_df.plot(
-        kind="barh", x="display_name", y="works_count", legend=False, ax=ax
+    genomics_concepts = set(
+        list(
+            load_s3_data(bucket_name, "inputs/openalex/all_oa_concepts.csv")[
+                "display_name"
+            ]
+        )
     )
-    ax.set_ylabel("Concept", fontsize=12)
-    ax.set_xlabel("Number of works", fontsize=12)
-    plt.tight_layout()
-    plt.savefig(f"{PROJECT_DIR}/outputs/figures/genomics_concepts.png")
 
     # Read genomics papers and concepts
     logging.info("Reading genetics works")
