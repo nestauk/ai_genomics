@@ -32,14 +32,13 @@ def scope_tag(cpc_codes: List[str]) -> List[str]:
     return tags
 
 
-def in_scope_flag(scope_tags: List[str]) -> bool:
-    """If at least 1 in scope tag is 'in scope',
-    tag document as in scope. 
-    """
-    if "in scope" in scope_tags:
-        return True
+def scope_flag(scope_tags: List[str], tag: str = "in scope") -> bool:
+    """If at least 1 in scope tag matches the tag, flag document as in scope."""
+    allowed = ["not in scope", "in scope", "tangential"]
+    if tag in allowed:
+        return True if tag in scope_tags else False
     else:
-        return False
+        raise ValueError(f"tag not in {allowed}")
 
 
 if __name__ == "__main__":
@@ -67,7 +66,13 @@ if __name__ == "__main__":
             lambda x: list(x)
         )
         patents_df["scope_tags"] = patents_df.cpc_codes.apply(scope_tag)
-        patents_df["in_scope"] = patents_df.scope_tags.apply(in_scope_flag)
+        patents_df["in_scope"] = patents_df.scope_tags.apply(scope_flag)
+        patents_df["tangential"] = patents_df.scope_tags.apply(
+            lambda x: scope_flag(x, "tangential")
+        )
+        patents_df["not_in_scope"] = patents_df.scope_tags.apply(
+            lambda x: scope_flag(x, "not in scope")
+        )
         logger.info("added in scope flag to patents data")
         save_to_s3(
             bucket_name,

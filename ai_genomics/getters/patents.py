@@ -18,7 +18,7 @@ def get_ai_genomics_patents() -> pd.DataFrame:
     """
     return load_s3_data(
         bucket_name,
-        "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_ipc_codes.csv",
+        "inputs/patent_data/processed_patent_data/ai_genomics_patents_cpc_codes.csv",
     )
 
 
@@ -36,7 +36,7 @@ def get_ai_sample_patents() -> pd.DataFrame:
     """
     return load_s3_data(
         bucket_name,
-        "inputs/patent_data/processed_patent_data/ai_sample_patents_cpc_ipc_codes.csv",
+        "inputs/patent_data/processed_patent_data/ai_sample_patents_cpc_codes.csv",
     )
 
 
@@ -54,7 +54,7 @@ def get_genomics_sample_patents() -> pd.DataFrame:
     """
     return load_s3_data(
         bucket_name,
-        "inputs/patent_data/processed_patent_data/genomics_sample_patents_cpc_ipc_codes.csv",
+        "inputs/patent_data/processed_patent_data/genomics_sample_patents_cpc_codes.csv",
     )
 
 
