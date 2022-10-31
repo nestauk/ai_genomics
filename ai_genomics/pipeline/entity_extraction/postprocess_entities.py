@@ -165,10 +165,12 @@ class EntityCleaner:
 
     def filter_entities(self, entities_list: List[Dict]) -> List[str]:
         """filters entities list based on predicted 'bad' entities"""
-        ents = [
-            [ent["URI"].split("/")[-1].replace("_", " "), ent["confidence"]]
-            for ent in entities_list
-        ]
+        ents = []
+        for ent in entities_list:
+            split_ent = ent["URI"].split("/")[-1].replace("_", " ")
+            if ent["confidence"] >= 60:
+                ents.append([split_ent, ent['confidence']])
+        
         ent_preds = self.predict([ent[0] for ent in ents])
 
         return [ents[i] for i, pred in enumerate(ent_preds) if pred != 1]
@@ -209,7 +211,6 @@ class EntityCleaner:
             logger.info(
                 f"results from applying spaCy's pretrained NER model to filter 'bad' entities: {scores}"
             )
-
 
 if __name__ == "__main__":
 
