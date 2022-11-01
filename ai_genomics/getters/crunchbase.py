@@ -59,3 +59,13 @@ def get_crunchbase_ai_genomics_entity_groups(k: int = 500) -> pd.DataFrame:
     """
     fname = f"inputs/entities/crunchbase_entity_group_vectors_k_{k}.csv"
     return load_s3_data(bucket_name, fname)
+
+
+def get_crunchbase_ai_genomics_description_embeddings() -> pd.DataFrame:
+    """Gets an array of description embeddings and the associated company IDs.
+
+    Returns:
+       pd.DataFrame: Description embeddings and the associated company IDs.
+    """
+    fname = "inputs/embedding/cb_ai_genomics_embeddings.csv"
+    return load_s3_data(bucket_name, fname)
