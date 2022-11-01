@@ -18,7 +18,9 @@ from ai_genomics.getters.patents import (
 CB_DATA = load_s3_data(bucket_name, "outputs/crunchbase/crunchbase_ai_genom_comps.csv")
 GTR_DATA = load_s3_data(bucket_name, "outputs/gtr/gtr_ai_genomics_projects.csv")
 
-OA_ABSTRACTS = load_s3_data(bucket_name, "outputs/openalex/openalex_abstracts.json")
+OA_ABSTRACTS = load_s3_data(
+    bucket_name, "outputs/openalex/ai_genomics_openalex_abstracts.json"
+)
 
 AI_PATENTS, GENOMICS_PATENTS, AI_GENOMICS_PATENTS = (
     get_ai_sample_patents(),
@@ -107,5 +109,5 @@ if __name__ == "__main__":
     save_to_s3(
         bucket_name,
         oa_abstracts_clean,
-        os.path.join(LOOKUP_TABLE_PATH, "oa_lookup.json"),
+        os.path.join(LOOKUP_TABLE_PATH, "ai_genomics_oa_lookup.json"),
     )
