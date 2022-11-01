@@ -56,3 +56,7 @@ Load the AI genomics and baseline projects table with `ai_genomics.getters.gtr.g
 [SPECTER](https://huggingface.co/allenai/specter) embeddings are generated for descriptions of patents, projects, publications and companies using `ai_genomics/pipeline/description_embed/embed.py`.
 
 For speed, this is carried out using an on-demand EC2 instance with a GPU. To create the embeddings, a lookup between unique document IDs and texts must be generated for each dataset and exported as a json. The naming convention for the files (to preserve compatibility with the getters) is `oa.json`, `pat.json`, `cb.json` and `gtr.json`. These files and the script need to be uploaded to the EC2 instance, with all of the data files placed in a subdirectory. The script can then be run using `python embed.py --directory=path/to/data/directory`. The output numpy arrays should be placed in S3 under `inputs/embeddings`.
+
+## Clustering
+
+To cluster OpenAlex publications and patents based on their SPECTER embeddings, run `python ai_genomics/pipeline/doc_cluster/doc_cluster.py`. Pass the `--ai` flag to perform clustering on a subset of documents that contain AI macro entities (relating only to machine learning and AI methods).
