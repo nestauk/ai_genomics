@@ -73,6 +73,7 @@ class EntityCleaner:
     bad_ents: list of spaCy entity types to remove
     ner: Spacy's model
     save_eval: Boolean to save evaluation results or not
+    confidence_threshold: The minimum confidence threshold to keep an entity
 
     Methods
     --------
@@ -101,11 +102,13 @@ class EntityCleaner:
         ner=spacy.load("en_core_web_sm"),
         bad_entities=BAD_ENTS,
         save_eval=True,
+        confidence_threshold=60,
     ):
         self.labelled_entity_path = labelled_entity_path
         self.ner = ner
         self.bad_entities = bad_entities
         self.save_eval = save_eval
+        self.confidence_threshold = confidence_threshold
 
     def clean_entity_col(self, entities):
         """FOR LABELLED DATA - cleans and extracts entity from entity col"""
@@ -165,10 +168,12 @@ class EntityCleaner:
 
     def filter_entities(self, entities_list: List[Dict]) -> List[str]:
         """filters entities list based on predicted 'bad' entities"""
-        ents = [
-            [ent["URI"].split("/")[-1].replace("_", " "), ent["confidence"]]
-            for ent in entities_list
-        ]
+        ents = []
+        for ent in entities_list:
+            split_ent = ent["URI"].split("/")[-1].replace("_", " ")
+            if ent["confidence"] >= self.confidence_threshold:
+                ents.append([split_ent, ent["confidence"]])
+
         ent_preds = self.predict([ent[0] for ent in ents])
 
         return [ents[i] for i, pred in enumerate(ent_preds) if pred != 1]
