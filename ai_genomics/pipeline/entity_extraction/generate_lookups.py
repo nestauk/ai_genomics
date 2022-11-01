@@ -23,7 +23,9 @@ s3_client = boto3.client("s3")
 CB_DATA = load_s3_data(bucket_name, "outputs/crunchbase/crunchbase_ai_genom_comps.csv")
 GTR_DATA = load_s3_data(bucket_name, "outputs/gtr/gtr_ai_genomics_projects.csv")
 
-OA_ABSTRACTS = load_s3_data(bucket_name, "outputs/openalex/openalex_abstracts.json")
+OA_ABSTRACTS = load_s3_data(
+    bucket_name, "outputs/openalex/ai_genomics_openalex_abstracts.json"
+)
 
 AI_PATENTS, GENOMICS_PATENTS, AI_GENOMICS_PATENTS = (
     get_ai_sample_patents(),
@@ -151,7 +153,7 @@ if __name__ == "__main__":
     s3_client.upload_file(
         OA_LOOKUP_LOCAL_PATH + "oa_lookup.json",
         bucket_name,
-        LOOKUP_TABLE_PATH + "oa_lookup.json",
-        Config=config,
+        oa_abstracts_clean,
+        os.path.join(LOOKUP_TABLE_PATH, "ai_genomics_oa_lookup.json"),
     )
     logger.info("uploaded oa_lookup to s3")
