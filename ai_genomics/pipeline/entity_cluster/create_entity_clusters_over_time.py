@@ -138,7 +138,6 @@ def propagate_labels(
         dists = jaccard_similarity(timeslice_x_ents, timeslice_y_ents)
         # if the similarity is not 0 AND above the minimum threshold
         if (dists != 0) & (dists > min_jaccard_score):
-            print(cluster_x, cluster_y, dists)
             perm_dists.append((cluster_x, cluster_y, dists))
     # sort the list of cluster numbers at t-1, cluster numbers at t and their
     # jaccard similarty scores
