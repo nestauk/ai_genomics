@@ -1,10 +1,9 @@
-import sys
-sys.path.append("/Users/india.kerlenesta/Projects/ai_genomics")
-
 """This script clusters AI genomics entity embeddings using k-means at successive 
 timestamps and propagates the cluster labels across timestamps.
 
-It also saves out the propagated cluster labels to s3. 
+It saves out the propagated cluster labels and reduced entity embeddings to s3. 
+
+python ai_genomics/pipeline/entity_cluster/create_entity_clusters_over_time.py
 """
 import pandas as pd
 from typing import Dict, List
@@ -107,7 +106,7 @@ def get_best_k(
 def propagate_labels(
     timeslice_x: Dict[str, List[str]],
     timeslice_y: Dict[str, List[str]],
-    min_jaccard_score: float = 0.7,
+    min_jaccard_score: float = 0.5,
 ) -> Dict[int, List[str]]:
     """Propogates cluster labels from t-1 to t based on maximum 
         jaccard similarity above a threshold between entity lists.    
@@ -139,6 +138,7 @@ def propagate_labels(
         dists = jaccard_similarity(timeslice_x_ents, timeslice_y_ents)
         # if the similarity is not 0 AND above the minimum threshold
         if (dists != 0) & (dists > min_jaccard_score):
+            print(cluster_x, cluster_y, dists)
             perm_dists.append((cluster_x, cluster_y, dists))
     # sort the list of cluster numbers at t-1, cluster numbers at t and their
     # jaccard similarty scores
@@ -156,6 +156,8 @@ def propagate_labels(
         timeslice_y[sorted_perm_dists_clusts[0][0]] = timeslice_y.get(
             sorted_perm_dists_clusts[0][1]
         )
+        #and pop key with old name!
+        timeslice_y.pop(sorted_perm_dists_clusts[0][1], None)
         sorted_perm_dists_clusts.remove(most_similar_clusts)
 
 if __name__ == "__main__":
@@ -215,7 +217,10 @@ if __name__ == "__main__":
     ent_embeds_lookup = generate_embed_lookup(
         entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=True
     )
-    logger.info("generated reduced entity embedding lookup.")
+    #save ent_embeds_lookup that is json serializable
+    save_to_s3(bucket_name, {k:v.tolist() for k, v in ent_embeds_lookup.items()}, 'outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json')
+
+    logger.info("generated and saved reduced entity embedding lookup.")
 
     # identify optimal k at every timeslice
     best_ks = get_best_k(
