@@ -103,6 +103,7 @@ def get_best_k(
 
     return best_ks
 
+
 def propagate_labels(
     timeslice_x: Dict[str, List[str]],
     timeslice_y: Dict[str, List[str]],
@@ -155,9 +156,10 @@ def propagate_labels(
         timeslice_y[sorted_perm_dists_clusts[0][0]] = timeslice_y.get(
             sorted_perm_dists_clusts[0][1]
         )
-        #and pop key with old name!
+        # and pop key with old name!
         timeslice_y.pop(sorted_perm_dists_clusts[0][1], None)
         sorted_perm_dists_clusts.remove(most_similar_clusts)
+
 
 if __name__ == "__main__":
     logger.info(
@@ -172,7 +174,8 @@ if __name__ == "__main__":
     )
     logger.info("loaded AI genomics DBpedia entities")
 
-    patents = get_ai_genomics_patents()
+    patents = (get_ai_genomics_patents()
+           .query('in_scope == True'))
     patents_filtered = filter_data(
         data=patents,
         query="~grant_date.isna()",
@@ -195,7 +198,8 @@ if __name__ == "__main__":
     )
     logger.info("loaded and filtered gtr data")
 
-    oa = get_openalex_ai_genomics_works()
+    oa = (load_s3_data(bucket_name, 'outputs/openalex/ai_genomics_openalex_works.csv')
+     .query('genomics_in_scope == True'))
     oa_filtered = filter_data(
         data=oa,
         query="ai_genomics == True",
@@ -216,8 +220,12 @@ if __name__ == "__main__":
     ent_embeds_lookup = generate_embed_lookup(
         entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=True
     )
-    #save ent_embeds_lookup that is json serializable
-    save_to_s3(bucket_name, {k:v.tolist() for k, v in ent_embeds_lookup.items()}, 'outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json')
+    # save ent_embeds_lookup that is json serializable
+    save_to_s3(
+        bucket_name,
+        {k: v.tolist() for k, v in ent_embeds_lookup.items()},
+        "outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json",
+    )
 
     logger.info("generated and saved reduced entity embedding lookup.")
 
@@ -233,7 +241,7 @@ if __name__ == "__main__":
         ent_embeds = [ent_embeds_lookup.get(ent) for ent in ents]
         km = KMeans(n_clusters=best_k).fit(ent_embeds)
         clust = km.predict(ent_embeds)
-        clust_dict = {f"{c}_{year}" : [] for c in clust}
+        clust_dict = {f"{c}_{year}": [] for c in clust}
         for i, c in enumerate(clust):
             clust_dict[f"{c}_{year}"].append(ents[i])
         ents_per_date_clusts[year] = clust_dict
