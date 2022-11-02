@@ -64,8 +64,6 @@ def make_cluster_names_unique(cluster_name_lookup: Dict[str, str]) -> Dict[str, 
 if __name__ == "__main__":
 
     entity_cluster_lookup_agg = defaultdict(list)
-    unique_cluster_name_lookup = dict()
-
     for k in "100", "200", "500", "1000":
         entity_cluster_lookup = get_entity_cluster_lookup(
             CONFIG["cluster"][f"k_{k}"]["n_clusters"]
