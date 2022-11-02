@@ -95,6 +95,6 @@ if __name__ == "__main__":
 
             save_to_s3(
                 bucket_name,
-                doc_vecs,
+                doc_vecs.reset_index(),
                 f"inputs/entities/{name}_entity_group_vectors_{k}.csv",
             )
