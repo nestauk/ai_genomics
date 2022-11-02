@@ -227,24 +227,14 @@ if __name__ == "__main__":
         list_of_dfs=[oa_filtered, patents_filtered, crunchbase_filtered, gtr_filtered],
         list_of_ents=[oa_ents, patent_ents, crunchbase_ents, gtr_ents],
     )
-    logger.info("timesliced entities on a yearly basis from 2010 to 2020.")
+    logger.info("timesliced entities on a yearly basis from 2010.")
 
     # embed and reduce ents and generate lookup
     all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
-    reduced_ent_embeds_lookup = generate_embed_lookup(
-        entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=True
-    )
-
-    save_to_s3(
-        bucket_name,
-        {k: v.tolist() for k, v in reduced_ent_embeds_lookup.items()},
-        "outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json",
-    )
-
     ent_embeds_lookup = generate_embed_lookup(
         entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=False
     )
-    logger.info("generated entity embedding lookups and saved reduced lookup.")
+    logger.info("generated entity embedding lookup")
 
     # identify optimal k at every timeslice
     best_ks = get_best_k(
@@ -264,19 +254,8 @@ if __name__ == "__main__":
         ents_per_date_clusts[year] = clust_dict
     logger.info("clustered entities at each timestamp using best ks.")
 
-    #### Append final timestamp
-    final_entity_cluster = get_entity_cluster_lookup(k=100)
-    entity_cluster_lookup_agg = defaultdict(list)
-    for key, value in sorted(final_entity_cluster.items()):
-        entity_cluster_lookup_agg[value].append(key)
-    final_entity_cluster_reformatted = {
-        2021: {f"{k}_2021": v for k, v in dict(entity_cluster_lookup_agg).items()}
-    }
-    ents_per_date_clusts.update(final_entity_cluster_reformatted)
-    logger.info("appended already clustered 2021 entities at final timestamp")
-
     #### propogate cluster names across timeslices
-    years = list(ents_per_date_clusts.keys())  # make sure this is ordered
+    years = list(ents_per_date_clusts.keys())
     for year in range(len(years) - 1):
         timeslice_x = ents_per_date_clusts[years[year]]
         timeslice_y = ents_per_date_clusts[years[year + 1]]
@@ -292,4 +271,21 @@ if __name__ == "__main__":
         },
         "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_embed.json",
     )
-    logger.info("saved dbpedia entities and propagated entity clusters.")
+    logger.info("propagated entity clusters.")
+
+    all_appended_ents = []
+    for ent_list in list(ents_per_date_clusts.values()):
+        all_appended_ents.extend(list(ent_list.values()))
+    
+    reduced_ent_embeds_lookup = generate_embed_lookup(
+        entities=list(set(list(itertools.chain(*all_appended_ents)))), model=CONFIG["embed"]["model"], reduce_embedding=True
+    )
+
+    save_to_s3(
+        bucket_name,
+        {k: v.tolist() for k, v in reduced_ent_embeds_lookup.items()},
+        "outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json",
+    )
+    logger.info("saved ALL reduced entities.")
+
+    
