@@ -6,7 +6,7 @@ To create AI in genomics entity clusters at different resolutions k and generate
 
 `python ai_genomics/pipeline/entity_cluster/create_entity_clusters.py`
 
-This will save as output both the entity clusters for different resolutions of k (100, 200, 500 and 10000) and sparse document vectors.
+This will save as output both the entity clusters for different resolutions of k (100, 200, 500 and 1000) and sparse document vectors.
 
 To create AI in genomics entity clusters at successive time points, run:
 
