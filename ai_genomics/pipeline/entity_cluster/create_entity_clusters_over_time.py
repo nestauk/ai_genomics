@@ -13,6 +13,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import ast
+from collections import defaultdict
 
 from ai_genomics import bucket_name, logger, get_yaml_config, PROJECT_DIR
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
@@ -24,6 +25,8 @@ from ai_genomics.getters.patents import (
 from ai_genomics.getters.crunchbase import get_crunchbase_entities
 from ai_genomics.getters.gtr import get_gtr_entities
 from ai_genomics.getters.openalex import get_openalex_ai_genomics_entities
+from ai_genomics.getters.entities import get_entity_cluster_lookup
+
 from ai_genomics.utils.text import jaccard_similarity
 from ai_genomics.utils.entities import generate_embed_lookup
 from ai_genomics.utils.filtering import filter_data
@@ -224,7 +227,7 @@ if __name__ == "__main__":
         list_of_dfs=[oa_filtered, patents_filtered, crunchbase_filtered, gtr_filtered],
         list_of_ents=[oa_ents, patent_ents, crunchbase_ents, gtr_ents],
     )
-    logger.info("timesliced entities on a yearly basis from 2010 onwards.")
+    logger.info("timesliced entities on a yearly basis from 2010 to 2020.")
 
     # embed and reduce ents and generate lookup
     all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
@@ -261,8 +264,19 @@ if __name__ == "__main__":
         ents_per_date_clusts[year] = clust_dict
     logger.info("clustered entities at each timestamp using best ks.")
 
+    #### Append final timestamp
+    final_entity_cluster = get_entity_cluster_lookup(k=100)
+    entity_cluster_lookup_agg = defaultdict(list)
+    for key, value in sorted(final_entity_cluster.items()):
+        entity_cluster_lookup_agg[value].append(key)
+    final_entity_cluster_reformatted = {
+        2021: {f"{k}_2021": v for k, v in dict(entity_cluster_lookup_agg).items()}
+    }
+    ents_per_date_clusts.update(final_entity_cluster_reformatted)
+    logger.info("appended already clustered 2021 entities at final timestamp")
+
     #### propogate cluster names across timeslices
-    years = list(ents_per_date_clusts.keys())
+    years = list(ents_per_date_clusts.keys())  # make sure this is ordered
     for year in range(len(years) - 1):
         timeslice_x = ents_per_date_clusts[years[year]]
         timeslice_y = ents_per_date_clusts[years[year + 1]]
