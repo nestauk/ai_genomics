@@ -5,7 +5,10 @@ Insures name uniquenss by adding a number at the end of any duplicate
 cluster name. 
 """
 from ai_genomics.utils.text import get_top_terms
-from ai_genomics.getters.entities import get_entity_cluster_lookup, get_evolved_entity_cluster_lookup
+from ai_genomics.getters.entities import (
+    get_entity_cluster_lookup,
+    get_evolved_entity_cluster_lookup,
+)
 from ai_genomics.getters.data_getters import save_to_s3
 
 from collections import defaultdict, Counter
@@ -13,7 +16,8 @@ from ai_genomics import get_yaml_config, PROJECT_DIR, bucket_name
 from typing import Dict, List
 
 CONFIG = get_yaml_config(PROJECT_DIR / "ai_genomics/config/entity_cluster.yaml")
-EVOLVED_CLUSTERS = get_evolved_entity_cluster_lookup() 
+EVOLVED_CLUSTERS = get_evolved_entity_cluster_lookup()
+
 
 def get_final_entity_list(
     cluster: str, evolved_clusters: Dict[str, List[str]] = EVOLVED_CLUSTERS
@@ -28,6 +32,7 @@ def get_final_entity_list(
     )
     return evolved_clusters[str(final_year)][cluster]
 
+
 def make_cluster_names_unique(cluster_name_lookup: Dict[str, str]) -> Dict[str, str]:
     """Insures uniqueness of name in cluster name lookup where
         key is cluster ID and value is cluster name using top 3 TF-IDF
@@ -40,13 +45,11 @@ def make_cluster_names_unique(cluster_name_lookup: Dict[str, str]) -> Dict[str, 
     for cluster_name, cluster_count in cluster_name_counts:
         if cluster_count > 1:
             name_mapper_indxs = [
-                    list(cluster_name_lookup.keys())[i]
-                    for i, j in enumerate(list(cluster_name_lookup.values()))
-                    if j == cluster_name
-                ]
-            unique_names = [
-                f"{cluster_name}-{str(i)}" for i in range(cluster_count)
+                list(cluster_name_lookup.keys())[i]
+                for i, j in enumerate(list(cluster_name_lookup.values()))
+                if j == cluster_name
             ]
+            unique_names = [f"{cluster_name}-{str(i)}" for i in range(cluster_count)]
             unique_cluster_name_lookup.update(
                 (dict(zip(name_mapper_indxs, unique_names)))
             )
@@ -56,6 +59,7 @@ def make_cluster_names_unique(cluster_name_lookup: Dict[str, str]) -> Dict[str, 
             ]
         ] = cluster_name
     return unique_cluster_name_lookup
+
 
 if __name__ == "__main__":
 
@@ -78,8 +82,8 @@ if __name__ == "__main__":
             unique_cluster_name_lookup,
             f"inputs/entities/entity_groups_names_k_{k}.json",
         )
-    
-    #do the same for evolved clusters
+
+    # do the same for evolved clusters
     all_clusters = []
     for timestamped_cluster in list(EVOLVED_CLUSTERS.values()):
         all_clusters.extend(list(timestamped_cluster.keys()))
@@ -91,6 +95,11 @@ if __name__ == "__main__":
         cluster_name = get_top_terms(final_entity_list)
         evolved_cluster_name_mapper[cluster] = cluster_name
 
-    unique_evolved_cluster_name_mapper = make_cluster_names_unique(evolved_cluster_name_mapper)
-    save_to_s3(bucket_name, unique_evolved_cluster_name_mapper, "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_names.json")
-
+    unique_evolved_cluster_name_mapper = make_cluster_names_unique(
+        evolved_cluster_name_mapper
+    )
+    save_to_s3(
+        bucket_name,
+        unique_evolved_cluster_name_mapper,
+        "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_names.json",
+    )
