@@ -39,9 +39,8 @@ def get_evolved_entity_cluster_name_lookup() -> Dict[str, str]:
         Dict[str, str]: A lookup where keys are timestamped cluster IDs and
             values are the cluster name
     """
-    return load_s3_data(bucket_name, NAME)
+    return load_s3_data(bucket_name, "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_names.json")
 
-#add look up for evolved clusters
 def get_evolved_entity_cluster_lookup() -> Dict[str, List[str]]:
     """Gets a lookup between timestamped cluster IDs and their
         DBpedia entities.
@@ -50,5 +49,5 @@ def get_evolved_entity_cluster_lookup() -> Dict[str, List[str]]:
         Dict[str, List[str]]: A lookup where keys are timestamped 
             cluster IDs and values are a list of DPedia entities associated to the cluster.
     """
-    return load_s3_data(bucket_name, NAME)
+    return load_s3_data(bucket_name, "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_embed.json")
 
