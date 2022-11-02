@@ -209,11 +209,8 @@ def run(ai, min_year, max_year):
     )
     gtr_ids = gtr_projects["id"].values
 
-    import pdb
-
-    pdb.set_trace()
-
     if ai:
+        logger.info("Fetching macro entities")
         oa_macro_entities = get_openalex_ai_genomics_works_entity_groups(
             K_MACRO_ENTITIES
         )
@@ -236,10 +233,7 @@ def run(ai, min_year, max_year):
         ]
     )
 
-    print((pd.isnull(embeddings).sum()))
-    print(embeddings.shape)
-
-    logger.info("Clustering")
+    logger.info(f"Clustering embeddings with shape {embeddings.shape}")
     km = KMeans(n_clusters=N_CLUSTERS, random_state=RANDOM_STATE)
     km.fit(embeddings)
     cluster_labels = [int(l) for l in km.labels_]
@@ -252,6 +246,7 @@ def run(ai, min_year, max_year):
     subset = "ai" if ai else "all"
     save_to_s3(
         bucket_name,
+        cluster_lookup,
         f"outputs/data/cluster/doc_{subset}_{min_year}_{max_year}_clusters.json",
     )
 
