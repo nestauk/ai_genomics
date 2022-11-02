@@ -28,7 +28,7 @@ from ai_genomics.getters.gtr import (
 
 LANG = "en"
 K_MACRO_ENTITIES = 100
-AI_MACRO_ENTITY_COLS = ["87", "88", "98"]
+AI_MACRO_ENTITY_COLS = ["11", "30", "64"]
 N_CLUSTERS = 20
 RANDOM_STATE = 42
 
