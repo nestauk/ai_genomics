@@ -3,6 +3,8 @@ between their entity cluster IDs and their top n TF-IDF name.
 
 Insures name uniquenss by adding a number at the end of any duplicate
 cluster name. 
+
+python ai_genomics/pipeline/entity_cluster/create_entity_clusters_names.py
 """
 from ai_genomics.utils.text import get_top_terms
 from ai_genomics.getters.entities import (
