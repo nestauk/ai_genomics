@@ -1,14 +1,13 @@
 import json
 from sklearn import cluster
 from toolz.dicttoolz import merge
-from toolz.functoolz import pipe
 
-from ai_genomics import PROJECT_DIR, get_yaml_config, logger
+from ai_genomics import PROJECT_DIR, get_yaml_config, logger, bucket_name
 from ai_genomics.utils.reading import make_path_if_not_exist
+from ai_genomics.getters.data_getters import save_to_s3
 
 from ai_genomics.getters.openalex import (
-    get_openalex_entities,
-    get_openalex_ai_genomics_works,
+    get_openalex_ai_genomics_entities,
 )
 from ai_genomics.getters.patents import (
     get_ai_genomics_patents_entities,
@@ -39,20 +38,16 @@ OUT_DIR = PROJECT_DIR / "inputs/entities/"
 if __name__ == "__main__":
 
     logger.info("Fetching and merging entities.")
+
     gtr_ids = list(get_ai_genomics_project_table().query("ai_genomics == True")["id"])
-    oa_ids = list(
-        get_openalex_ai_genomics_works().query("ai_genomics == True")["work_id"]
-    )
-    cb_ids = list(get_ai_genomics_crunchbase_orgs().query("ai_genom == True")["id"])
-
-    oa_entities = get_openalex_entities()
-    oa_entities = {k: oa_entities[k] for k in oa_ids}
-
     gtr_entities = get_gtr_entities()
     gtr_entities = {k: gtr_entities[k] for k in gtr_ids}
 
+    cb_ids = list(get_ai_genomics_crunchbase_orgs().query("ai_genom == True")["id"])
     cb_entities = get_crunchbase_entities()
     cb_entities = {k: cb_entities[k] for k in cb_ids}
+
+    oa_entities = get_openalex_ai_genomics_entities()
 
     patent_entities = get_ai_genomics_patents_entities()
 
@@ -83,6 +78,10 @@ if __name__ == "__main__":
             params,
         )
 
+        save_to_s3(
+            bucket_name, cluster_lookup, f"inputs/entities/entity_groups_{k}.json"
+        )
+
         with open(OUT_DIR / f"entity_groups_{k}.json", "w") as f:
             json.dump(cluster_lookup, f)
 
@@ -93,3 +92,9 @@ if __name__ == "__main__":
             ents = strip_scores(ents)
             doc_vecs = create_doc_vectors(ents, cluster_lookup)
             doc_vecs.to_csv(OUT_DIR / f"{name}_entity_group_vectors_{k}.csv")
+
+            save_to_s3(
+                bucket_name,
+                doc_vecs.reset_index(),
+                f"inputs/entities/{name}_entity_group_vectors_{k}.csv",
+            )
