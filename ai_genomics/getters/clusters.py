@@ -26,7 +26,7 @@ def get_doc_cluster_lookup(
             mapping of cluster IDs to lists of document IDs belonging to that cluster.
     """
     subset = "ai" if ai_only else "all"
-    fname = f"outputs/cluster/doc_{subset}_{min_year}_{max_year}_clusters.json"
+    fname = f"outputs/data/cluster/doc_{subset}_{min_year}_{max_year}_clusters.json"
 
     try:
         return load_s3_data(bucket_name, fname)
