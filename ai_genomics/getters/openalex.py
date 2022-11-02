@@ -156,7 +156,13 @@ def ai_genom_getter(
 
 
 def get_openalex_ai_genomics_works(local: bool = True) -> pd.DataFrame:
-    """Returns dataframe of AI in genomics OpenAlex works"""
+    """Returns dataframe of in scope AI in genomics OpenAlex works."""
+
+    return ai_genom_getter("ai_genomics_openalex_works", "csv", local)
+
+
+def get_openalex_works(local: bool = True) -> pd.DataFrame:
+    """Returns dataframe of AI in genomics OpenAlex works."""
 
     return ai_genom_getter("openalex_works", "csv", local)
 
@@ -180,7 +186,13 @@ def get_openalex_ai_genomics_institutes(local: bool = True) -> pd.DataFrame:
 
 
 def get_openalex_ai_genomics_abstracts(local: bool = True) -> Dict:
-    """Returns dataframe of AI in genomics OpenAlex MeSH institutes/authorships"""
+    """Returns dataframe of in scope AI in genomics OpenAlex abstracts"""
+
+    return ai_genom_getter("ai_genomics_openalex_abstracts", "json", local)
+
+
+def get_openalex_abstracts(local: bool = True) -> Dict:
+    """Returns dataframe of all OpenAlex abstracts"""
 
     return ai_genom_getter("openalex_abstracts", "json", local)
 
