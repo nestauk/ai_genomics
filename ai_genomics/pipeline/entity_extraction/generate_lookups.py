@@ -20,11 +20,6 @@ from boto3.s3.transfer import TransferConfig
 
 s3_client = boto3.client("s3")
 
-import boto3
-from boto3.s3.transfer import TransferConfig
-
-s3_client = boto3.client("s3")
-
 CB_DATA = load_s3_data(bucket_name, "outputs/crunchbase/crunchbase_ai_genom_comps.csv")
 GTR_DATA = load_s3_data(bucket_name, "outputs/gtr/gtr_ai_genomics_projects.csv")
 
