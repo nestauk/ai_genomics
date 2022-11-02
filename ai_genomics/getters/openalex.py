@@ -10,7 +10,7 @@ from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics import PROJECT_DIR, logger, bucket_name
 
 OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
-OALEX_OUT_PATH = f"{PROJECT_DIR}/outputs/data/openalex"
+OALEX_OUT_PATH = f"{PROJECT_DIR}/outputs/openalex"
 
 
 def get_openalex_works() -> List[Dict[Any, Any]]:
@@ -232,7 +232,7 @@ def get_openalex_ai_genomics_entities() -> Mapping[str, Mapping[str, Union[str, 
     """From S3 loads ai genomics oa entities"""
     return load_s3_data(
         bucket_name,
-        "outputs/entity_extraction/oa_ai_genomics_lookup_clean.json",
+        "outputs/entity_extraction/ai_genomics_oa_lookup_clean.json",
     )
 
 
