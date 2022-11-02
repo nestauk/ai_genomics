@@ -36,7 +36,7 @@ def get_final_entity_list(
 def make_cluster_names_unique(cluster_name_lookup: Dict[str, str]) -> Dict[str, str]:
     """Insures uniqueness of name in cluster name lookup where
         key is cluster ID and value is cluster name using top 3 TF-IDF
-        terms.
+        terms by adding number after duplicate TF-IDF name
     
     Returns unique cluster name lookup 
     """
