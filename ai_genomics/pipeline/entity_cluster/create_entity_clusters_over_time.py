@@ -57,7 +57,7 @@ def timestamp_entities(
         is a list of entities across datasets that appeared 
         up to that year. 
     """
-    periods = 2022 - ast.literal_eval(start_date.split("-")[0])
+    periods = 2021 - ast.literal_eval(start_date.split("-")[0])
     date_range = pd.date_range(start=start_date, periods=periods, freq="A")
 
     ents_per_date = dict()
@@ -254,6 +254,15 @@ if __name__ == "__main__":
             clust_dict[f"{c}_{year}"].append(ents[i])
         ents_per_date_clusts[year] = clust_dict
     logger.info("clustered entities at each timestamp using best ks.")
+
+    ###Append 2021 to ents_per_date
+    all_ents =  get_entity_cluster_lookup(k=100)
+    all_ents_agg = defaultdict(list)
+    for key, value in sorted(all_ents.items()):
+        all_ents_agg[value].append(key)
+    ents_per_date_clusts.update({2021: {f"{k}_2021": v for k,v in all_ents_agg.items()}})
+    logger.info('appended final year to ents per date')
+
 
     #### propogate cluster names across timeslices
     years = list(ents_per_date_clusts.keys())
