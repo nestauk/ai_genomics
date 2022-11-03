@@ -7,7 +7,7 @@ from ai_genomics.getters.data_getters import load_s3_data, get_s3_dir_files
 
 def get_doc_cluster_lookup(
     ai_only: bool = False,
-    min_year: int = 2020,
+    min_year: int = 2012,
     max_year: int = 2021,
 ) -> Dict[str, Dict[int, str]]:
     """Get patent and OpenAlex document clusters.
@@ -43,7 +43,7 @@ def get_doc_cluster_lookup(
 
 def get_doc_cluster_names(
     ai_only: bool = False,
-    min_year: int = 2020,
+    min_year: int = 2012,
     max_year: int = 2021,
 ) -> Dict[int, str]:
     """Get document cluster names generated through tf-idf of entity counts.
