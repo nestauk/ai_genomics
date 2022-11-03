@@ -232,10 +232,14 @@ if __name__ == "__main__":
     # embed and reduce ents and generate lookup
     all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
     ent_embeds_lookup = generate_embed_lookup(
-        entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=False
+        entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=True
     )
-    logger.info("generated entity embedding lookup")
-
+    save_to_s3(
+        bucket_name,
+        {k: v.tolist() for k, v in ent_embeds_lookup.items()},
+        "outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json",
+    )
+    logger.info("embedded and saved reduced entities.")
     # identify optimal k at every timeslice
     best_ks = get_best_k(
         reduced_entities=ent_embeds_lookup, ents_per_date=ents_per_date
@@ -272,20 +276,3 @@ if __name__ == "__main__":
         "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_embed.json",
     )
     logger.info("propagated entity clusters.")
-
-    all_appended_ents = []
-    for ent_list in list(ents_per_date_clusts.values()):
-        all_appended_ents.extend(list(ent_list.values()))
-    
-    reduced_ent_embeds_lookup = generate_embed_lookup(
-        entities=list(set(list(itertools.chain(*all_appended_ents)))), model=CONFIG["embed"]["model"], reduce_embedding=True
-    )
-
-    save_to_s3(
-        bucket_name,
-        {k: v.tolist() for k, v in reduced_ent_embeds_lookup.items()},
-        "outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json",
-    )
-    logger.info("saved ALL reduced entities.")
-
-    
