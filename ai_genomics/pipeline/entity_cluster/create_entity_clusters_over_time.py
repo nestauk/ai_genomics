@@ -256,13 +256,14 @@ if __name__ == "__main__":
     logger.info("clustered entities at each timestamp using best ks.")
 
     ###Append 2021 to ents_per_date
-    all_ents =  get_entity_cluster_lookup(k=100)
+    all_ents = get_entity_cluster_lookup(k=100)
     all_ents_agg = defaultdict(list)
     for key, value in sorted(all_ents.items()):
         all_ents_agg[value].append(key)
-    ents_per_date_clusts.update({2021: {f"{k}_2021": v for k,v in all_ents_agg.items()}})
-    logger.info('appended final year to ents per date')
-
+    ents_per_date_clusts.update(
+        {2021: {f"{k}_2021": v for k, v in all_ents_agg.items()}}
+    )
+    logger.info("appended final year to ents per date")
 
     #### propogate cluster names across timeslices
     years = list(ents_per_date_clusts.keys())

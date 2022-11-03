@@ -12,7 +12,7 @@ To create AI in genomics entity clusters at successive time points, run:
 
 `python ai_genomics/pipeline/entity_cluster/create_entity_clusters_over_time.py`
 
-This will cluster AI in genomics entity embeddings at successive, cumulative time points. Labels are propagated across timestamps based on jaccard similarity between entity clusters at successive timestamps.
+This will cluster AI in genomics entity embeddings at successive, cumulative time points. Labels are propagated across timestamps based on jaccard similarity between entity clusters at successive timestamps. The final timestamp is the output of entity cluster at resolution k=100.
 
 To generate entity cluster names for both the entity clusters at different resolutions k and for evolved entity clusters, run:
 
