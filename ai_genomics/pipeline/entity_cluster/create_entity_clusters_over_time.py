@@ -1,8 +1,6 @@
 """This script clusters AI genomics entity embeddings using k-means at successive 
 timestamps and propagates the cluster labels across timestamps.
-
-It saves out the propagated cluster labels and reduced entity embeddings to s3. 
-
+It also saves out the propagated cluster labels and reduced entity embeddings to s3. 
 python ai_genomics/pipeline/entity_cluster/create_entity_clusters_over_time.py
 """
 import pandas as pd
@@ -13,6 +11,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import ast
+from collections import defaultdict
 
 from ai_genomics import bucket_name, logger, get_yaml_config, PROJECT_DIR
 from ai_genomics.getters.data_getters import load_s3_data, save_to_s3
@@ -23,13 +22,16 @@ from ai_genomics.getters.patents import (
 
 from ai_genomics.getters.crunchbase import get_crunchbase_entities
 from ai_genomics.getters.gtr import get_gtr_entities
-from ai_genomics.getters.openalex import (
-    get_openalex_ai_genomics_works,
-    get_openalex_ai_genomics_entities,
-)
+from ai_genomics.getters.openalex import get_openalex_ai_genomics_entities
+from ai_genomics.getters.entities import get_entity_cluster_lookup
+
 from ai_genomics.utils.text import jaccard_similarity
 from ai_genomics.utils.entities import generate_embed_lookup
 from ai_genomics.utils.filtering import filter_data
+from ai_genomics.utils.entities import (
+    filter_entities,
+    strip_scores,
+)
 
 CONFIG = get_yaml_config(PROJECT_DIR / "ai_genomics/config/entity_cluster.yaml")
 
@@ -64,7 +66,7 @@ def timestamp_entities(
         for df, ents in zip(list_of_dfs, list_of_ents):
             df_ids = list(df[df.date < min_date].id)
             ents_subset = {
-                id_: [i[0] for i in ents.get(id_)] for id_ in df_ids if ents.get(id_)
+                id_: [i for i in ents.get(id_)] for id_ in df_ids if ents.get(id_)
             }
             all_ents.extend(list(itertools.chain(*ents_subset.values())))
         ents_per_date[min_date.year] = list(set(all_ents))
@@ -85,7 +87,6 @@ def get_best_k(
         ents_per_date (List[dict]): A dictionary where the key is the 
             year and the value is a list of entities across datasets 
             that appeared up to that year.
-
     Returns:            
         list of optimal ks per timeslice.
     """
@@ -93,7 +94,7 @@ def get_best_k(
     for ents in ents_per_date.values():
         results = []
         ent_embeds = [reduced_entities.get(ent) for ent in ents]
-        for n in range(10, 70, 5):
+        for n in range(10, 100, 5):
             km = KMeans(n_clusters=n)
             clust = km.fit_predict(ent_embeds)
             score = silhouette_score(ent_embeds, clust)
@@ -174,8 +175,17 @@ if __name__ == "__main__":
     )
     logger.info("loaded AI genomics DBpedia entities")
 
-    patents = (get_ai_genomics_patents()
-           .query('in_scope == True'))
+    for ents in patent_ents, crunchbase_ents, gtr_ents, oa_ents:
+        ents_no_scores = strip_scores(ents)
+        ents_filtered = filter_entities(
+            ents_no_scores,
+            min_entity_freq=CONFIG["filter_entities"]["min_entity_freq"],
+            max_entity_freq=CONFIG["filter_entities"]["max_entity_freq"],
+        )
+        ents.update(ents_filtered)
+    logger.info("filtered AI genomics DBpedia entities")
+
+    patents = get_ai_genomics_patents().query("in_scope == True")
     patents_filtered = filter_data(
         data=patents,
         query="~grant_date.isna()",
@@ -198,8 +208,9 @@ if __name__ == "__main__":
     )
     logger.info("loaded and filtered gtr data")
 
-    oa = (load_s3_data(bucket_name, 'outputs/openalex/ai_genomics_openalex_works.csv')
-     .query('genomics_in_scope == True'))
+    oa = load_s3_data(
+        bucket_name, "outputs/openalex/ai_genomics_openalex_works.csv"
+    ).query("genomics_in_scope == True")
     oa_filtered = filter_data(
         data=oa,
         query="ai_genomics == True",
@@ -210,25 +221,22 @@ if __name__ == "__main__":
 
     # timeslice entities
     ents_per_date = timestamp_entities(
-        list_of_dfs=[patents_filtered, crunchbase_filtered, gtr_filtered],
-        list_of_ents=[patent_ents, crunchbase_ents, gtr_ents],
+        list_of_dfs=[oa_filtered, patents_filtered, crunchbase_filtered, gtr_filtered],
+        list_of_ents=[oa_ents, patent_ents, crunchbase_ents, gtr_ents],
     )
-    logger.info("timesliced entities on a yearly basis from 2010 onwards.")
+    logger.info("timesliced entities on a yearly basis from 2010.")
 
     # embed and reduce ents and generate lookup
     all_ents = list(set(list(itertools.chain(*list(ents_per_date.values())))))
     ent_embeds_lookup = generate_embed_lookup(
         entities=all_ents, model=CONFIG["embed"]["model"], reduce_embedding=True
     )
-    # save ent_embeds_lookup that is json serializable
     save_to_s3(
         bucket_name,
         {k: v.tolist() for k, v in ent_embeds_lookup.items()},
         "outputs/analysis/tag_evolution/dbpedia_tags_reduced_embed.json",
     )
-
-    logger.info("generated and saved reduced entity embedding lookup.")
-
+    logger.info("embedded and saved reduced entities.")
     # identify optimal k at every timeslice
     best_ks = get_best_k(
         reduced_entities=ent_embeds_lookup, ents_per_date=ents_per_date
@@ -264,4 +272,4 @@ if __name__ == "__main__":
         },
         "outputs/analysis/tag_evolution/dbpedia_clusters_timeslice_embed.json",
     )
-    logger.info("saved dbpedia entities and propagated entity clusters.")
+    logger.info("propagated entity clusters.")
