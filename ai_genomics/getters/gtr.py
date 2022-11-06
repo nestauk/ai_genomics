@@ -81,3 +81,13 @@ def get_gtr_ai_genomics_project_entity_groups(k: int = 500) -> pd.DataFrame:
     """
     fname = f"inputs/entities/gtr_entity_group_vectors_k_{k}.csv"
     return load_s3_data(BUCKET_NAME, fname)
+
+
+def get_gtr_ai_genomics_project_embeddings() -> pd.DataFrame:
+    """Gets an array of project description embeddings and the associated project IDs.
+
+    Returns:
+       pd.DataFrame: Project description embeddings and the associated project IDs.
+    """
+    fname = "inputs/embedding/gtr_ai_genomics_embeddings.csv"
+    return load_s3_data(BUCKET_NAME, fname)
