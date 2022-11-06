@@ -28,3 +28,4 @@ sentence-transformers
 networkx
 leidenalg
 umap-learn
+statsmodels

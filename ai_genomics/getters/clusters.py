@@ -1,6 +1,9 @@
+from pandas import read_csv
+from turtle import pd
 from typing import Dict
 from botocore.exceptions import ClientError
 
+from ai_genomics import PROJECT_DIR
 from ai_genomics import bucket_name
 from ai_genomics.getters.data_getters import load_s3_data, get_s3_dir_files
 
@@ -62,3 +65,24 @@ def get_doc_cluster_names(
         f"outputs/data/cluster/doc_{subset}_{min_year}_{max_year}_clusters_names.json"
     )
     return load_s3_data(bucket_name, fname)
+
+
+def get_doc_cluster_interp() -> Dict[int, str]:
+    """Returns interpretable doc cluster names"""
+
+    return read_csv(
+        f"{PROJECT_DIR}/inputs/data/cluster_names.csv", header=None
+    ).to_dict()[0]
+
+
+def get_id_cluster_lookup() -> Dict[int, str]:
+    """Parses the cluster lookup so each ID is mapped to a cluster name" """
+
+    cl_names = get_doc_cluster_interp()
+
+    return {
+        str(_id): cl_names[int(cl)]
+        for source, cl_assgn in get_doc_cluster_lookup().items()
+        for cl, id_list in cl_assgn.items()
+        for _id in id_list
+    }
