@@ -45,18 +45,17 @@ You can fetch a lookup between `work_id` and the discipline influence values usi
 
 ## All data sources -- Analysis of emergence
 
-Run `python ai_genomics/analysis/integrated_emergence/make_integrated_emergency.py` to perform an emergence analysis on the OpenAlex, Patent and GtR data, and to integrate the results across datasets. This works as follows:
+Run `python ai_genomics/analysis/integrated_emergence/make_emergence_analysis.py` to perform an emergence analysis of document clusters in the OpenAlex, Patent and GtR data, and to integrate the results across datasets. This works as follows:
 
-1. We calculate cluster-year frequencies by dataset
+1. We calculate document cluster-year frequencies by dataset
 
-- The clusters, also referred to as macro-entities, are clusters of DBPedia entities that we have used to tag all documents. You can perform the analysis at different levels of resolution (100, 500, 1000 clusters) but the vanilla script focuses on 100
+2. We calculate the "recency" and "significance" of each cluster in the table.
 
-2. We calculate the "emergence" and "significance" of each cluster in the table.
-
-- Emergence captures the % of all activity in a cluster happening in recent years i.e. the extent to which it skews towards the past or the present
+- Recency captures the % of all activity in a cluster happening in recent years i.e. the extent to which it skews towards the past or the present
 - Significance captures the % of activity in all clusters in a cluster i.e the extent to which the cluster is important within the population of clusters
 
 3. We visualise the above in a two by two matrix which identifies different "types" of clusters based on their emergence / significance values
 4. We combine these indicators for all data sources and compare their emergence and significance
+5. We have also produced a correlation matrix between measures of recency and significance inside / across all datasets.
 
 All charts are saved in `figures/outputs/png`
