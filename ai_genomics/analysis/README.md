@@ -32,16 +32,18 @@ Run `python ai_genomics/analysis/gtr/gtr_cluster_analysis.py` to reproduce the p
 
 You can run change the `reproduce` parameter to re-run the analysis from scratch. This includes creating vector representations of all sampled projects (which takes around 1hr locally).
 
-## OpenAlex -- analysis of influence
+## Analysis of influence
 
-Run `python ai_genomics/analysis/influence/openalex_influence_analysis.py` to perform a semantic analysis of discipline influence in our corpus of AI genomics research. This works as follows:
+Run `python ai_genomics/analysis/influence/make_influence_tables.py` to calculate influence scores for documents in key datasets. This works as follows:
 
-1. Train topic model on corpus including AI genomics, AI, and Genomics research
+1. Train topic model on corpus including AI genomics, AI, and Genomics research (AI, genomics are sampled to include the same number of articles)
 2. Calculate a discipline weight that captures the share of activity in a topic accounted by AI or Genomics e.g. if 80% of the top documents in a topic are in genomics, then it's weight is 0.8 (and the AI weight is 0.2)
 3. Calculate overall influence of a discipline (AI or Genomics) in a document by weighting each topic weight in a document by its discipline weight and aggregating them over disciplines
-4. The script validates findings by checking publication venues for documents in different positions of the "influenced by AI" distribution.
+4. Save results
 
-You can fetch a lookup between `work_id` and the discipline influence values using `ai_genomics.getters.openalex.get_openalex_disc_influence`
+Run `python ai_genomics/analysis/influence/make_influence_analysis.py` to reproduce the analysis presented in the report. This includes an analysis of influence scores and an analysis of influence via citations.
+
+All charts are saved in `outputs/figures/png`.
 
 ## All data sources -- Analysis of emergence
 
