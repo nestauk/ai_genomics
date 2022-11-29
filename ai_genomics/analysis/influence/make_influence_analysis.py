@@ -1,6 +1,7 @@
 # Analysis of influence
 import altair as alt
 import logging
+import os
 import numpy as np
 import pandas as pd
 from itertools import chain
@@ -9,6 +10,7 @@ from toolz import pipe
 from statsmodels.formula.api import poisson
 
 from ai_genomics import PROJECT_DIR
+from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.getters.clusters import (
     get_id_cluster_lookup,
 )
@@ -22,9 +24,14 @@ from ai_genomics.utils.save_plotting import AltairSaver
 SOURCES = ["openalex", "patstat", "gtr"]
 
 
-def get_influence(source: str):
+def get_influence(source: str, local: bool = False):
 
-    return pd.read_csv(f"{PROJECT_DIR}/outputs/data/{source}/influence_scores.csv")
+    if local:
+        return pd.read_csv(f"{PROJECT_DIR}/outputs/data/{source}/influence_scores.csv")
+    else:
+        return load_s3_data(
+            "ai-genomics", f"outputs/analysis/influence/{source}_influence_scores.csv"
+        )
 
 
 def get_influence_table():
@@ -71,10 +78,21 @@ def get_id_year_lookup():
 
 
 def get_openalex_institutes_temp():
+    """Temporary function to get institute metadata"""
 
-    return pd.read_csv(
-        f"{PROJECT_DIR}/outputs/data/openalex/openalex_institutes_v2.csv"
-    )
+    path = f"{PROJECT_DIR}/outputs/data/openalex/openalex_institutes_v2.csv"
+
+    if os.path.exists(path):
+        return pd.read_csv(path)
+
+    else:
+        logging.info("Getting institute metadata from OpenAlex - This may take a while")
+        instit = load_s3_data(
+            "ai-genomics", "outputs/data/openalex/openalex_institutes.csv"
+        )
+        instit.to_csv(path, index=False)
+
+        return instit
 
 
 def make_chart_influence_clusters(infl_df):
