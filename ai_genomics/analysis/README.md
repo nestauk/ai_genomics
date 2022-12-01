@@ -34,6 +34,8 @@ You can run change the `reproduce` parameter to re-run the analysis from scratch
 
 ## Analysis of influence
 
+### If you want to re-run the whole pipeline
+
 Run `python ai_genomics/analysis/influence/make_influence_tables.py` to calculate influence scores for documents in key datasets. This works as follows:
 
 1. Train topic model on corpus including AI genomics, AI, and Genomics research (AI, genomics are sampled to include the same number of articles)
@@ -41,9 +43,17 @@ Run `python ai_genomics/analysis/influence/make_influence_tables.py` to calculat
 3. Calculate overall influence of a discipline (AI or Genomics) in a document by weighting each topic weight in a document by its discipline weight and aggregating them over disciplines
 4. Save results
 
-Run `python ai_genomics/analysis/influence/make_influence_analysis.py` to reproduce the analysis presented in the report. This includes an analysis of influence scores and an analysis of influence via citations.
+This will save `influence_scores` locally for follow-on analysis.
+
+Run `python ai_genomics/analysis/influence/make_influence_analysis.py` with `get_influence(local=False)` to reproduce the analysis in the report with new influence scores. This includes an analysis of influence scores and an analysis of influence via citations.
+
+### If you want to reproduce the analysis in the report (the default)
+
+Run `python ai_genomics/analysis/influence/make_influence_analysis.py` with `get_influence(local=True)`. This will read the original set of influence scores from s3 and reproduce the analysis with that.
 
 All charts are saved in `outputs/figures/png`.
+
+### If you want to
 
 ## All data sources -- Analysis of emergence
 
