@@ -4,7 +4,7 @@ from functools import partial
 from toolz import pipe
 from collections import ChainMap
 import os
-import ai_genomics.utils.influence_analysis as infl
+import ai_genomics.analysis.influence.influence_analysis as infl
 from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.getters.patents import (
     get_ai_genomics_patents,

@@ -9,7 +9,7 @@ from collections import ChainMap
 from toolz import pipe
 from statsmodels.formula.api import poisson
 
-from ai_genomics import PROJECT_DIR
+from ai_genomics import PROJECT_DIR, bucket_name
 from ai_genomics.getters.data_getters import load_s3_data
 from ai_genomics.getters.clusters import (
     get_id_cluster_lookup,
@@ -23,8 +23,7 @@ from ai_genomics.utils.save_plotting import AltairSaver
 
 SOURCES = ["openalex", "patstat", "gtr"]
 
-
-def get_influence(source: str, local: bool = False):
+def get_influence(source: str, local: bool = True):
 
     if local:
         return pd.read_csv(f"{PROJECT_DIR}/outputs/data/{source}/influence_scores.csv")
@@ -88,11 +87,9 @@ def get_openalex_institutes_temp():
     else:
         logging.info("Getting institute metadata from OpenAlex - This may take a while")
         instit = load_s3_data(
-            "ai-genomics", "outputs/data/openalex/openalex_institutes.csv"
+            bucket_name, "outputs/openalex/openalex_institutes.csv"
         )
-        instit.to_csv(path, index=False)
-
-        return instit
+        return instit.to_csv(path, index=False)
 
 
 def make_chart_influence_clusters(infl_df):

@@ -4,6 +4,7 @@ from typing import Dict
 from botocore.exceptions import ClientError
 
 from ai_genomics import PROJECT_DIR
+from pathlib import Path
 from ai_genomics import bucket_name
 from ai_genomics.getters.data_getters import load_s3_data, get_s3_dir_files
 
@@ -70,11 +71,16 @@ def get_doc_cluster_names(
 def get_doc_cluster_interp() -> Dict[int, str]:
     """Returns interpretable doc cluster names"""
 
-    return read_csv(
-        f"{PROJECT_DIR}/inputs/data/cluster_names.csv", header=None
-    ).to_dict()[0]
+    cluster_names = "inputs/data/cluster_names.csv"
 
+    if (PROJECT_DIR / cluster_names).exists():
+        data = read_csv(
+            f"{PROJECT_DIR}/{cluster_names}"
+        )
+    data = load_s3_data(bucket_name, cluster_names)
 
+    return data.set_index('cluster')['name'].to_dict()
+    
 def get_id_cluster_lookup() -> Dict[int, str]:
     """Parses the cluster lookup so each ID is mapped to a cluster name" """
 
