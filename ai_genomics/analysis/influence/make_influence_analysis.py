@@ -11,9 +11,7 @@ from statsmodels.formula.api import poisson
 
 from ai_genomics import PROJECT_DIR, bucket_name
 from ai_genomics.getters.data_getters import load_s3_data
-from ai_genomics.getters.clusters import (
-    get_id_cluster_lookup,
-)
+from ai_genomics.getters.clusters import get_id_cluster_lookup
 from ai_genomics.getters.patents import get_ai_genomics_patents
 from ai_genomics.getters.gtr import get_ai_genomics_gtr_data
 from ai_genomics.analysis.influence.make_influence_tables import sample_getter
@@ -22,6 +20,7 @@ from ai_genomics.getters.openalex import instit_metadata
 from ai_genomics.utils.save_plotting import AltairSaver
 
 SOURCES = ["openalex", "patstat", "gtr"]
+
 
 def get_influence(source: str, local: bool = True):
 
@@ -86,9 +85,7 @@ def get_openalex_institutes_temp():
 
     else:
         logging.info("Getting institute metadata from OpenAlex - This may take a while")
-        instit = load_s3_data(
-            bucket_name, "outputs/openalex/openalex_institutes.csv"
-        )
+        instit = load_s3_data(bucket_name, "outputs/openalex/openalex_institutes.csv")
         return instit.to_csv(path, index=False)
 
 
@@ -121,8 +118,7 @@ def make_chart_influence_clusters(infl_df):
         alt.Chart(infl_df)
         .mark_tick(color="black", thickness=3)
         .encode(
-            y=alt.Y("cluster", sort=sort_clusters),
-            x=alt.X("median(disc_influence)"),
+            y=alt.Y("cluster", sort=sort_clusters), x=alt.X("median(disc_influence)"),
         )
     ).properties(width=200)
 
@@ -181,18 +177,14 @@ def make_chart_cluster_trends(infl_df, cut_off_year=2017):
         alt.Chart()
         .mark_line()
         .encode(
-            x=alt.X("year:O", title=None),
-            color="source",
-            y="median(disc_influence)",
+            x=alt.X("year:O", title=None), color="source", y="median(disc_influence)",
         )
     ).properties(width=150, height=100)
     cl_error = (
         alt.Chart()
         .mark_errorband(extent="ci")
         .encode(
-            x="year:O",
-            color="source",
-            y=alt.Y("disc_influence", title="AI influence"),
+            x="year:O", color="source", y=alt.Y("disc_influence", title="AI influence"),
         )
     )
 

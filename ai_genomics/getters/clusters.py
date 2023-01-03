@@ -4,15 +4,12 @@ from typing import Dict
 from botocore.exceptions import ClientError
 
 from ai_genomics import PROJECT_DIR
-from pathlib import Path
 from ai_genomics import bucket_name
 from ai_genomics.getters.data_getters import load_s3_data, get_s3_dir_files
 
 
 def get_doc_cluster_lookup(
-    ai_only: bool = False,
-    min_year: int = 2012,
-    max_year: int = 2021,
+    ai_only: bool = False, min_year: int = 2012, max_year: int = 2021,
 ) -> Dict[str, Dict[int, str]]:
     """Get patent and OpenAlex document clusters.
 
@@ -46,9 +43,7 @@ def get_doc_cluster_lookup(
 
 
 def get_doc_cluster_names(
-    ai_only: bool = False,
-    min_year: int = 2012,
-    max_year: int = 2021,
+    ai_only: bool = False, min_year: int = 2012, max_year: int = 2021,
 ) -> Dict[int, str]:
     """Get document cluster names generated through tf-idf of entity counts.
 
@@ -74,13 +69,12 @@ def get_doc_cluster_interp() -> Dict[int, str]:
     cluster_names = "inputs/data/cluster_names.csv"
 
     if (PROJECT_DIR / cluster_names).exists():
-        data = read_csv(
-            f"{PROJECT_DIR}/{cluster_names}"
-        )
+        data = read_csv(f"{PROJECT_DIR}/{cluster_names}")
     data = load_s3_data(bucket_name, cluster_names)
 
-    return data.set_index('cluster')['name'].to_dict()
-    
+    return data.set_index("cluster")["name"].to_dict()
+
+
 def get_id_cluster_lookup() -> Dict[int, str]:
     """Parses the cluster lookup so each ID is mapped to a cluster name" """
 
