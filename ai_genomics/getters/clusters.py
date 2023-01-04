@@ -62,3 +62,8 @@ def get_doc_cluster_names(
         f"outputs/data/cluster/doc_{subset}_{min_year}_{max_year}_clusters_names.json"
     )
     return load_s3_data(bucket_name, fname)
+
+
+def get_doc_cluster_manual_names():
+    fname = "outputs/data/cluster/doc_cluster_manual_names.csv"
+    return load_s3_data(bucket_name, fname)
