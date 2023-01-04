@@ -10,8 +10,9 @@ def parse_project_dates(projects: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Gtr projects table with date objects in `start` column.
     """
-    projects["start"] = pd.to_datetime(
-        [t[0] for t in projects["start"].str.split("T")],
-        errors="coerce",
-    )
+    if projects["start"].dtype == "O":
+        projects["start"] = pd.to_datetime(
+            [t[0] for t in projects["start"].str.split("T")],
+            errors="coerce",
+        )
     return projects
