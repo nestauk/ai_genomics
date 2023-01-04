@@ -86,3 +86,8 @@ def get_id_cluster_lookup() -> Dict[int, str]:
         for cl, id_list in cl_assgn.items()
         for _id in id_list
     }
+
+
+def get_doc_cluster_manual_names():
+    fname = "outputs/data/cluster/doc_cluster_manual_names.csv"
+    return load_s3_data(bucket_name, fname)
