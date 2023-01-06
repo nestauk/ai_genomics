@@ -26,7 +26,7 @@ We identify main topics in the landscape via three **approaches**:
 2. Clustering semantic embeddings of [DBpedia entities](https://www.dbpedia.org/about/) associated to the dataset texts.
 3. Manually clustering Crunchbase data.
 
-## :rotating_light: Dimensions of Innovation (`ai_genomics/analysis/`)
+## :tv: Dimensions of Innovation (`ai_genomics/analysis/`)
 
 We primarily map out the landcape using the identified topics via the following dimensions:
 
