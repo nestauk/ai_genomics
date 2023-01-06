@@ -11,10 +11,10 @@ This repo contains the source code behind the AI in genomics innovation mapping 
 
 To uncover trends in the space, we are presently using the following data:
 
-- **[Gateway to Research (GtR)](https://gtr.ukri.org/)**: Research projects funded by UKRI
-- **[Crunchbase](https://crunchbase.com/)**: Global company directory
-- **[OpenAlex](https://crunchbase.com/)**: Global research paper catalogue
-- **[Google Patents](https://crunchbase.com/)**: Inventions around the world
+- **[Gateway to Research (GtR)](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/pipeline/gtr)**: Research projects funded by UKRI
+- **[Crunchbase](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/pipeline/crunchbase_data)**: Global company directory
+- **[OpenAlex](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/pipeline/openalex)**: Global research paper catalogue
+- **[Google Patents](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/pipeline/patent_data)**: Inventions around the world
 
 All these datasets except Crunchbase are freely available. Note, however, that this project accesses the datasets via our internal Nesta database and as such are intended for internal use.
 
@@ -22,8 +22,8 @@ All these datasets except Crunchbase are freely available. Note, however, that t
 
 We identify main topics in the landscape via three **approaches**:
 
-1. Clustering semantic embeddings of texts across the datasets;
-2. Clustering semantic embeddings of [DBpedia entities](https://www.dbpedia.org/about/) associated to the dataset texts.
+1. [Clustering semantic embeddings of texts across the datasets](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/pipeline/doc_cluster);
+2. [Clustering semantic embeddings of DBpedia entities](https://github.com/nestauk/ai_genomics/blob/project_readme/ai_genomics/pipeline/entity_cluster/create_entity_clusters.py) associated to the dataset texts.
 3. Manually clustering Crunchbase data.
 
 ## :tv: Dimensions of Innovation (`ai_genomics/analysis/`)
@@ -31,8 +31,8 @@ We identify main topics in the landscape via three **approaches**:
 We primarily map out the landcape using the identified topics via the following dimensions:
 
 1. **Evolution**: This method describes the change in DBpedia macro-entities over time across all datasets;
-2. **Influence**: This method calculates AI vs. Genomics influence in papers across key datasets;
-3. **Emergence**: This method uses [Innovation Sweet Spot's](https://github.com/nestauk/innovation_sweet_spots) typology of innovation to identify emergant, hot and stabilising topics across and between datasets
+2. [**Influence**](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/analysis/influence): This method calculates AI vs. Genomics influence in papers across key datasets;
+3. [**Emergence**](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/analysis/integrated_emergence): This method uses [Innovation Sweet Spot's](https://github.com/nestauk/innovation_sweet_spots) typology of innovation to identify emergant, hot and stabilising topics across and between datasets
 4. **Distribution**: This method explores the 'Revealed Comparative Advantage' (RCA) of institutions and regions in the AI and genomics topics defined by our clusters.
 
 We also explore high level trends in patents and publications.
