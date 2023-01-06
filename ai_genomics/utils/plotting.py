@@ -12,23 +12,26 @@ ChartType = alt.vegalite.v4.api.Chart
 FONT = "Averta"  # should be changed depending on what your font is called in your system's font book
 TITLE_FONT = "Averta"  # should be changed depending on what your font is called in your system's font book
 
-NESTA_COLOURS = [
-    "#0000FF",
-    "#FDB633",
-    "#18A48C",
-    "#9A1BBE",
-    "#EB003B",
-    "#FF6E47",
-    "#646363",
-    "#0F294A",
-    "#97D9E3",
-    "#A59BEE",
-    "#F6A4B7",
-    "#D2C9C0",
-    "#FFFFFF",
-    "#000000",
-]
-
+NESTA_COLOURS = ['#0000FF',
+ '#FDB633',
+ '#18A48C',
+ '#9A1BBE',
+ '#EB003B',
+ '#FF6E47',
+ '#646363',
+ '#0F294A',
+ '#97D9E3',
+ '#A59BEE',
+ '#F6A4B7',
+ '#D2C9C0',
+ '#000000',
+ '#EB4034',
+ '#8334EB',
+ '#34EB99',
+ '#D9831A',
+ '#C9D91A',
+ '#63A891',
+ '#274075']
 
 def nestafont():
     """Define Nesta fonts"""

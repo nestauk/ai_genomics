@@ -70,7 +70,7 @@ def get_doc_cluster_names(
 def get_doc_cluster_interp() -> Dict[int, str]:
     """Returns interpretable doc cluster names"""
 
-    cluster_names = "outputs/data/cluster.csv"
+    cluster_names = "outputs/data/cluster/doc_cluster_manual_names.csv"
 
     if (PROJECT_DIR / cluster_names).exists():
         data = read_csv(f"{PROJECT_DIR}/{cluster_names}")
