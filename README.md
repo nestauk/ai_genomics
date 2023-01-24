@@ -18,6 +18,12 @@ To uncover trends in the space, we are presently using the following data:
 
 All these datasets except Crunchbase are freely available. Note, however, that this project accesses the datasets via our internal Nesta database and as such are intended for internal use.
 
+## :floppy_disk: Data Enrichment (`ai_genomics/pipeline/entity_extraction`)
+
+We enrich the above datasets by extracting [DBpedia entities](https://github.com/nestauk/service_dbpedia_annotation_python_sdk) across them.
+
+We post-process the DBpedia entities in this repo.
+
 ## :rotating_light: AI in genomics topics (`ai_genomics/pipeline/`)
 
 We identify main topics in the landscape via three **approaches**:
