@@ -34,11 +34,11 @@ We identify main topics in the landscape via three **approaches**:
 
 ## :tv: Dimensions of Innovation (`ai_genomics/analysis/`)
 
-We primarily map out the landcape using the identified topics via the following dimensions:
+We primarily map out the landscape using the identified topics via the following dimensions:
 
 1. **Evolution**: This method describes the change in DBpedia macro-entities over time across all datasets;
 2. [**Influence**](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/analysis/influence): This method calculates AI vs. Genomics influence in papers across key datasets;
-3. [**Emergence**](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/analysis/integrated_emergence): This method uses [Innovation Sweet Spot's](https://github.com/nestauk/innovation_sweet_spots) typology of innovation to identify emergant, hot and stabilising topics across and between datasets
+3. [**Emergence**](https://github.com/nestauk/ai_genomics/tree/project_readme/ai_genomics/analysis/integrated_emergence): This method uses [Innovation Sweet Spot's](https://github.com/nestauk/innovation_sweet_spots) typology of innovation to identify emergent, hot and stabilising topics across and between datasets
 4. **Distribution**: This method explores the 'Revealed Comparative Advantage' (RCA) of institutions and regions in the AI and genomics topics defined by our clusters.
 
 We also explore high level trends in patents and publications.
