@@ -6,14 +6,14 @@ import os
 from functools import partial
 
 from toolz import pipe
+from metaflow import FlowSpec, step, batch
 
 from ai_genomics.utils import openalex
 from ai_genomics import PROJECT_DIR
 from ai_genomics.getters.openalex import get_openalex_instits
 
 
-OA_NAME_ID_LOOKUP = {"artificial_intelligence": "C154945302", "genetics": "C54355233"}
-OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex"
+OALEX_PATH = f"{PROJECT_DIR}/inputs/data/openalex/"
 
 
 def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
@@ -75,15 +75,35 @@ def fetch_save_year(concept_name: str, year: int, make_df: bool = True):
         json.dump(openalex.make_deinverted_abstracts(oalex_works), outfile)
 
 
+class MakeYearSummaryFlow(FlowSpec):
+    @step
+    def start(self):
+        self.next(self.make_directories)
+
+    @step
+    def make_directories(self):
+        os.makedirs(OALEX_PATH, exist_ok=True)
+        pipe(
+            get_openalex_instits(),
+            partial(openalex.make_inst_metadata, meta_vars=openalex.INST_META_VARS),
+        ).to_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv", index=False)
+        self.years = list(range(2015, 2017))
+        self.next(self.fetch_save_year, foreach="years")
+
+    @step
+    def fetch_save_year(self):
+        for concept_name in ["genetics", "artificial_intelligence"]:
+            fetch_save_year(concept_name, self.input, make_df=True)
+        self.next(self.join)
+
+    @step
+    def join(self, inputs):
+        self.next(self.end)
+
+    @step
+    def end(self):
+        pass
+
+
 if __name__ == "__main__":
-
-    os.makedirs(OALEX_PATH, exist_ok=True)
-
-    pipe(
-        get_openalex_instits(),
-        partial(openalex.make_inst_metadata, meta_vars=openalex.INST_META_VARS),
-    ).to_csv(f"{OALEX_PATH}/oalex_institutions_meta.csv", index=False)
-
-    for year in range(2007, 2022):
-        for concept_name in ["artificial_intelligence", "genetics"]:
-            fetch_save_year(concept_name, year, make_df=True)
+    MakeYearSummaryFlow()

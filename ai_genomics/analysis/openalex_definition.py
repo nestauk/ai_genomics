@@ -57,7 +57,7 @@ def flag_ambiguous(abstract: str) -> bool:
 
     """
 
-    _abstract = abstract.lower()
+    _abstract = str(abstract).lower()
 
     ml_terms = set(config["ai_terms"])
 
@@ -330,11 +330,11 @@ if __name__ == "__main__":
 
     logging.info("Getting Openalex data")
 
-    works_meta = work_metadata("artificial_intelligence", [2012, 2017, 2021])
+    works_meta = work_metadata("artificial_intelligence", list(range(2007, 2023)))
     concepts = work_concepts(
-        "artificial_intelligence", "concepts", year_list=[2012, 2017, 2021]
+        "artificial_intelligence", "concepts", year_list=list(range(2007, 2023))
     )
-    abstracts = work_abstracts("artificial_intelligence", years=[2012, 2017, 2021])
+    abstracts = work_abstracts("artificial_intelligence", years=list(range(2007, 2023)))
 
     works_meta_filtered = filter_works(works_meta, abstracts)
 
@@ -408,12 +408,12 @@ if __name__ == "__main__":
     )
 
     logging.info("Apply criteria to AI dataset")
-    all_works = work_metadata("artificial_intelligence", range(2012, 2022))
+    all_works = work_metadata("artificial_intelligence", range(2007, 2023))
     all_concepts = work_concepts(
-        "artificial_intelligence", "concepts", range(2012, 2022)
+        "artificial_intelligence", "concepts", range(2007, 2023)
     )
-    all_ai_mesh = work_concepts("artificial_intelligence", "mesh", range(2012, 2022))
-    all_abstracts = work_abstracts("artificial_intelligence", range(2012, 2022))
+    all_ai_mesh = work_concepts("artificial_intelligence", "mesh", range(2007, 2023))
+    all_abstracts = work_abstracts("artificial_intelligence", range(2007, 2023))
 
     full_size = (
         all_works.query("predicted_language=='en'").query("has_abstract==True").shape[0]
@@ -463,7 +463,7 @@ if __name__ == "__main__":
 
     # Read genomics papers and concepts
     logging.info("Reading genetics works")
-    y = range(2012, 2022)
+    y = range(2007, 2023)
     works_meta_genetics = work_metadata("genetics", y)
     works_concepts_genetics = work_concepts("genetics", "concepts", y)
     works_mesh_genetics = work_concepts("genetics", "mesh", y)

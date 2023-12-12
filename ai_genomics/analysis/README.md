@@ -12,7 +12,7 @@ Output csvs will be saved in the `outputs/data/experts` folder.
 
 ### OpenAlex data -- influential researchers
 
-Run `python ai_genomics/analysis/researchers/influential_researchers.py` to generate two csvs of active / influential researchers based on the OpenAlex data.
+Run `python ai_genomics/analysis/ai_genomics_researchers/influential_researchers.py` to generate two csvs of active / influential researchers based on the OpenAlex data.
 
 ### Patents data -- top assignees
 

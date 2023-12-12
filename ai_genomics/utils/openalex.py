@@ -20,7 +20,25 @@ INST_META_VARS, WORK_META_VARS, VENUE_META_VARS = [
 
 MESH_VARS = ["descriptor_ui", "descriptor_name", "qualifier_name"]
 
-OA_NAME_ID_LOOKUP = {"artificial_intelligence": "C154945302", "genetics": "C54355233"}
+
+def read_large(obj) -> str:
+    """Reads a large file from s3
+
+    Args:
+        obj: an s3 object
+
+    Returns:
+        A string with the contents of the file"""
+    buf = bytearray(obj["ContentLength"])
+    view = memoryview(buf)
+    pos = 0
+    while True:
+        chunk = obj["Body"].read(67108864)
+        if len(chunk) == 0:
+            break
+        view[pos : pos + len(chunk)] = chunk
+        pos += len(chunk)
+    return view.tobytes().decode()
 
 
 def fetch_openalex(
@@ -41,9 +59,9 @@ def fetch_openalex(
     logging.info(f"Fetching {concept_name} for year {year}")
 
     return pipe(
-        f"inputs/openalex/{concept_name}/openalex-works_production-True_concept-{OA_NAME_ID_LOOKUP[concept_name]}_year-{year}.json",
+        f"inputs/openalex/{concept_name}/openalex-works_production-True_year-{year}.json",
         ai_genomics_bucket.Object,
-        lambda _object: _object.get()["Body"].read().decode(),
+        lambda _object: read_large(_object.get()),
         json.loads,
     )
 
